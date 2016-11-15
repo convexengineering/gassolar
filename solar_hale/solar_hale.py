@@ -1,156 +1,84 @@
-from gpkit import Variable, Model, units
+from gpkit import Variable, Model, units, VectorVariable
 from gpkit.constraints.set import ConstraintSet
 from gpkit import LinkedConstraintSet
+from gpkit.constraints.tight import TightConstraintSet as TCS
 import numpy as np
 import matplotlib.pyplot as plt
-
-CD = Variable('C_D', '-', 'Drag coefficient')
-CL = Variable('C_L', '-', 'Lift coefficient')
-P_shaft = Variable('P_{shaft}', 'W', 'Shaft power')
-S = Variable('S', 'm^2', 'Wing reference area')
-S_solar = Variable('S_{solar}', 'm^2', 'solar cell area')
-V = Variable('V', 'm/s', 'Cruise velocity')
-W = Variable('W', 'lbf', 'Aircraft weight')
-rho = Variable(r'\rho', 0.1895, 'kg/m^3', 'Density of air')
-E_batt = Variable('E_{batt}', 'J', 'Battery energy')
-h = Variable("h", "ft", "Altitude")
-g = Variable('g', 9.81, 'm/s^2', 'Gravitational acceleration')
-
-# Steady Level Flight
-
-class SteadyLevelFlight(Model):
-    def __init__(self, **kwargs):
-        eta_prop = Variable(r'\eta_{prop}', 0.80, '-', 'Propulsive efficiency')
-
-        constraints = [P_shaft >= V*W*CD/CL/eta_prop,   # eta*P = D*V
-                       W == 0.5*rho*V**2*CL*S]
-        Model.__init__(self, None, constraints, **kwargs)
-
-# Aerodynamics
-
-class Aero(Model):
-    def __init__(self, **kwargs):
-
-        Cd0 = Variable('C_{d0}', 0.002, '-', "non-wing drag coefficient")
-        cdp = Variable("c_{dp}", "-", "wing profile drag coeff")
-        CLmax = Variable('C_{L-max}', 1.5, '-', 'maximum lift coefficient')
-        e = Variable('e', 0.9, '-', "spanwise efficiency")
-        AR = Variable('AR', 27, '-', "aspect ratio")
-        b = Variable('b', 'ft', 'span')
-        mu = Variable(r'\mu', 1.5e-5, 'N*s/m^2', "dynamic viscosity")
-        Re = Variable("Re", '-', "Reynolds number")
-        Re_ref = Variable("Re_{ref}", 3e5, "-", "Reference Re for cdp")
-        Cf = Variable("C_f", "-", "wing skin friction coefficient")
-        Kwing = Variable("K_{wing}", 1.3, "-", "wing form factor")
-
-        constraints = [
-            CD >= Cd0 + cdp + CL**2/(np.pi*e*AR),
-            cdp >= ((0.006 + 0.005*CL**2 + 0.00012*CL**10)*(Re/Re_ref)**-0.3),
-            b**2 == S*AR,
-            CL <= CLmax,
-            Re == rho*V/mu*(S/AR)**0.5,
-            ]
-        Model.__init__(self, None, constraints, **kwargs)
-
-# Weights
-
-class Weight(Model):
-    def __init__(self, **kwargs):
-
-        W_batt = Variable('W_{batt}', 'lbf', 'Battery weight')
-        W_airframe = Variable('W_{airframe}', 'lbf', 'Airframe weight')
-        W_solar = Variable('W_{solar}', 'lbf', 'Solar panel weight')
-        W_pay = Variable('W_{pay}', 10, 'lbf', 'Payload weight')
-        W_avionics = Variable('W_{avionics}', 8, 'lbf', 'avionics weight')
-        rho_solar = Variable(r'\rho_{solar}', 0.3, 'kg/m^2',
-                             'Solar cell area density')
-        f_airframe = Variable('f_{airframe}', 0.30, '-',
-                              'Airframe weight fraction') # incl propulsion
-        h_batt = Variable('h_{batt}', 350, 'W*hr/kg', 'Battery energy density')
-
-        constraints = [W_airframe >= W*f_airframe,
-                       W_batt >= E_batt/h_batt*g,
-                       W_solar >= rho_solar*g*S_solar,
-                       W >= W_pay + W_solar + W_airframe + W_batt + W_avionics]
-        Model.__init__(self, None, constraints, **kwargs)
-
-# Power
+from solar_irradiance import get_Eirr
+from gasmale import SteadyLevelFlight, Aerodynamics, Atmosphere, Fuel
+from gasmale import BreguetEndurance, GasMALE
+from wind_speeds import get_windspeed
 
 class Power(Model):
-    def __init__(self, **kwargs):
+    def __init__(self, N, latitude, day, **kwargs):
 
-        ES_irr = Variable('(E/S)_{irr}', 2.9, 'kW*hr/m^2',
-                          'Average daytime solar energy')
-        P_oper = Variable('P_{oper}', 'W', 'Aircraft operating power')
-        P_acc = Variable('P_{acc}', 25, 'W', 'Accessory power draw')
-        eta_solar = Variable(r'\eta_{solar}', 0.2, '-',
-                             'Solar cell efficiency')
-        eta_charge = Variable(r'\eta_{charge}', 0.95, '-',
-                              'Battery charging efficiency')
-        eta_discharge = Variable(r'\eta_{discharge}', 0.95, '-',
-                                 'Battery discharging efficiency')
-        t_day = Variable('t_{day}', 8, 'hr', 'Daylight span')
-        t_night = Variable('t_{night}', 16, 'hr', 'Night span')
+        # day must be in julian day Jan 1st = 1
+        # latitude is in degrees
+        esirr, td, tn = get_Eirr(latitude, day)
 
-        constraints = [ES_irr*eta_solar*S_solar >= P_oper*t_day + E_batt/eta_charge,
-                       S_solar <= S,
-                       P_oper >= P_shaft + P_acc,
-                       E_batt >= P_oper*t_night/eta_discharge]
-        Model.__init__(self, None, constraints, **kwargs)
-
-# Atmosphere
-
-class Atmosphere(Model):
-    def __init__(self, **kwargs):
-
-        p_sl = Variable("p_{sl}", 101325, "Pa", "Pressure at sea level")
-        T_sl = Variable("T_{sl}", 288.15, "K", "Temperature at sea level")
-        L_atm = Variable("L_{atm}", 0.0065, "K/m", "Temperature lapse rate")
-        T_atm = Variable("T_{atm}", "K", "air temperature")
-        M_atm = Variable("M_{atm}", 0.0289644, "kg/mol",
-                         "Molar mass of dry air")
-        R_atm = Variable("R_{atm}", 8.31447, "J/mol/K",
-                         "air specific heating value")
-        TH = (g*M_atm/R_atm/L_atm).value
+        ESirr = Variable("(E/S)_{irr}", esirr, "W*hr/m^2",
+                         "Average daytime solar energy")
+        Poper = VectorVariable(N, "P_{oper}", "W", "Aircraft operating power")
+        Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
+        eta_solar = Variable("\\eta_{solar}", 0.2, "-",
+                             "Solar cell efficiency")
+        eta_charge = Variable("\\eta_{charge}", 0.98, "-",
+                              "Battery charging efficiency")
+        eta_discharge = Variable("\\eta_{discharge}", 0.98, "-",
+                                 "Battery discharging efficiency")
+        tday = Variable("t_{day}", td, "hr", "Daylight span")
+        tnight = Variable("t_{night}", tn, "hr", "Night span")
+        Ssolar = Variable("S_{solar}", "ft**2", "solar cell area")
+        Ebatt = Variable("E_{batt}", "J", "total battery energy")
+        P_shaft = VectorVariable(N, "P_{shaft}", "hp", "Shaft power")
+        S = Variable("S", "ft**2", "wing area")
 
         constraints = [
-            #h <= 20000*units.m,  # Model valid to top of troposphere
-            T_sl >= T_atm + L_atm*h,     # Temp decreases w/ altitude
-            # http://en.wikipedia.org/wiki/Density_of_air#Altitude
-            rho <= p_sl*T_atm**(TH-1)*M_atm/R_atm/(T_sl**TH)]
+            ESirr*eta_solar*Ssolar >= Poper*tday + Ebatt/eta_charge,
+            Ssolar <= S,
+            Poper >= P_shaft + Pacc,
+            Ebatt >= Poper*tnight/eta_discharge]
         Model.__init__(self, None, constraints, **kwargs)
 
-class StationKeeping(Model):
-    def __init__(self, **kwargs):
+class SolarSimple(Model):
+    def __init__(self, latitude=45, avail=90, day=355, altitude=16000, N=1, **kwargs):
+        # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
-        h_min = Variable('h_{min}', 15000, 'ft', 'minimum altitude')
-        V_wind = Variable('V_{wind}', 10, 'm/s', 'wind speed')
+        slf = SteadyLevelFlight(N, [0.8]*N)
+        aero = Aerodynamics(N, jh01=False)
+        atm = Atmosphere(N, [altitude]*N)
+        power = Power(N, latitude, day)
+        aero.substitutions.update({"AR": 25})
+        wind = get_windspeed(latitude, avail, altitude)
 
-        constraints = [h >= h_min,
-                       V >= V_wind]
-        Model.__init__(self, None, constraints, **kwargs)
+        fstructures = Variable("f_{structures}", 0.35, "-",
+                               "fractional structural weight")
+        Wstructures = Variable("W_{structures}", "lbf", "structural weight")
+        mtow = Variable("MTOW", "lbf", "max take off weight")
+        Vmin = Variable("V_{min}", wind, "m/s", "minimum velocity")
+        Wpay = Variable("W_{pay}", 1, "lbf", "payload")
+        Wsolar = Variable("W_{solar}", "lbf", "solar cell weight")
+        rhosolar = Variable("\\rho_{solar}", 0.3, "kg/m^2",
+                            "solar cell area density")
+        g = Variable("g", 9.81, "m/s**2", "gravitational constant")
+        hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery energy density")
+        Wbatt = Variable("W_{batt}", "lbf", "battery weight")
 
-class SolarHALE(Model):
-    """High altitude long endurance solar UAV"""
-    def __init__(self, **kwargs):
-        """Setup method should return objective, list of constraints"""
+        constraints = [mtow >= Wstructures + Wpay + Wsolar + Wbatt,
+                       Wstructures >= mtow*fstructures,
+                       Wsolar >= rhosolar*power["S_{solar}"]*g,
+                       Wbatt >= power["E_{batt}"]/hbatt*g,
+                       slf["V"] >= Vmin,
+                       slf["W_{N+1}"] == mtow,
+                       slf["W_{N}"] == mtow,
+                      ]
 
-        slf = SteadyLevelFlight()
-        power = Power()
-        weight = Weight()
-        sk = StationKeeping()
-        aero = Aero()
-        # atmosphere = Atmosphere()
-        # self.submodels = [slf, power, weight, sk, aero, atmosphere]
-        self.submodels = [slf, power, weight, sk, aero]
+        cost = mtow
 
-        constraints = []
-        lc = LinkedConstraintSet([self.submodels, constraints])
+        lc = LinkedConstraintSet([constraints, slf, aero, atm, power])
 
-        objective = W
-
-        Model.__init__(self, objective, lc, **kwargs)
+        Model.__init__(self, cost, lc, **kwargs)
 
 if __name__ == "__main__":
-    M = SolarHALE()
+    M = SolarSimple(latitude=35, avail=80, altitude=70000)
     sol = M.solve("mosek")
