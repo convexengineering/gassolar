@@ -135,11 +135,11 @@ class SteadyLevelFlight(Model):
 
 class Mission(Model):
     "create a mission for the flight"
-    def __init__(self):
+    def __init__(self, etap=0.7, latitude=45, percent=90, altitude=16000, day=355):
 
         gassimple = Aircraft()
 
-        loiter = Loiter(gassimple)
+        loiter = Loiter(gassimple, etap=etap, latitude=latitude, altitude=altitude, day=day)
         mission = [loiter]
 
         mtow = Variable("MTOW", 200, "lbf", "max take off weight")

@@ -1,10 +1,8 @@
 " Simple Solar-Electric Powered Aircraft Model "
-from gpkit import Model, Variable, vectorize
+from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero
 from gpkitmodels.environment.wind_speeds import get_windspeed
 from gpkitmodels.environment.air_properties import get_airvars
-import numpy as np
-import matplotlib.pyplot as plt
 from solar_irradiance import get_Eirr
 
 class Aircraft(Model):
@@ -157,11 +155,13 @@ class Power(Model):
         Model.__init__(self, None, constraints, **kwargs)
 
 class Mission(Model):
-    def __init__(self):
+    "define mission for aircraft"
+    def __init__(self, etap=0.7, latitude=35, percent=80, altitude=60000,
+                 day=355):
         # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
         solarsimple = Aircraft()
-        fs = FlightSegment(solarsimple)
+        fs = FlightSegment(solarsimple, etap, latitude, percent, altitude, day)
 
         cost = solarsimple["W"]
 
