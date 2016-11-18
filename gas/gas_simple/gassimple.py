@@ -4,6 +4,7 @@ from gpkitmodels.aircraft.GP_submodels.wing import WingAero
 from gpkitmodels.aircraft.GP_submodels.breguet_endurance import BreguetEndurance
 from gpkitmodels.environment.wind_speeds import get_windspeed
 from gpkitmodels.environment.air_properties import get_airvars
+from gas.flight_state import FlightState
 
 class Aircraft(Model):
     "vehicle"
@@ -51,33 +52,6 @@ class AircraftPerf(Model):
                        bsfc == bsfc]
 
         Model.__init__(self, None, [self.wing, constraints])
-
-class FlightState(Model):
-    """
-    environmental state of aircraft
-
-    inputs
-    ------
-    latitude: earth latitude [deg]
-    altitude: flight altitude [ft]
-    percent: percentile wind speeds [%]
-    day: day of the year [Jan 1st = 1]
-    """
-    def __init__(self, latitude=45, percent=90, altitude=15000, day=355):
-
-        wind = get_windspeed(latitude, percent, altitude, day)
-        density, vis = get_airvars(altitude)
-
-        Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
-        V = Variable("V", "m/s", "true airspeed")
-        rho = Variable("\\rho", density, "kg/m**3", "air density")
-        mu = Variable("\\mu", vis, "N*s/m**2", "dynamic viscosity")
-
-        constraints = [V >= Vwind,
-                       rho == rho,
-                       mu == mu]
-
-        Model.__init__(self, None, constraints)
 
 class FlightSegment(Model):
     "flight segment"

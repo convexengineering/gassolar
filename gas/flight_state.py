@@ -1,0 +1,30 @@
+" flight state of gas powered aircraft "
+from gpkit import Model, Variable
+from gpkitmodels.environment.wind_speeds import get_windspeed
+from gpkitmodels.environment.air_properties import get_airvars
+class FlightState(Model):
+    """
+    environmental state of aircraft
+
+    inputs
+    ------
+    latitude: earth latitude [deg]
+    altitude: flight altitude [ft]
+    percent: percentile wind speeds [%]
+    day: day of the year [Jan 1st = 1]
+    """
+    def __init__(self, latitude=45, percent=90, altitude=15000, day=355):
+
+        wind = get_windspeed(latitude, percent, altitude, day)
+        density, vis = get_airvars(altitude)
+
+        Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
+        V = Variable("V", "m/s", "true airspeed")
+        rho = Variable("\\rho", density, "kg/m**3", "air density")
+        mu = Variable("\\mu", vis, "N*s/m**2", "dynamic viscosity")
+
+        constraints = [V >= Vwind,
+                       rho == rho,
+                       mu == mu]
+
+        Model.__init__(self, None, constraints)
