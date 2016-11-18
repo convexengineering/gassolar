@@ -22,9 +22,13 @@ class FlightState(Model):
         V = Variable("V", "m/s", "true airspeed")
         rho = Variable("\\rho", density, "kg/m**3", "air density")
         mu = Variable("\\mu", vis, "N*s/m**2", "dynamic viscosity")
+        h = Variable("h", altitude, "ft", "flight altitude")
+        href = Variable("h_{ref}", 15000, "ft", "reference altitude")
 
         constraints = [V >= Vwind,
                        rho == rho,
-                       mu == mu]
+                       mu == mu,
+                       h == h,
+                       href == href]
 
         Model.__init__(self, None, constraints)
