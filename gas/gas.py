@@ -6,7 +6,7 @@ from gpkitmodels.aircraft.GP_submodels.fuselage import Fuselage
 from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
 from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
 from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
-from helpers import summing_vars
+from gpkitmodels.helpers import summing_vars
 from gpkit import Model, Variable, vectorize, units
 from flight_segment import FlightSegment
 from loiter import Loiter

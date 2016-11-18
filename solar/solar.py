@@ -1,9 +1,9 @@
 " Simple Solar-Electric Powered Aircraft Model "
+from solar.solar_irradiance import get_Eirr
 from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero
 from gpkitmodels.environment.wind_speeds import get_windspeed
 from gpkitmodels.environment.air_properties import get_airvars
-from solar_irradiance import get_Eirr
 
 class Aircraft(Model):
     "vehicle"
@@ -21,7 +21,7 @@ class Aircraft(Model):
         S = Variable("S", "ft**2", "planform area")
         b = Variable("b", "ft", "wing span")
         cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
-        A = Variable("A", 27, "-", "aspect ratio")
+        AR = Variable("AR", 27, "-", "aspect ratio")
         W = Variable("W", "lbf", "aircraft weight")
         Ssolar = Variable("S_{solar}", "ft**2", "solar cell area")
         eta_solar = Variable("\\eta_{solar}", 0.2, "-",
@@ -41,7 +41,7 @@ class Aircraft(Model):
                        Wsolar >= rhosolar*Ssolar*g,
                        Wbatt >= Ebatt/hbatt*g,
                        Ssolar <= S,
-                       b**2 == S*A,
+                       b**2 == S*AR,
                        cmac == S/b,
                        eta_solar == eta_solar,
                        eta_charge == eta_charge,
