@@ -1,15 +1,15 @@
 """Jungle Hawk Owl"""
 import numpy as np
-from gpkitmodels.aircraft.GP_submodels.breguet_endurance import BreguetEndurance
 from gpkitmodels.aircraft.GP_submodels.gas_engine import Engine
 from gpkitmodels.aircraft.GP_submodels.wing import Wing
 from gpkitmodels.aircraft.GP_submodels.fuselage import Fuselage
 from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
 from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
 from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
-from flight_state import FlightState
 from helpers import summing_vars
 from gpkit import Model, Variable, vectorize, units
+from flight_segment import FlightSegment
+from loiter import Loiter
 
 # pylint: disable=invalid-name
 
@@ -18,7 +18,7 @@ class Aircraft(Model):
     def __init__(self, Wfueltot, DF70=False, **kwargs):
         self.flight_model = AircraftPerf
         self.fuselage = Fuselage(Wfueltot)
-        self.wing = Wing()
+        self.wing = Wing(spar="TubeSpar")
         self.engine = Engine(DF70)
         self.empennage = Empennage()
 
@@ -103,46 +103,11 @@ class AircraftPerf(Model):
 
         Model.__init__(self, None, [self.dynamicmodels, constraints], **kwargs)
 
-class FlightSegment(Model):
-    "creates flight segment for aircraft"
-    def __init__(self, N, aircraft, alt=15000, etap=0.7):
-
-        self.aircraft = aircraft
-
-        with vectorize(N):
-            self.fs = FlightState(altitude=alt)
-            self.aircraftPerf = self.aircraft.flight_model(self.aircraft,
-                                                           self.fs)
-            self.slf = SteadyLevelFlight(self.fs, self.aircraft,
-                                         self.aircraftPerf, etap)
-            self.be = BreguetEndurance(self.aircraftPerf)
-
-        self.submodels = [self.fs, self.aircraftPerf, self.slf, self.be]
-        Wfuelfs = Variable("W_{fuel-fs}", "lbf", "flight segment fuel weight")
-
-        self.constraints = [Wfuelfs >= self.be["W_{fuel}"].sum()]
-
-        if N > 1:
-            self.constraints.extend([self.aircraftPerf["W_{end}"][:-1] >=
-                                     self.aircraftPerf["W_{start}"][1:]])
-
-        Model.__init__(self, None, [self.aircraft, self.submodels,
-                                    self.constraints])
-
-class Loiter(Model):
-    "make a loiter flight segment"
-    def __init__(self, N, aircraft, alt=15000, etap=0.7):
-        fs = FlightSegment(N, aircraft, alt, etap)
-
-        t = Variable("t", "days", "time loitering")
-        constraints = [fs.be["t"] >= t/N]
-
-        Model.__init__(self, None, [constraints, fs])
-
 class Cruise(Model):
     "make a cruise flight segment"
-    def __init__(self, N, aircraft, alt=15000, etap=0.7, R=200):
-        fs = FlightSegment(N, aircraft, alt, etap)
+    def __init__(self, aircraft, N, altitude=15000, latitude=45, percent=90,
+                 day=355, R=200):
+        fs = FlightSegment(aircraft, N, altitude, latitude, percent, day)
 
         R = Variable("R", R, "nautical_miles", "Range to station")
         constraints = [R/N <= fs["V"]*fs.be["t"]]
@@ -151,8 +116,9 @@ class Cruise(Model):
 
 class Climb(Model):
     "make a climb flight segment"
-    def __init__(self, N, aircraft, alt=15000, etap=0.7, dh=15000):
-        fs = FlightSegment(N, aircraft, alt, etap)
+    def __init__(self, aircraft, N, altitude=15000, latitude=45, percent=90,
+                 day=355, dh=15000):
+        fs = FlightSegment(aircraft, N, altitude, latitude, percent, day)
 
         with vectorize(N):
             hdot = Variable("\\dot{h}", "ft/min", "Climb rate")
@@ -171,23 +137,6 @@ class Climb(Model):
 
         Model.__init__(self, None, [fs, constraints])
 
-class SteadyLevelFlight(Model):
-    "steady level flight model"
-    def __init__(self, state, aircraft, perf, etap, **kwargs):
-
-        T = Variable("T", "N", "thrust")
-        etaprop = Variable("\\eta_{prop}", etap, "-", "propulsive efficiency")
-
-        constraints = [
-            (perf["W_{end}"]*perf["W_{start}"])**0.5 <= (
-                0.5*state["\\rho"]*state["V"]**2*perf["C_L"]
-                * aircraft.wing["S"]),
-            T >= (0.5*state["\\rho"]*state["V"]**2*perf["C_D"]
-                  *aircraft.wing["S"]),
-            perf["P_{shaft}"] >= T*state["V"]/etaprop]
-
-        Model.__init__(self, None, constraints, **kwargs)
-
 class Mission(Model):
     "creates flight profile"
     def __init__(self, DF70=False, **kwargs):
@@ -200,10 +149,10 @@ class Mission(Model):
         JHO = Aircraft(Wfueltot, DF70)
         loading = JHO.loading(JHO, Wcent)
 
-        climb1 = Climb(10, JHO, alt=np.linspace(0, 15000, 11)[1:], etap=0.508)
-        cruise1 = Cruise(1, JHO, etap=0.684, R=180)
-        loiter1 = Loiter(5, JHO, etap=0.647)
-        cruise2 = Cruise(1, JHO, etap=0.684)
+        climb1 = Climb(JHO, 10, altitude=np.linspace(0, 15000, 11)[1:])
+        cruise1 = Cruise(JHO, 1, R=200)
+        loiter1 = Loiter(JHO, 5)
+        cruise2 = Cruise(JHO, 1)
         mission = [climb1, cruise1, loiter1, cruise2]
 
         constraints = [
@@ -225,6 +174,6 @@ class Mission(Model):
                        **kwargs)
 
 if __name__ == "__main__":
-    M = Mission(DF70=True)
+    M = Mission()
     sol = M.solve("mosek")
     print sol.table()

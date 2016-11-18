@@ -1,31 +1,39 @@
 " Simple Gas Powered Aircraft Model"
-from gpkit import Model, Variable, vectorize
+from gas.loiter import Loiter
+from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero
-from gpkitmodels.aircraft.GP_submodels.breguet_endurance import BreguetEndurance
-from gpkitmodels.environment.wind_speeds import get_windspeed
-from gpkitmodels.environment.air_properties import get_airvars
-from gas.flight_state import FlightState
 
 class Aircraft(Model):
     "vehicle"
     def __init__(self):
 
         self.flight_model = AircraftPerf
+        self.wing = Wing()
 
         Wstructures = Variable("W_{structures}", "lbf", "structural weight")
         fstructures = Variable("f_{structures}", 0.35, "-",
                                "fractional structural weight")
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
         Wzfw = Variable("W_{zfw}", "lbf", "zero fuel weight")
-        S = Variable("S", "ft**2", "planform area")
-        b = Variable("b", "ft", "wing span")
-        cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
-        A = Variable("A", 27, "-", "aspect ratio")
 
         constraints = [Wstructures == Wstructures,
                        fstructures == fstructures,
-                       Wzfw >= Wstructures + Wpay,
-                       b**2 == S*A,
+                       Wzfw >= Wstructures + Wpay]
+
+        Model.__init__(self, None, [self.wing, constraints])
+
+class Wing(Model):
+    "wing model"
+    def __init__(self):
+
+        S = Variable("S", "ft**2", "planform area")
+        b = Variable("b", "ft", "wing span")
+        cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
+        AR = Variable("AR", 27, "-", "aspect ratio")
+
+        self.flight_model = WingAero
+
+        constraints = [b**2 == S*AR,
                        cmac == S/b]
 
         Model.__init__(self, None, constraints)
@@ -34,7 +42,7 @@ class AircraftPerf(Model):
     "aircraft performance"
     def __init__(self, static, state):
 
-        self.wing = WingAero(static, state)
+        self.wing = static.wing.flight_model(static.wing, state)
 
         CD = Variable("C_D", "-", "aircraft drag coefficient")
         cda0 = Variable("CDA_0", 0.005, "-", "non-wing drag coefficient")
@@ -53,67 +61,13 @@ class AircraftPerf(Model):
 
         Model.__init__(self, None, [self.wing, constraints])
 
-class FlightSegment(Model):
-    "flight segment"
-    def __init__(self, aircraft, N=5, etap=0.7, latitude=45, percent=90,
-                 altitude=15000, day=355):
-
-        self.aircraft = aircraft
-        with vectorize(N):
-            self.fs = FlightState(latitude, percent, altitude, day)
-            self.aircraftPerf = self.aircraft.flight_model(self.aircraft,
-                                                           self.fs)
-            self.slf = SteadyLevelFlight(self.fs, self.aircraft,
-                                         self.aircraftPerf, etap)
-            self.be = BreguetEndurance(self.aircraftPerf)
-
-        self.submodels = [self.fs, self.aircraftPerf, self.slf, self.be]
-        Wfuelfs = Variable("W_{fuel-fs}", "lbf", "flight segment fuel weight")
-
-        self.constraints = [Wfuelfs >= self.be["W_{fuel}"].sum()]
-
-        if N > 1:
-            self.constraints.extend([self.aircraftPerf["W_{end}"][:-1] >=
-                                     self.aircraftPerf["W_{start}"][1:]])
-
-        Model.__init__(self, None, [self.aircraft, self.submodels,
-                                    self.constraints])
-
-class Loiter(Model):
-    "loiter segment"
-    def __init__(self, aircraft, N=5, etap=0.7, latitude=45, percent=90,
-                 altitude=15000, day=355):
-        fs = FlightSegment(aircraft, N, etap, latitude, percent, altitude, day)
-
-        t = Variable("t", "days", "loitering time")
-        constraints = [fs.be["t"] >= t/N]
-
-        Model.__init__(self, None, [fs, constraints])
-
-class SteadyLevelFlight(Model):
-    "steady level flight model"
-    def __init__(self, state, aircraft, perf, etap, **kwargs):
-
-        T = Variable("T", "N", "thrust")
-        etaprop = Variable("\\eta_{prop}", etap, "-", "propulsive efficiency")
-
-        constraints = [
-            (perf["W_{end}"]*perf["W_{start}"])**0.5 <= (
-                0.5*state["\\rho"]*state["V"]**2*perf["C_L"]
-                * aircraft["S"]),
-            T >= (0.5*state["\\rho"]*state["V"]**2*perf["C_D"]
-                  *aircraft["S"]),
-            perf["P_{shaft}"] >= T*state["V"]/etaprop]
-
-        Model.__init__(self, None, constraints, **kwargs)
-
 class Mission(Model):
     "create a mission for the flight"
-    def __init__(self, etap=0.7, latitude=45, percent=90, altitude=16000, day=355):
+    def __init__(self):
 
         gassimple = Aircraft()
 
-        loiter = Loiter(gassimple, etap=etap, latitude=latitude, altitude=altitude, day=day)
+        loiter = Loiter(gassimple)
         mission = [loiter]
 
         mtow = Variable("MTOW", 200, "lbf", "max take off weight")
@@ -133,4 +87,4 @@ class Mission(Model):
 
 if __name__ == "__main__":
     M = Mission()
-    sol = M.solve("mosek")
+    Sol = M.solve("mosek")
