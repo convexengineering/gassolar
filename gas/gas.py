@@ -103,54 +103,9 @@ class AircraftPerf(Model):
 
         Model.__init__(self, None, [self.dynamicmodels, constraints], **kwargs)
 
-# class FlightState(Model):
-#     "define environment state during a portion of an aircraft mission"
-#     def __init__(self, alt, onStation, wind, **kwargs):
-#
-#         self.onStation = onStation
-#
-#         mu = Variable("\\mu", 1.628e-5, "N*s/m^2", "dynamic viscosity")
-#         rho = Variable("\\rho", "kg/m^3", "air density")
-#         h = Variable("h", alt, "ft", "altitude")
-#         href = Variable("h_{ref}", 15000, "ft", "Reference altitude")
-#         psl = Variable("p_{sl}", 101325, "Pa", "Pressure at sea level")
-#         Latm = Variable("L_{atm}", 0.0065, "K/m", "Temperature lapse rate")
-#         Tsl = Variable("T_{sl}", 288.15, "K", "Temperature at sea level")
-#         temp = [(t.value - l.value*v.value).magnitude
-#                 for t, v, l in zip(Tsl, h, Latm)]
-#         Tatm = Variable("t_{atm}", temp, "K", "Air temperature")
-#         mu = Variable("\\mu", "N*s/m^2", "Dynamic viscosity")
-#         musl = Variable("\\mu_{sl}", 1.789*10**-5, "N*s/m^2",
-#                         "Dynamic viscosity at sea level")
-#         Rspec = Variable("R_{spec}", 287.058, "J/kg/K",
-#                          "Specific gas constant of air")
-#
-#         # Atmospheric variation with altitude (valid from 0-7km of altitude)
-#         constraints = [rho == psl*Tatm**(5.257-1)/Rspec/(Tsl**5.257),
-#                        (mu/musl)**0.1 == 0.991*(h/href)**(-0.00529),
-#                        h == h,
-#                        href == href]
-#
-#         V = Variable("V", "m/s", "true airspeed")
-#
-#         if wind:
-#
-#             V_wind = Variable("V_{wind}", 25, "m/s", "Wind speed")
-#             constraints.extend([V >= V_wind])
-#
-#         else:
-#
-#             V_wind = Variable("V_{wind}", "m/s", "Wind speed")
-#             V_ref = Variable("V_{ref}", 25, "m/s", "Reference wind speed")
-#
-#             constraints.extend([(V_wind/V_ref) >= 0.6462*(h/href) + 0.3538,
-#                                 V >= V_wind])
-#         Model.__init__(self, None, constraints, **kwargs)
-
 class FlightSegment(Model):
     "creates flight segment for aircraft"
-    def __init__(self, N, aircraft, alt=15000, onStation=False, wind=False,
-                 etap=0.7, **kwargs):
+    def __init__(self, N, aircraft, alt=15000, etap=0.7):
 
         self.aircraft = aircraft
 
@@ -163,7 +118,6 @@ class FlightSegment(Model):
             self.be = BreguetEndurance(self.aircraftPerf)
 
         self.submodels = [self.fs, self.aircraftPerf, self.slf, self.be]
-
         Wfuelfs = Variable("W_{fuel-fs}", "lbf", "flight segment fuel weight")
 
         self.constraints = [Wfuelfs >= self.be["W_{fuel}"].sum()]
@@ -173,35 +127,32 @@ class FlightSegment(Model):
                                      self.aircraftPerf["W_{start}"][1:]])
 
         Model.__init__(self, None, [self.aircraft, self.submodels,
-                                    self.constraints], **kwargs)
+                                    self.constraints])
 
 class Loiter(Model):
     "make a loiter flight segment"
-    def __init__(self, N, aircraft, alt=15000, onStation=False, wind=False,
-                 etap=0.7, **kwargs):
-        fs = FlightSegment(N, aircraft, alt, onStation, wind, etap)
+    def __init__(self, N, aircraft, alt=15000, etap=0.7):
+        fs = FlightSegment(N, aircraft, alt, etap)
 
         t = Variable("t", "days", "time loitering")
         constraints = [fs.be["t"] >= t/N]
 
-        Model.__init__(self, None, [constraints, fs], **kwargs)
+        Model.__init__(self, None, [constraints, fs])
 
 class Cruise(Model):
     "make a cruise flight segment"
-    def __init__(self, N, aircraft, alt=15000, onStation=False, wind=False,
-                 etap=0.7, R=200, **kwargs):
-        fs = FlightSegment(N, aircraft, alt, onStation, wind, etap)
+    def __init__(self, N, aircraft, alt=15000, etap=0.7, R=200):
+        fs = FlightSegment(N, aircraft, alt, etap)
 
         R = Variable("R", R, "nautical_miles", "Range to station")
         constraints = [R/N <= fs["V"]*fs.be["t"]]
 
-        Model.__init__(self, None, [fs, constraints], **kwargs)
+        Model.__init__(self, None, [fs, constraints])
 
 class Climb(Model):
     "make a climb flight segment"
-    def __init__(self, N, aircraft, alt=15000, onStation=False, wind=False,
-                 etap=0.7, dh=15000, **kwargs):
-        fs = FlightSegment(N, aircraft, alt, onStation, wind, etap)
+    def __init__(self, N, aircraft, alt=15000, etap=0.7, dh=15000):
+        fs = FlightSegment(N, aircraft, alt, etap)
 
         with vectorize(N):
             hdot = Variable("\\dot{h}", "ft/min", "Climb rate")
@@ -218,7 +169,7 @@ class Climb(Model):
                             / fs["V"]),
             ]
 
-        Model.__init__(self, None, [fs, constraints], **kwargs)
+        Model.__init__(self, None, [fs, constraints])
 
 class SteadyLevelFlight(Model):
     "steady level flight model"
@@ -251,7 +202,7 @@ class Mission(Model):
 
         climb1 = Climb(10, JHO, alt=np.linspace(0, 15000, 11)[1:], etap=0.508)
         cruise1 = Cruise(1, JHO, etap=0.684, R=180)
-        loiter1 = Loiter(5, JHO, etap=0.647, onStation=True)
+        loiter1 = Loiter(5, JHO, etap=0.647)
         cruise2 = Cruise(1, JHO, etap=0.684)
         mission = [climb1, cruise1, loiter1, cruise2]
 
@@ -275,7 +226,5 @@ class Mission(Model):
 
 if __name__ == "__main__":
     M = Mission(DF70=True)
-    M.substitutions.update({"b": 24})
-    # JHO.debug(solver="mosek")
     sol = M.solve("mosek")
     print sol.table()
