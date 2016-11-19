@@ -67,8 +67,21 @@ class SolarCells(Model):
         etasolar = Variable("\\eta_{solar}", 0.2, "-",
                             "Solar cell efficiency")
 
+        self.flight_model = SolarCellPerf
+
         constraints = [W >= rhosolar*S*g,
                        etasolar == etasolar]
+
+        Model.__init__(self, None, constraints)
+
+class SolarCellPerf(Model):
+    "collecting solar cell energy"
+    def __init__(self, static, state):
+
+        E = Variable("E", "J", "solar cell energy collected")
+
+        constraints = [
+            state["(E/S)_{irr}"]*static["\\eta_{solar}"]*static["S"] >= E]
 
         Model.__init__(self, None, constraints)
 
@@ -77,6 +90,8 @@ class AircraftPerf(Model):
     def __init__(self, static, state):
 
         self.wing = WingAero(static, state)
+        self.solarcells = static.solarcells.flight_model(static.solarcells,
+                                                         state)
 
         CD = Variable("C_D", "-", "aircraft drag coefficient")
         cda0 = Variable("CDA_0", 0.005, "-", "non-wing drag coefficient")
@@ -85,7 +100,7 @@ class AircraftPerf(Model):
         constraints = [CD >= cda0 + self.wing["C_d"],
                        Pshaft == Pshaft]
 
-        Model.__init__(self, None, [self.wing, constraints])
+        Model.__init__(self, None, [self.wing, self.solarcells, constraints])
 
 class FlightState(Model):
     """
@@ -133,7 +148,7 @@ class FlightSegment(Model):
                                                        self.fs)
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                      self.aircraftPerf, etap)
-        self.power = Power(self.aircraft, self.fs)
+        self.power = Power(self.aircraft, self.fs, self.aircraftPerf)
 
         self.submodels = [self.fs, self.aircraftPerf, self.slf, self.power]
 
@@ -161,13 +176,13 @@ class SteadyLevelFlight(Model):
         Model.__init__(self, None, constraints, **kwargs)
 
 class Power(Model):
-    def __init__(self, static, state, **kwargs):
+    def __init__(self, static, state, perf, **kwargs):
 
         Poper = Variable("P_{oper}", "W", "Aircraft operating power")
         Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
 
         constraints = [
-            state["(E/S)_{irr}"]*static["\\eta_{solar}"]*static["S_Mission, Aircraft, SolarCells"] >= (
+            perf["E"] >= (
                 Poper*state["t_{day}"] + static["E_{batt}"]
                 / static["\\eta_{discharge}"]),
             Poper == Poper,
