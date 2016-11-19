@@ -13,29 +13,38 @@ class Aircraft(Model):
         self.flight_model = AircraftPerf
         self.solarcells = SolarCells()
         self.wing = Wing()
+        self.battery = Battery()
 
-        self.components = [self.solarcells, self.wing]
+        self.components = [self.solarcells, self.wing, self.battery]
 
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
-        Wbatt = Variable("W_{batt}", "lbf", "battery weight")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
+
+        constraints = [self.wing["W"] >= Wtotal*self.wing["f"],
+                       Wtotal >= (Wpay +
+                                  sum(summing_vars(self.components, "W"))),
+                       self.solarcells["S"] <= self.wing["S"]]
+
+        Model.__init__(self, None, [constraints, self.components])
+
+class Battery(Model):
+    "battery model"
+    def __init__(self):
+
+        W = Variable("W", "lbf", "battery weight")
         eta_charge = Variable("\\eta_{charge}", 0.98, "-",
                               "Battery charging efficiency")
         eta_discharge = Variable("\\eta_{discharge}", 0.98, "-",
                                  "Battery discharging efficiency")
-        hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery energy density")
         Ebatt = Variable("E_{batt}", "J", "total battery energy")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
+        hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery energy density")
 
-        constraints = [self.wing["W"] >= Wtotal*self.wing["f"],
-                       Wtotal >= (Wbatt + Wpay +
-                                  sum(summing_vars(self.components, "W"))),
-                       Wbatt >= Ebatt/hbatt*g,
-                       self.solarcells["S"] <= self.wing["S"],
+        constraints = [W >= Ebatt/hbatt*g,
                        eta_charge == eta_charge,
                        eta_discharge == eta_discharge]
 
-        Model.__init__(self, None, [constraints, self.components])
+        Model.__init__(self, None, constraints)
 
 class Wing(Model):
     "simple wing model"
