@@ -12,19 +12,13 @@ class Aircraft(Model):
 
         self.flight_model = AircraftPerf
         self.solarcells = SolarCells()
+        self.wing = Wing()
 
-        self.components = [self.solarcells]
+        self.components = [self.solarcells, self.wing]
 
-        Wstructures = Variable("W_{structures}", "lbf", "structural weight")
-        fstructures = Variable("f_{structures}", 0.35, "-",
-                               "fractional structural weight")
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
         Wbatt = Variable("W_{batt}", "lbf", "battery weight")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
-        S = Variable("S", "ft**2", "planform area")
-        b = Variable("b", "ft", "wing span")
-        cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
-        AR = Variable("AR", 27, "-", "aspect ratio")
         eta_charge = Variable("\\eta_{charge}", 0.98, "-",
                               "Battery charging efficiency")
         eta_discharge = Variable("\\eta_{discharge}", 0.98, "-",
@@ -33,17 +27,33 @@ class Aircraft(Model):
         Ebatt = Variable("E_{batt}", "J", "total battery energy")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
 
-        constraints = [Wstructures >= Wtotal*fstructures,
-                       Wtotal >= (Wstructures + Wbatt + Wpay +
+        constraints = [self.wing["W"] >= Wtotal*self.wing["f"],
+                       Wtotal >= (Wbatt + Wpay +
                                   sum(summing_vars(self.components, "W"))),
                        Wbatt >= Ebatt/hbatt*g,
-                       b**2 == S*AR,
-                       cmac == S/b,
-                       self.solarcells["S"] <= S,
+                       self.solarcells["S"] <= self.wing["S"],
                        eta_charge == eta_charge,
                        eta_discharge == eta_discharge]
 
         Model.__init__(self, None, [constraints, self.components])
+
+class Wing(Model):
+    "simple wing model"
+    def __init__(self):
+
+        S = Variable("S", "ft**2", "planform area")
+        b = Variable("b", "ft", "wing span")
+        cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
+        AR = Variable("AR", 27, "-", "aspect ratio")
+        W = Variable("W", "lbf", "structural weight")
+        f = Variable("f", 0.35, "-", "fractional structural weight")
+
+        constraints = [b**2 == S*AR,
+                       cmac == S/b,
+                       W == W,
+                       f == f]
+
+        Model.__init__(self, None, constraints)
 
 class SolarCells(Model):
     "solar cell model"
@@ -143,9 +153,9 @@ class SteadyLevelFlight(Model):
         constraints = [
             aircraft["W_{total}"] <= (
                 0.5*state["\\rho"]*state["V"]**2*perf["C_L"]
-                * aircraft["S_Mission, Aircraft"]),
+                * aircraft.wing["S"]),
             T >= (0.5*state["\\rho"]*state["V"]**2*perf["C_D"]
-                  *aircraft["S_Mission, Aircraft"]),
+                  *aircraft.wing["S"]),
             perf["P_{shaft}"] >= T*state["V"]/etaprop]
 
         Model.__init__(self, None, constraints, **kwargs)
@@ -176,7 +186,7 @@ class Mission(Model):
         solarsimple = Aircraft()
         fs = FlightSegment(solarsimple, etap, latitude, percent, altitude, day)
 
-        cost = solarsimple["W"]
+        cost = solarsimple["W_{total}"]
 
         Model.__init__(self, cost, [solarsimple, fs])
 
