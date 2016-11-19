@@ -36,13 +36,13 @@ class Battery(Model):
                               "Battery charging efficiency")
         eta_discharge = Variable("\\eta_{discharge}", 0.98, "-",
                                  "Battery discharging efficiency")
-        Ebatt = Variable("E_{batt}", "J", "total battery energy")
+        E = Variable("E", "J", "total battery energy")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery energy density")
 
         self.flight_model = BatteryPerf
 
-        constraints = [W >= Ebatt/hbatt*g,
+        constraints = [W >= E/hbatt*g,
                        eta_charge == eta_charge,
                        eta_discharge == eta_discharge]
 
@@ -55,8 +55,7 @@ class BatteryPerf(Model):
         Poper = Variable("P_{oper}", "W", "operating power")
 
         constraints = [
-            static["E_{batt}"] >= (Poper*state["t_{night}"]
-                                   / static["\\eta_{discharge}"])]
+            static["E"] >= Poper*state["t_{night}"]/static["\\eta_{discharge}"]]
 
         Model.__init__(self, None, constraints)
 
@@ -131,7 +130,7 @@ class AircraftPerf(Model):
             CD >= cda0 + self.wing["C_d"],
             self.solarcells["E"] >= (
                 self.battery["P_{oper}"]*state["t_{day}"]
-                + self.battery["E_{batt}"]/static.battery["\\eta_{discharge}"]),
+                + self.battery["E"]/static.battery["\\eta_{discharge}"]),
             self.battery["P_{oper}"] >= Pacc + Pshaft
             ]
 
