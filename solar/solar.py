@@ -40,9 +40,23 @@ class Battery(Model):
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery energy density")
 
+        self.flight_model = BatteryPerf
+
         constraints = [W >= Ebatt/hbatt*g,
                        eta_charge == eta_charge,
                        eta_discharge == eta_discharge]
+
+        Model.__init__(self, None, constraints)
+
+class BatteryPerf(Model):
+    "battery performance model"
+    def __init__(self, static, state):
+
+        Poper = Variable("P_{oper}", "W", "operating power")
+
+        constraints = [
+            static["E_{batt}"] >= (Poper*state["t_{night}"]
+                                   / static["\\eta_{discharge}"])]
 
         Model.__init__(self, None, constraints)
 
@@ -75,13 +89,10 @@ class SolarCells(Model):
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         S = Variable("S", "ft**2", "solar cell area")
         W = Variable("W", "lbf", "solar cell weight")
-        etasolar = Variable("\\eta_{solar}", 0.2, "-",
-                            "Solar cell efficiency")
 
         self.flight_model = SolarCellPerf
 
-        constraints = [W >= rhosolar*S*g,
-                       etasolar == etasolar]
+        constraints = [W >= rhosolar*S*g]
 
         Model.__init__(self, None, constraints)
 
@@ -90,9 +101,11 @@ class SolarCellPerf(Model):
     def __init__(self, static, state):
 
         E = Variable("E", "J", "solar cell energy collected")
+        etasolar = Variable("\\eta_{solar}", 0.2, "-",
+                            "Solar cell efficiency")
 
         constraints = [
-            state["(E/S)_{irr}"]*static["\\eta_{solar}"]*static["S"] >= E]
+            state["(E/S)_{irr}"]*etasolar*static["S"] >= E]
 
         Model.__init__(self, None, constraints)
 
@@ -103,15 +116,26 @@ class AircraftPerf(Model):
         self.wing = static.wing.flight_model(static.wing, state)
         self.solarcells = static.solarcells.flight_model(static.solarcells,
                                                          state)
+        self.battery = static.battery.flight_model(static.battery, state)
+
+        self.flight_models = [self.wing, self.solarcells, self.battery]
 
         CD = Variable("C_D", "-", "aircraft drag coefficient")
         cda0 = Variable("CDA_0", 0.005, "-", "non-wing drag coefficient")
         Pshaft = Variable("P_{shaft}", "hp", "shaft power")
+        Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
+        constraints = [
+            ]
 
-        constraints = [CD >= cda0 + self.wing["C_d"],
-                       Pshaft == Pshaft]
+        constraints = [
+            CD >= cda0 + self.wing["C_d"],
+            self.solarcells["E"] >= (
+                self.battery["P_{oper}"]*state["t_{day}"]
+                + self.battery["E_{batt}"]/static.battery["\\eta_{discharge}"]),
+            self.battery["P_{oper}"] >= Pacc + Pshaft
+            ]
 
-        Model.__init__(self, None, [self.wing, self.solarcells, constraints])
+        Model.__init__(self, None, [self.flight_models, constraints])
 
 class FlightState(Model):
     """
@@ -159,15 +183,10 @@ class FlightSegment(Model):
                                                        self.fs)
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                      self.aircraftPerf, etap)
-        self.power = Power(self.aircraft, self.fs, self.aircraftPerf)
 
-        self.submodels = [self.fs, self.aircraftPerf, self.slf, self.power]
+        self.submodels = [self.fs, self.aircraftPerf, self.slf]
 
-        constraints = [
-            self.power["P_{oper}"] >= self.power["P_{acc}"] + self.aircraftPerf["P_{shaft}"]
-            ]
-
-        Model.__init__(self, None, [self.aircraft, self.submodels, constraints])
+        Model.__init__(self, None, [self.aircraft, self.submodels])
 
 class SteadyLevelFlight(Model):
     "steady level flight model"
@@ -184,23 +203,6 @@ class SteadyLevelFlight(Model):
                   *aircraft.wing["S"]),
             perf["P_{shaft}"] >= T*state["V"]/etaprop]
 
-        Model.__init__(self, None, constraints, **kwargs)
-
-class Power(Model):
-    def __init__(self, static, state, perf, **kwargs):
-
-        Poper = Variable("P_{oper}", "W", "Aircraft operating power")
-        Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
-
-        constraints = [
-            perf["E"] >= (
-                Poper*state["t_{day}"] + static["E_{batt}"]
-                / static["\\eta_{discharge}"]),
-            Poper == Poper,
-            Pacc == Pacc,
-            static["E_{batt}"] >= (Poper*state["t_{night}"]
-                                   / static["\\eta_{discharge}"])
-            ]
         Model.__init__(self, None, constraints, **kwargs)
 
 class Mission(Model):
