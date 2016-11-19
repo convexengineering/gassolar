@@ -48,6 +48,8 @@ class Wing(Model):
         W = Variable("W", "lbf", "structural weight")
         f = Variable("f", 0.35, "-", "fractional structural weight")
 
+        self.flight_model = WingAero
+
         constraints = [b**2 == S*AR,
                        cmac == S/b,
                        W == W,
@@ -89,7 +91,7 @@ class AircraftPerf(Model):
     "aircraft performance"
     def __init__(self, static, state):
 
-        self.wing = WingAero(static, state)
+        self.wing = static.wing.flight_model(static.wing, state)
         self.solarcells = static.solarcells.flight_model(static.solarcells,
                                                          state)
 
