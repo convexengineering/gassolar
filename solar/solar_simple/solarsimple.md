@@ -5,7 +5,7 @@
 #inPDF: skip
 from solarsimple import Mission
 from gpkitmodels.environment.wind_speeds import get_windspeed
-from solar_irradiance import get_Eirr
+from solar.solar_irradiance import get_Eirr
 import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams.update({'font.size':19})
@@ -63,7 +63,7 @@ for a in [80, 85, 90, 95]:
 ax.set_ylim([0, 500])
 ax.grid()
 ax.set_xlabel("Latitude [deg]")
-ax.set_ylabel("Span [ft]")
+ax.set_ylabel("Max Take Off Weight [lbf]")
 ax.legend(["%d Percentile Winds" % a for a in [80, 85, 90, 95]], loc=2, fontsize=15)
 fig.savefig("mtowvslatsolarh50k.pdf", bbox_inches="tight")
 
