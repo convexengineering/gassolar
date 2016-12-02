@@ -1,5 +1,5 @@
 " Simple Gas Powered Aircraft Model"
-from gas.loiter import Loiter
+from gassolar.gas.loiter import Loiter
 from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero
 

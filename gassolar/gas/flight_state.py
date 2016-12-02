@@ -1,7 +1,7 @@
 " flight state of gas powered aircraft "
 from gpkit import Model, Variable
-from environment.wind_speeds import get_windspeed
-from environment.air_properties import get_airvars
+from gassolar.environment.wind_speeds import get_windspeed
+from gassolar.environment.air_properties import get_airvars
 class FlightState(Model):
     """
     environmental state of aircraft

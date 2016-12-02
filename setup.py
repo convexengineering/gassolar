@@ -44,7 +44,7 @@ setup(
     url="https://www.github.com/hoburg/gpkit-models",
     install_requires=["numpy", "scipy", "pint"],
     version="0.0.0.0",
-    packages=["gassolar", "gassolar.gas"],
+    packages=["gassolar", "gassolar.gas", "gassolar.environment"],
     package_data={},
     license=LICENSE,
     long_description=LONG_DESCRIPTION,
