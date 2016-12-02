@@ -170,11 +170,10 @@ class Mission(Model):
                 mission[i]["W_{end}"][-1] == fs["W_{start}"][0]
                 ])
 
-        cost = 1/loiter1["t_Mission, Loiter"]
-
         return JHO, mission, loading, constraints
 
 if __name__ == "__main__":
     M = Mission()
+    M.cost = 1/M["t_Mission, Loiter"]
     sol = M.solve("mosek")
     print sol.table()
