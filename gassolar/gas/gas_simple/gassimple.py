@@ -5,9 +5,8 @@ from gpkitmodels.aircraft.GP_submodels.wing import WingAero
 
 class Aircraft(Model):
     "vehicle"
-    def __init__(self):
+    def setup(self):
 
-        self.flight_model = AircraftPerf
         self.wing = Wing()
 
         Wstructures = Variable("W_{structures}", "lbf", "structural weight")
@@ -20,29 +19,33 @@ class Aircraft(Model):
                        fstructures == fstructures,
                        Wzfw >= Wstructures + Wpay]
 
-        Model.__init__(self, None, [self.wing, constraints])
+        return self.wing, constraints
+
+    def flight_model(self, state):
+        return AircraftPerf(self, state)
 
 class Wing(Model):
     "wing model"
-    def __init__(self):
+    def setup(self):
 
         S = Variable("S", "ft**2", "planform area")
         b = Variable("b", "ft", "wing span")
         cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
         AR = Variable("AR", 27, "-", "aspect ratio")
 
-        self.flight_model = WingAero
-
         constraints = [b**2 == S*AR,
                        cmac == S/b]
 
-        Model.__init__(self, None, constraints)
+        return constraints
+
+    def flight_model(self, state):
+        return WingAero(self, state)
 
 class AircraftPerf(Model):
     "aircraft performance"
-    def __init__(self, static, state):
+    def setup(self, static, state):
 
-        self.wing = static.wing.flight_model(static.wing, state)
+        self.wing = static.wing.flight_model(state)
 
         CD = Variable("C_D", "-", "aircraft drag coefficient")
         cda0 = Variable("CDA_0", 0.005, "-", "non-wing drag coefficient")
@@ -59,11 +62,11 @@ class AircraftPerf(Model):
                        Ptot >= Pshaft,
                        bsfc == bsfc]
 
-        Model.__init__(self, None, [self.wing, constraints])
+        return self.wing, constraints
 
 class Mission(Model):
     "create a mission for the flight"
-    def __init__(self):
+    def setup(self):
 
         gassimple = Aircraft()
 
@@ -81,10 +84,9 @@ class Mission(Model):
             gassimple["W_{structures}"] >= mtow*gassimple["f_{structures}"]
             ]
 
-        cost = 1/loiter["t_Mission, Loiter"]
-
-        Model.__init__(self, cost, [gassimple, mission, constraints])
+        return gassimple, mission, constraints
 
 if __name__ == "__main__":
     M = Mission()
+    M.cost = 1/M["t_Mission, Loiter"]
     Sol = M.solve("mosek")
