@@ -3,7 +3,7 @@ from gpkit import Model, Variable
 
 class SteadyLevelFlight(Model):
     "steady level flight model"
-    def __init__(self, state, aircraft, perf, etap=0.7, **kwargs):
+    def setup(self, state, aircraft, perf, etap=0.7):
 
         T = Variable("T", "N", "thrust")
         etaprop = Variable("\\eta_{prop}", etap, "-", "propulsive efficiency")
@@ -16,4 +16,4 @@ class SteadyLevelFlight(Model):
                   *aircraft.wing["S"]),
             perf["P_{shaft}"] >= T*state["V"]/etaprop]
 
-        Model.__init__(self, None, constraints, **kwargs)
+        return constraints

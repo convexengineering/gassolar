@@ -15,8 +15,8 @@ from loiter import Loiter
 
 class Aircraft(Model):
     "the JHO vehicle"
-    def __init__(self, Wfueltot, DF70=False, **kwargs):
-        self.flight_model = AircraftPerf
+    def setup(self, Wfueltot, DF70=False):
+
         self.fuselage = Fuselage(Wfueltot)
         self.wing = Wing(spar="TubeSpar")
         self.engine = Engine(DF70)
@@ -24,8 +24,6 @@ class Aircraft(Model):
 
         components = [self.fuselage, self.wing, self.engine, self.empennage]
         self.smeared_loads = [self.fuselage, self.engine]
-
-        self.loading = AircraftLoading
 
         Wzfw = Variable("W_{zfw}", "lbf", "zero fuel weight")
         Wpay = Variable("W_{pay}", 10, "lbf", "payload weight")
@@ -46,37 +44,39 @@ class Aircraft(Model):
                 / self.empennage.horizontaltail["m_h"])
             ]
 
-        Model.__init__(self, None, [components, constraints],
-                       **kwargs)
+        return components, constraints
+
+    def flight_model(self, state):
+        return AircraftPerf(self, state)
+
+    def loading(self, Wcent):
+        return AircraftLoading(self, Wcent)
 
 class AircraftLoading(Model):
     "aircraft loading model"
-    def __init__(self, aircraft, Wcent, **kwargs):
+    def setup(self, aircraft, Wcent):
 
-        loading = [aircraft.wing.loading(aircraft.wing, Wcent)]
-        loading.append(aircraft.empennage.loading(aircraft.empennage))
-        loading.append(aircraft.fuselage.loading(aircraft.fuselage, Wcent))
+        loading = [aircraft.wing.loading(Wcent)]
+        loading.append(aircraft.empennage.loading())
+        loading.append(aircraft.fuselage.loading(Wcent))
 
         tbstate = TailBoomState()
         loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
                                            aircraft.empennage.tailboom,
-                                           aircraft.wing, tbstate, **kwargs))
+                                           aircraft.wing, tbstate))
 
-        Model.__init__(self, None, loading, **kwargs)
+        return loading
 
 class AircraftPerf(Model):
     "performance model for aircraft"
-    def __init__(self, static, state, **kwargs):
+    def setup(self, static, state):
 
-        self.wing = static.wing.flight_model(static.wing, state)
-        self.fuselage = static.fuselage.flight_model(static.fuselage, state)
-        self.engine = static.engine.flight_model(static.engine, state)
-        self.htail = static.empennage.horizontaltail.flight_model(
-            static.empennage.horizontaltail, state)
-        self.vtail = static.empennage.verticaltail.flight_model(
-            static.empennage.verticaltail, state)
-        self.tailboom = static.empennage.tailboom.flight_model(
-            static.empennage.tailboom, state)
+        self.wing = static.wing.flight_model(state)
+        self.fuselage = static.fuselage.flight_model(state)
+        self.engine = static.engine.flight_model(state)
+        self.htail = static.empennage.horizontaltail.flight_model(state)
+        self.vtail = static.empennage.verticaltail.flight_model(state)
+        self.tailboom = static.empennage.tailboom.flight_model(state)
 
         self.dynamicmodels = [self.wing, self.fuselage, self.engine,
                               self.htail, self.vtail, self.tailboom]
@@ -103,22 +103,22 @@ class AircraftPerf(Model):
                        CDA/mfac >= sum(dvars),
                        CD >= CDA + self.wing["C_d"]]
 
-        Model.__init__(self, None, [self.dynamicmodels, constraints], **kwargs)
+        return self.dynamicmodels, constraints
 
 class Cruise(Model):
     "make a cruise flight segment"
-    def __init__(self, aircraft, N, altitude=15000, latitude=45, percent=90,
+    def setup(self, aircraft, N, altitude=15000, latitude=45, percent=90,
                  day=355, R=200):
         fs = FlightSegment(aircraft, N, altitude, latitude, percent, day)
 
         R = Variable("R", R, "nautical_miles", "Range to station")
         constraints = [R/N <= fs["V"]*fs.be["t"]]
 
-        Model.__init__(self, None, [fs, constraints])
+        return fs, constraints
 
 class Climb(Model):
     "make a climb flight segment"
-    def __init__(self, aircraft, N, altitude=15000, latitude=45, percent=90,
+    def setup(self, aircraft, N, altitude=15000, latitude=45, percent=90,
                  day=355, dh=15000):
         fs = FlightSegment(aircraft, N, altitude, latitude, percent, day)
 
@@ -137,11 +137,11 @@ class Climb(Model):
                             / fs["V"]),
             ]
 
-        Model.__init__(self, None, [fs, constraints])
+        return fs, constraints
 
 class Mission(Model):
     "creates flight profile"
-    def __init__(self, DF70=False, **kwargs):
+    def setup(self, DF70=False, **kwargs):
 
         mtow = Variable("MTOW", "lbf", "max-take off weight")
         Wcent = Variable("W_{cent}", "lbf", "center aircraft weight")
@@ -149,7 +149,7 @@ class Mission(Model):
         LS = Variable("(W/S)", "lbf/ft**2", "wing loading")
 
         JHO = Aircraft(Wfueltot, DF70)
-        loading = JHO.loading(JHO, Wcent)
+        loading = JHO.loading(Wcent)
 
         climb1 = Climb(JHO, 10, altitude=np.linspace(0, 15000, 11)[1:])
         cruise1 = Cruise(JHO, 1, R=200)
@@ -172,8 +172,7 @@ class Mission(Model):
 
         cost = 1/loiter1["t_Mission, Loiter"]
 
-        Model.__init__(self, cost, [JHO, mission, loading, constraints],
-                       **kwargs)
+        return JHO, mission, loading, constraints
 
 if __name__ == "__main__":
     M = Mission()

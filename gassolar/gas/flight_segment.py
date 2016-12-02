@@ -6,14 +6,13 @@ from flight_state import FlightState
 
 class FlightSegment(Model):
     "flight segment"
-    def __init__(self, aircraft, N=5, altitude=15000, latitude=45, percent=90,
+    def setup(self, aircraft, N=5, altitude=15000, latitude=45, percent=90,
                  day=355):
 
         self.aircraft = aircraft
         with Vectorize(N):
             self.fs = FlightState(latitude, percent, altitude, day)
-            self.aircraftPerf = self.aircraft.flight_model(self.aircraft,
-                                                           self.fs)
+            self.aircraftPerf = self.aircraft.flight_model(self.fs)
             self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                          self.aircraftPerf)
             self.be = BreguetEndurance(self.aircraftPerf)
@@ -27,5 +26,4 @@ class FlightSegment(Model):
             self.constraints.extend([self.aircraftPerf["W_{end}"][:-1] >=
                                      self.aircraftPerf["W_{start}"][1:]])
 
-        Model.__init__(self, None, [self.aircraft, self.submodels,
-                                    self.constraints])
+        return self.aircraft, self.submodels, self.constraints
