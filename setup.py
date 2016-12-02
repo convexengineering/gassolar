@@ -36,7 +36,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE."""
 
 setup(
-    name="gas_solar_trade",
+    name="gassolar",
     description="Library of geometric and signomial programming models "
                 "that can be manipulated and solved using GPkit.",
     author="MIT Department of Aeronautics and Astronautics",
@@ -44,8 +44,7 @@ setup(
     url="https://www.github.com/hoburg/gpkit-models",
     install_requires=["numpy", "scipy", "pint"],
     version="0.0.0.0",
-    packages=["gas", "gas.gas_simple", "solar", "solar.solar_simple",
-              "environment"],
+    packages=["gassolar", "gassolar.gas"],
     package_data={},
     license=LICENSE,
     long_description=LONG_DESCRIPTION,
