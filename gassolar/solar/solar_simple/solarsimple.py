@@ -1,15 +1,13 @@
 " Simple Solar-Electric Powered Aircraft Model "
-from solar.solar_irradiance import get_Eirr
+from gassolar.solar.solar_irradiance import get_Eirr
 from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero
-from gpkitmodels.environment.wind_speeds import get_windspeed
-from gpkitmodels.environment.air_properties import get_airvars
+from gassolar.environment.wind_speeds import get_windspeed
+from gassolar.environment.air_properties import get_airvars
 
 class Aircraft(Model):
     "vehicle"
-    def __init__(self):
-
-        self.flight_model = AircraftPerf
+    def setup(self):
 
         Wstructures = Variable("W_{structures}", "lbf", "structural weight")
         fstructures = Variable("f_{structures}", 0.35, "-",
@@ -47,11 +45,14 @@ class Aircraft(Model):
                        eta_charge == eta_charge,
                        eta_discharge == eta_discharge]
 
-        Model.__init__(self, None, constraints)
+        return constraints
+
+    def flight_model(self, state):
+        return AircraftPerf(self, state)
 
 class AircraftPerf(Model):
     "aircraft performance"
-    def __init__(self, static, state):
+    def setup(self, static, state):
 
         self.wing = WingAero(static, state)
 
@@ -62,7 +63,7 @@ class AircraftPerf(Model):
         constraints = [CD >= cda0 + self.wing["C_d"],
                        Pshaft == Pshaft]
 
-        Model.__init__(self, None, [self.wing, constraints])
+        return self.wing, constraints
 
 class FlightState(Model):
     """
@@ -75,7 +76,7 @@ class FlightState(Model):
     percent: percentile wind speeds [%]
     day: day of the year [Jan 1st = 1]
     """
-    def __init__(self, latitude=45, percent=90, altitude=15000, day=355):
+    def setup(self, latitude=45, percent=90, altitude=15000, day=355):
 
         wind = get_windspeed(latitude, percent, altitude, day)
         density, vis = get_airvars(altitude)
@@ -97,17 +98,16 @@ class FlightState(Model):
                        tday == tday,
                        tnight == tnight]
 
-        Model.__init__(self, None, constraints)
+        return constraints
 
 class FlightSegment(Model):
     "flight segment"
-    def __init__(self, aircraft, etap=0.7, latitude=35, percent=80,
+    def setup(self, aircraft, etap=0.7, latitude=35, percent=80,
                  altitude=60000, day=355):
 
         self.aircraft = aircraft
         self.fs = FlightState(latitude, percent, altitude, day)
-        self.aircraftPerf = self.aircraft.flight_model(self.aircraft,
-                                                       self.fs)
+        self.aircraftPerf = self.aircraft.flight_model(self.fs)
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                      self.aircraftPerf, etap)
         self.power = Power(self.aircraft, self.fs)
@@ -118,11 +118,11 @@ class FlightSegment(Model):
             self.power["P_{oper}"] >= self.power["P_{acc}"] + self.aircraftPerf["P_{shaft}"]
             ]
 
-        Model.__init__(self, None, [self.aircraft, self.submodels, constraints])
+        return self.aircraft, self.submodels, constraints
 
 class SteadyLevelFlight(Model):
     "steady level flight model"
-    def __init__(self, state, aircraft, perf, etap, **kwargs):
+    def setup(self, state, aircraft, perf, etap, **kwargs):
 
         T = Variable("T", "N", "thrust")
         etaprop = Variable("\\eta_{prop}", etap, "-", "propulsive efficiency")
@@ -135,10 +135,10 @@ class SteadyLevelFlight(Model):
                   *aircraft["S"]),
             perf["P_{shaft}"] >= T*state["V"]/etaprop]
 
-        Model.__init__(self, None, constraints, **kwargs)
+        return constraints
 
 class Power(Model):
-    def __init__(self, static, state, **kwargs):
+    def setup(self, static, state):
 
         Poper = Variable("P_{oper}", "W", "Aircraft operating power")
         Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
@@ -152,21 +152,20 @@ class Power(Model):
             static["E_{batt}"] >= (Poper*state["t_{night}"]
                                    / static["\\eta_{discharge}"])
             ]
-        Model.__init__(self, None, constraints, **kwargs)
+        return constraints
 
 class Mission(Model):
     "define mission for aircraft"
-    def __init__(self, etap=0.7, latitude=35, percent=80, altitude=60000,
+    def setup(self, etap=0.7, latitude=35, percent=80, altitude=60000,
                  day=355):
         # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
         solarsimple = Aircraft()
         fs = FlightSegment(solarsimple, etap, latitude, percent, altitude, day)
 
-        cost = solarsimple["W"]
-
-        Model.__init__(self, cost, [solarsimple, fs])
+        return solarsimple, fs
 
 if __name__ == "__main__":
     M = Mission()
+    M.cost = M["W"]
     sol = M.solve("mosek")
