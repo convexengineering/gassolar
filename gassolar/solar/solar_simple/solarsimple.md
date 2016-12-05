@@ -4,7 +4,7 @@
 ```python
 #inPDF: skip
 from solarsimple import Mission
-from gpkitmodels.environment.wind_speeds import get_windspeed
+from gassolar.environment.wind_speeds import get_windspeed
 from solar.solar_irradiance import get_Eirr
 import matplotlib.pyplot as plt
 import numpy as np
