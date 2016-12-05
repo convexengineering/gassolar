@@ -1,7 +1,7 @@
 " Simple Solar-Electric Powered Aircraft Model "
 from solar_irradiance import get_Eirr
 from gpkit import Model, Variable
-from gpkitmodels.aircraft.GP_submodels.wing import WingAero
+from gpkitmodels.aircraft.GP_submodels.wing import WingAero, Wing
 from gassolar.environment.wind_speeds import get_windspeed
 from gassolar.environment.air_properties import get_airvars
 from gpkitmodels.helpers import summing_vars
@@ -11,7 +11,7 @@ class Aircraft(Model):
     def setup(self):
 
         self.solarcells = SolarCells()
-        self.wing = Wing()
+        self.wing = Wing(hollow=True)
         self.battery = Battery()
 
         self.components = [self.solarcells, self.wing, self.battery]
@@ -19,15 +19,25 @@ class Aircraft(Model):
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
 
-        constraints = [self.wing["W"] >= Wtotal*self.wing["f"],
-                       Wtotal >= (Wpay +
-                                  sum(summing_vars(self.components, "W"))),
-                       self.solarcells["S"] <= self.wing["S"]]
+        constraints = [
+            Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
+            self.solarcells["S"] <= self.wing["S"]]
 
         return constraints, self.components
 
     def flight_model(self, state):
         return AircraftPerf(self, state)
+
+    def loading(self, Wcent):
+        return AircraftLoading(self, Wcent)
+
+class AircraftLoading(Model):
+    "aircraft loading cases"
+    def setup(self, aircraft, Wcent):
+
+        loading = aircraft.wing.loading(Wcent)
+
+        return loading
 
 class Battery(Model):
     "battery model"
@@ -62,26 +72,26 @@ class BatteryPerf(Model):
 
         return constraints
 
-class Wing(Model):
-    "simple wing model"
-    def setup(self):
-
-        S = Variable("S", "ft**2", "planform area")
-        b = Variable("b", "ft", "wing span")
-        cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
-        AR = Variable("AR", 27, "-", "aspect ratio")
-        W = Variable("W", "lbf", "structural weight")
-        f = Variable("f", 0.35, "-", "fractional structural weight")
-
-        constraints = [b**2 == S*AR,
-                       cmac == S/b,
-                       W == W,
-                       f == f]
-
-        return constraints
-
-    def flight_model(self, state):
-        return WingAero(self, state)
+# class Wing(Model):
+#     "simple wing model"
+#     def setup(self):
+#
+#         S = Variable("S", "ft**2", "planform area")
+#         b = Variable("b", "ft", "wing span")
+#         cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
+#         AR = Variable("AR", 27, "-", "aspect ratio")
+#         W = Variable("W", "lbf", "structural weight")
+#         f = Variable("f", 0.35, "-", "fractional structural weight")
+#
+#         constraints = [b**2 == S*AR,
+#                        cmac == S/b,
+#                        W == W,
+#                        f == f]
+#
+#         return constraints
+#
+#     def flight_model(self, state):
+#         return WingAero(self, state)
 
 class SolarCells(Model):
     "solar cell model"
@@ -192,7 +202,7 @@ class FlightSegment(Model):
 
 class SteadyLevelFlight(Model):
     "steady level flight model"
-    def setup(self, state, aircraft, perf, etap, **kwargs):
+    def setup(self, state, aircraft, perf, etap):
 
         T = Variable("T", "N", "thrust")
         etaprop = Variable("\\eta_{prop}", etap, "-", "propulsive efficiency")
@@ -209,14 +219,19 @@ class SteadyLevelFlight(Model):
 
 class Mission(Model):
     "define mission for aircraft"
-    def setup(self, etap=0.7, latitude=35, percent=80, altitude=60000,
-                 day=355):
+    def setup(self, etap=0.7, latitude=35, percent=80, altitude=60000, day=355):
         # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
-        solarsimple = Aircraft()
-        fs = FlightSegment(solarsimple, etap, latitude, percent, altitude, day)
+        Wcent = Variable("W_{cent}", "lbf", "center weight")
 
-        return solarsimple, fs
+        self.solar = Aircraft()
+        fs = FlightSegment(self.solar, etap, latitude, percent, altitude, day)
+        loading = AircraftLoading(self.solar, Wcent)
+        loading.substitutions.update({"N_{max}": 5})
+
+        constraints = [Wcent >= self.solar["W_{pay}"] + self.solar.battery["W"]]
+
+        return self.solar, fs, loading, constraints
 
 if __name__ == "__main__":
     M = Mission()
