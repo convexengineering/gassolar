@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: gassolarpaper.aux
+The style file: aiaa.bst
+Database file #1: biblibrary.bib
+Warning--entry type for "wind" isn't style-file defined
+--line 124 of file biblibrary.bib
+Warning--entry type for "bending" isn't style-file defined
+--line 158 of file biblibrary.bib
+Warning--entry type for "density" isn't style-file defined
+--line 167 of file biblibrary.bib
+Warning--entry type for "br2" isn't style-file defined
+--line 182 of file biblibrary.bib
+You've used 9 entries,
+            2292 wiz_defined-function locations,
+            616 strings with 5251 characters,
+and the built_in function-call counts, 1192 in all, are:
+= -- 74
+> -- 34
+< -- 2
++ -- 17
+- -- 8
+* -- 69
+:= -- 168
+add.period$ -- 15
+call.type$ -- 9
+change.case$ -- 2
+chr.to.int$ -- 3
+cite$ -- 9
+duplicate$ -- 72
+empty$ -- 166
+format.name$ -- 8
+if$ -- 269
+int.to.chr$ -- 0
+int.to.str$ -- 9
+missing$ -- 6
+newline$ -- 31
+num.names$ -- 8
+pop$ -- 38
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 44
+stack$ -- 0
+substring$ -- 26
+swap$ -- 14
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 0
+while$ -- 10
+width$ -- 10
+write$ -- 69
+(There were 4 warnings)

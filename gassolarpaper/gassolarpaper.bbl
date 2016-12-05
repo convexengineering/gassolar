@@ -1,0 +1,37 @@
+\begin{thebibliography}{1}
+\newcommand{\enquote}[1]{``#1''}
+
+\bibitem{gp}
+Boyd, S., \enquote{A Tutorial on Geometric Programming,} {\em Optimization and
+  Engineering\/}, Vol.~8, No.~1, 2007, pp.~67--127.
+
+\bibitem{hoburgthesis}
+Hoburg, W., {\em Aircraft Design Optimization as a Geometric Program\/}, Ph.D.
+  thesis, University of California, Berkeley, 2013.
+
+\bibitem{wind}
+for Medium-Range Weather~Forecasts, E.~C., \enquote{ERA Interim, Daily,} .
+
+\bibitem{density}
+\enquote{Density of Air,} .
+
+\bibitem{solar}
+McMordie, R.~K., {\em Solar Energy Fundamentals\/}, The Fairmont Printing
+  Press, Inc., 2012.
+
+\bibitem{br2}
+Lutze, F.~H., \enquote{AOE 3104 Vehicle Performance,} .
+
+\bibitem{fitting}
+Warren~Hoburg, P.~K., \enquote{Data fitting with
+  geometric-programming-compatible softmax functions,} {\em Optimization and
+  Engineering\/}, 2016.
+
+\bibitem{raymer}
+Raymer, D.~P., {\em Aircraft Design: A Conceptual Approach\/}, American
+  Institute of Aeronautics and Astronautics, Inc., 4th ed., 2006.
+
+\bibitem{bending}
+Drela, M., \enquote{Wing Bending Calculations,} .
+
+\end{thebibliography}

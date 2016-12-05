@@ -4,7 +4,7 @@
 ```python
 #inPDF: skip
 from gassimple import Mission
-from gpkitmodels.environment.wind_speeds import get_windspeed
+from gassolar.environment.wind_speeds import get_windspeed
 import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams.update({'font.size':19})
