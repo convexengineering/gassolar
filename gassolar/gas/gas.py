@@ -177,3 +177,5 @@ if __name__ == "__main__":
     M.cost = 1/M["t_Mission, Loiter"]
     sol = M.solve("mosek")
     print sol.table()
+
+
