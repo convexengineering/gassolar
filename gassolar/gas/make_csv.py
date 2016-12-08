@@ -10,8 +10,13 @@ def sketch_params(M, sol, varnames, othervars=None, pointmasses=None):
 
     data = {}
     for vname in varnames:
-        data[vname.replace(",", "")] = [sol(vname).magnitude, unitstr(M[vname].descr["units"]),
-                       M[vname].descr["label"]]
+        uts = unitstr(M[vname].descr["units"])
+        if "ft" not in uts and uts != "":
+            spt = uts.split("*")
+            spt[0] = "ft"
+            uts = "".join(spt)
+        data[vname.replace(", ", "-")] = [sol(vname).to(uts).magnitude, uts,
+                                          M[vname].descr["label"]]
 
     if othervars:
         data.update(othervars)
@@ -37,7 +42,7 @@ if __name__ == "__main__":
     sol = M.solve("mosek")
 
     sketchvars = [
-        "R_Mission, Aircraft, Fuselage", "l_Mission, Aircraft, Fuselage",
+        "R_Mission, Aircraft, Fuselage",
         "S_Mission, Aircraft, Wing", "b_Mission, Aircraft, Wing",
         "l_Mission, Aircraft, Empennage, TailBoom", "d_0",
         "b_Mission, Aircraft, Empennage, HorizontalTail",
