@@ -44,8 +44,12 @@ S = Mission(altitude=50000)
 S.substitutions.update({"W_{pay}": 10})
 S.substitutions.update({"\\eta_{prop}": 0.75})
 S.substitutions.update({"CDA_0": 0.002})
-for a in [80, 85, 90, 95]:
+S.substitutions.update({"\\rho_{solar}": 0.3})
+S.substitutions.update({"h_{batt}": 400})
+S.cost = S["W"]
+for a in [70, 75, 80, 85, 90, 95]:
     b = []
+    sen = []
     for l in lat:
         wind = get_windspeed(l, a, 50000, 355)
         irr, td, tn = get_Eirr(l, 355)
@@ -56,29 +60,39 @@ for a in [80, 85, 90, 95]:
         try:
             sol = S.solve("mosek")
             b.append(sol("W").magnitude)
+            sen.append(sol["sensitivities"]["constants"]["\\rho"])
         except RuntimeWarning:
             b.append(np.nan)
+            sen.append(np.nan)
     ax.plot(lat, b)
 
-ax.set_ylim([0, 500])
+ax.set_ylim([0, 30000])
 ax.grid()
 ax.set_xlabel("Latitude [deg]")
-ax.set_ylabel("Max Take Off Weight [lbf]")
-ax.legend(["%d Percentile Winds" % a for a in [80, 85, 90, 95]], loc=2, fontsize=15)
+ax.set_ylabel("span [ft]")
+ax.legend(["%d Percentile Winds" % a for a in [70, 75, 80, 85, 90, 95]], loc=2, fontsize=15)
 fig.savefig("mtowvslatsolarh50k.pdf", bbox_inches="tight")
+
+fig, ax = plt.subplots()
+ax.plot(lat, sen)
+ax.set_xlabel("Latitude [deg]")
+ax.set_ylabel("Sensitivities")
+ax.grid()
+fig.savefig("latsensitivitiesh50.pdf")
 
 """ latitutde span """
 fig, ax = plt.subplots()
 lat = np.arange(0, 60, 1)
-S = Mission(altitude=50000)
+S = Mission(altitude=60000)
 S.substitutions.update({"W_{pay}": 10})
-S.substitutions.update({"\\eta_{prop}": 0.75})
-S.substitutions.update({"CDA_0": 0.002})
-S.cost = S["b"]
-for a in [80, 85, 90, 95]:
-    b = []
+S.substitutions.update({"\\eta_{prop}": 0.85})
+S.substitutions.update({"CDA_0": 0.001})
+S.cost = S["W"]
+for a in [70, 75, 80, 85, 90, 95]:
+    b1 = []
+    sen = []
     for l in lat:
-        wind = get_windspeed(l, a, 50000, 355)
+        wind = get_windspeed(l, a, 60000, 355)
         irr, td, tn = get_Eirr(l, 355)
         S.substitutions.update({"V_{wind}": wind})
         S.substitutions.update({"(E/S)_{irr}": irr})
@@ -86,14 +100,24 @@ for a in [80, 85, 90, 95]:
         S.substitutions.update({"t_{night}": tn})
         try:
             sol = S.solve("mosek")
-            b.append(sol("b").magnitude)
+            b1.append(sol("W").magnitude)
+            sen.append(sol["sensitivities"]["constants"]["\\rho"])
         except RuntimeWarning:
-            b.append(np.nan)
-    ax.plot(lat, b)
+            b1.append(np.nan)
+            sen.append(np.nan)
+    ax.plot(lat, b1)
 
-ax.set_ylim([0, 500])
+ax.set_ylim([0, 30000])
 ax.grid()
 ax.set_xlabel("Latitude [deg]")
 ax.set_ylabel("Span [ft]")
-ax.legend(["%d Percentile Winds" % a for a in [80, 85, 90, 95]], loc=2, fontsize=15)
-fig.savefig("spanvslatsolarh50k.pdf", bbox_inches="tight")
+ax.legend(["%d Percentile Winds" % a for a in [70, 75, 80, 85, 90, 95]], loc=2, fontsize=15)
+fig.savefig("mtowvslatsolarh60k.pdf", bbox_inches="tight")
+
+fig, ax = plt.subplots()
+ax.plot(lat, sen)
+ax.set_xlabel("Latitude [deg]")
+ax.set_ylabel("Sensitivities")
+ax.grid()
+fig.savefig("latsensitivitiesh60.pdf")
+
