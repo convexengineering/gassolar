@@ -15,7 +15,7 @@ def sketch_params(M, sol, varnames, othervars=None, pointmasses=None):
             spt = uts.split("*")
             spt[0] = "ft"
             uts = "".join(spt)
-        data[vname.replace(", ", "-")] = [sol(vname).to(uts).magnitude, uts,
+        data[vname.replace(", ", "-").replace("\\", "")] = [sol(vname).to(uts).magnitude, uts,
                                           M[vname].descr["label"]]
 
     if othervars:
