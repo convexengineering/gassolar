@@ -100,13 +100,43 @@ def plot_fit(altitude):
     ax.grid()
     return fig, ax
 
+def return_yfit(cnstr, x, fittype):
+    """
+    given a constraint and x data, return y
+
+    Inputs
+    ------
+    cnstr: Constraint - (MonomialInequality, MonomialEquality,
+                         PosynomialInequality)
+    x: 1D or 2D array - array of input values in log space
+    fittype: string - "MA", "SMA",  or "ISMA"
+
+    Output
+    ------
+    y: 1D array - array of output for the given x inputs in log space
+
+    """
+
+    y = 0
+
+    if x.ndim == 1:
+        x = x.reshape(x.size, 1)
+
+    if fittype == "MA":
+        if not hasattr(cnstr, "__len__"):
+            cnstr = [cnstr]
+        params = np.hstack([[np.log(cn.left.c), cn.left.exp.items()[0][1]]
+                            for cn in cnstr])
+        y, _ = max_affine(x, params)
+
+    return y
+
 if __name__ == "__main__":
 
     X, Y = fit_setup()
     cns, rm = fit(X, Y, 2, "MA")
-    X = X.reshape(X.size, 1)
 
-    yfit, _ = max_affine(X, np.hstack([[np.log(cn.left.c), cn.left.exp.items()[0][1]] for cn in cns]))
+    yfit = return_yfit(cns, X, "MA")
     fig, ax = plt.subplots()
     ax.plot(np.exp(X), np.exp(Y), "*")
     ax.plot(np.exp(X), np.exp(yfit))
