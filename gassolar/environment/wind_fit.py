@@ -1,49 +1,50 @@
 " fitting wind speed data "
 import numpy as np
-from gpfit.fit import fit
-from wind_speeds import get_windspeed
 import matplotlib.pyplot as plt
+import pandas as pd
+from gpfit.fit import fit
+from gassolar.environment.wind_speeds import get_windspeed, interpolate
+from gpfit.max_affine import max_affine
 plt.rc("text", usetex=True)
 
-def fit_setup(altitude=[50000, 70000], latitude=[30, 45], percentage=90):
+def fit_setup(altitude=(40000, 80000), latitude=45, percentage=90):
+    """
+    Function that sets up the fit for altitude versus density. Density in
+    10^-1 kg/m^3
+
+    Inputs
+    ------
+    altitude: tuple - two values for the upper and lower bound of altitude
+              range (ex. (40000, 80000)). Altitude in ft
+    latitude: int - latitude of earth in degrees
+    percentage: int - percentile wind speeds
+
+    Outputs
+    ------
+    x: 1D array of x values for fit
+    y: 1D array of y values for fit
+
+    """
 
     N = 20
-    wind = []
     altitude = np.linspace(altitude[0], altitude[1], N)
-    for l in range(latitude[0], latitude[1]+1, 1):
-        wind.append(get_windspeed(l, percentage, altitude, 355))
+    wind = get_windspeed(latitude, percentage, altitude, 355)
+    df = pd.read_csv("usstd_atm.csv")
+    hm = altitude*0.3048
+    density = []
+    for h in hm:
+        indh = df["Altitude"][df["Altitude"] > h].index[0]
+        indl = indh-1
+        xs = [df["Altitude"][indl], df["Altitude"][indh]]
+        ys = [df["Density"][indl], df["Density"][indh]]
+        density.append(interpolate(xs, ys, h))
 
-    lats = range(latitude[0], latitude[1]+1, 1)*N
-    alts = [[a]*(latitude[1]-latitude[0] + 1) for a in altitude]
-
-    u1 = lats
-    u2 = np.hstack(alts)/1000
-    if np.diff(latitude)[0] == 0:
-        u = u2
-    else:
-        u = [u1, u2]
+    u = np.hstack(density)
     w = np.hstack(wind)
     x = np.log(u)
     y = np.log(w)
 
     return x, y
-
-def sweep_lats(lat_low, K=3, fn="SMA"):
-
-    error = []
-    for l in lat_low:
-        x, y = fit_setup(latitude=[l, 45])
-        cn, rm = fit(x, y, K, fn)
-        error.append(rm)
-
-    return error
-
-def plot_errors(x, y, xlabel, ylabel):
-    fig, ax = plt.subplots()
-    ax.plot(x, y)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    return fig, ax
 
 def return_fitSMA(u_1):
 
@@ -100,35 +101,13 @@ def plot_fit(altitude):
     return fig, ax
 
 if __name__ == "__main__":
-    # RMS = sweep_lats(range(30, 46, 1))
-    # F, A = plot_errors(range(30, 46, 1), RMS, "lower lat", "RMS")
-    # F.savefig("laterror.pdf")
-    # X, Y = fit_setup(latitude=[45, 45])
-    # cn, rm = fit(X, Y, 3, "SMA")
 
-    F, A = plot_fit(np.linspace(50, 70, 20))
-    A.set_title("45 deg latitude")
-    F.savefig("windaltfit50k-70k.pdf")
-    # fig, ax = plt.subplots()
-    # wind = []
-    # for l in range(20, 46, 1):
-    #     wind.append(get_windspeed(l, 90, 60000, 355))
-    # ax.loglog(wind, range(20, 46, 1))
-    # ax.grid()
-    # ax.set_xlabel("wind speed [m/s] in log space")
-    # ax.set_ylabel("latitude in log space")
-    # ax.set_title("Altitude=60,000 ft")
-    # fig.savefig("windlatlogh60k.pdf")
-    # u = range(20, 46, 1)
-    # w = wind
-    # x = np.log(u)
-    # y = np.log(w)
-    # cn, rm = fit(x, y, 1, "SMA")
+    X, Y = fit_setup()
+    cns, rm = fit(X, Y, 2, "MA")
+    X = X.reshape(X.size, 1)
 
-    # X, Y = fit_setup(altitude=[40000, 80000], latitude=[45, 45])
-    # cn, rm = fit(X, Y, 3, "SMA")
-    # F, A = plot_fit(np.linspace(40, 80, 20))
-    # A.set_title("45 deg latitude")
-    # F.savefig("windaltfit40k-80k.pdf")
-
-
+    yfit, _ = max_affine(X, np.hstack([[np.log(cn.left.c), cn.left.exp.items()[0][1]] for cn in cns]))
+    fig, ax = plt.subplots()
+    ax.plot(np.exp(X), np.exp(Y), "*")
+    ax.plot(np.exp(X), np.exp(yfit))
+    fig.savefig("testfit.pdf")
