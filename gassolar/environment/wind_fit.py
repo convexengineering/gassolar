@@ -9,7 +9,7 @@ from gpfit.softmax_affine import softmax_affine
 from gpfit.implicit_softmax_affine import implicit_softmax_affine
 plt.rc("text", usetex=True)
 
-def fit_setup(altitude=(40000, 80000), latitude=45, percentage=90):
+def fit_setup(altitude=(40000, 80000), latitude=45):
     """
     Function that sets up the fit for altitude versus density. Density in
     10^-1 kg/m^3
@@ -29,9 +29,15 @@ def fit_setup(altitude=(40000, 80000), latitude=45, percentage=90):
     """
 
     N = 20
+    percentiles = range(75, 100, 5) + [99]
     altitude = np.linspace(altitude[0], altitude[1], N)
-    wind = get_windspeed(latitude, percentage, altitude, 355)
     df = pd.read_csv("usstd_atm.csv")
+    wind = []
+    ps = []
+    for p in percentiles:
+        wind.append(get_windspeed(latitude, p, altitude, 355))
+        ps.append([p]*len(altitude))
+
     hm = altitude*0.3048
     density = []
     for h in hm:
@@ -41,57 +47,13 @@ def fit_setup(altitude=(40000, 80000), latitude=45, percentage=90):
         ys = [df["Density"][indl], df["Density"][indh]]
         density.append(interpolate(xs, ys, h))
 
-    u = np.hstack(density)
+    u1 = np.hstack([density]*len(percentiles))
+    u2 = np.hstack(ps)
     w = np.hstack(wind)
-    x = np.log(u)
+    x = np.log([u1, u2])
     y = np.log(w)
 
     return x, y
-
-def return_fitSMA(u_1):
-
-    "K=3"
-    # w = (132960 * (u_1)**-2.38864 + 9.23163e-05 * (u_1)**2.73706
-    #      + 8356.28 * (u_1)**-4.01751)**(1/0.763341)
-    "K=4, RMS=0.004059"
-    w = (1.16012e+180 * (u_1)**-97.6238 + 7.97629e+134 * (u_1)**-120.996
-         + 2.31229e-93 * (u_1)**123.733
-         + 3.24369e+213 * (u_1)**-46.4295)**(1/86.4913)
-
-    "K=5, RMS=0.0154"
-    # w = (3540.95 * (u_1)**-2.26982 + 4681.92 * (u_1)**-2.26415
-    #      + 3345.87 * (u_1)**-1.95286 + 1.60184 * (u_1)**-3.46449
-    #      + 0.00256264 * (u_1)**1.67464)**(1/0.420148)
-
-    "K=3, RM=0.01519, alt=[40000,80000]"
-    # w = (6.33474e-17 * (u_1)**10.9121 + 1.03701e+09 * (u_1)**-2.90501
-    #      + 1.92786e-48 * (u_1)**-35.1658)**(1/2.61021)
-
-    return w
-
-def plot_fit(altitude):
-
-    alt = np.linspace(altitude[0], altitude[-1], 100)
-    fig, ax = plt.subplots()
-    wfit = return_fitSMA(alt)
-    wdata = get_windspeed(45, 90, altitude*1000, 355)
-    ax.plot(wdata, altitude, "bo")
-    ax.plot(wfit, alt, "b-")
-    ax.set_xlabel("wind speed [m/s]")
-    ax.set_ylabel("altitude [kft]")
-    ax.set_xlim([0, 60]) #max(np.concatenate((wdata, wfit)))])
-    ax.set_ylim([40, 80])
-    ax.text(0, 70, "eq: $w^{86.5} = 1.16e+180u_1^{-97.6}$\n \
-                    $+ 7.97e+134u_1^{-120.996}$\n \
-                    $+ 2.31e-93u_1^{123.733}$\n \
-                    $+ 3.24e+213u_1^{-46.4295}$\n \
-                    RMS = 0.004059", fontsize=12)
-    # ax.text(0, 70, "eq: $w^{-2.90} = 6.33e-17u_1^{10.91}$ \n \
-    #                 $+ 1.03e+09u_1^{-2.90}$\n \
-    #                 $+ 1.92e-48u_1^{-35.16}$ \n \
-    #                 RMS = 0.01519", fontsize=12)
-    ax.grid()
-    return fig, ax
 
 def return_yfit(cnstr, x, fittype):
     """
@@ -114,42 +76,70 @@ def return_yfit(cnstr, x, fittype):
 
     if x.ndim == 1:
         x = x.reshape(x.size, 1)
+    else:
+        x = x.T
 
     if fittype == "MA":
         if not hasattr(cnstr, "__len__"):
             cnstr = [cnstr]
-        params = np.hstack([[np.log(cn.left.c), cn.left.exp.items()[0][1]]
-                            for cn in cnstr])
+        vkn = range(1, len(cnstr[0].varkeys))
+        expos = np.array(
+            [cn.left.exp[list(cn.varkeys["u_%d" % n])[0]] for cn in cnstr
+             for n in vkn]).reshape(len(cnstr), len(vkn))
+        params = np.hstack([np.hstack([np.log(cn.left.c), ex])
+                            for cn, ex in zip(cnstr, expos)])
         y, _ = max_affine(x, params)
 
     elif fittype == "SMA":
-        alpha = 1./cnstr.left.exp.items()[0][1]
-        exps = [e.items()[0][1] for e in cns.right.exps]
-        params = np.hstack([[np.log(c**(alpha)), e*alpha]
-                            for c, e in zip(cnstr.right.cs, exps)])
+        wvk = [vk for vk in cnstr.varkeys if vk.name == "w"][0]
+        alpha = [1/ex[wvk] for ex in cnstr.left.exps][0]
+        vkn = range(1, len(cnstr.varkeys))
+        expos = np.array(
+            [e[list(cnstr.varkeys["u_%d" % n])[0]] for e in cnstr.right.exps
+             for n in vkn]).reshape(len(cnstr.right.cs), len(vkn))
+        params = np.hstack([np.hstack([np.log(c**(alpha))] + [ex*alpha])
+                            for c, ex in zip(cnstr.right.cs, expos)])
         params = np.append(params, alpha)
         y, _ = softmax_affine(x, params)
 
     elif fittype == "ISMA":
         wvk = [vk for vk in cnstr.varkeys if vk.name == "w"][0]
-        u1vk = [vk for vk in cnstr.varkeys if vk.name == "u_1"][0]
         alphas = [-1/ex[wvk] for ex in cnstr.left.exps]
-        exps = [ex[u1vk] for ex in cnstr.left.exps]
-        params = np.hstack([[np.log(c**a), e*a] for c, e, a in
-                            zip(cns.left.cs, exps, alphas)])
+        vkn = range(1, len(cnstr.varkeys))
+        expos = np.array(
+            [e[list(cnstr.varkeys["u_%d" % n])[0]] for e in cnstr.left.exps
+             for n in vkn]).reshape(len(cnstr.left.cs), len(vkn))
+        params = np.hstack([np.hstack([np.log(c**a)] + [e*a]) for c, e, a in
+                            zip(cns.left.cs, expos, alphas)])
         params = np.append(params, alphas)
         y, _ = implicit_softmax_affine(x, params)
 
     return y
 
+def plot_fits(xdata, ydata, yfit):
+
+    x1 = np.flipud(np.unique(xdata[0]))
+    x2 = np.unique(xdata[1])
+    colors = ["b", "r", "g", "m", "k", "y"]
+    assert len(colors) == len(x2)
+    fig, ax = plt.subplots()
+    for p, y, yf, cl in zip(x2, ydata.reshape(len(x2), len(x1)),
+                            yfit.reshape(len(x2), len(x1)), colors):
+        ax.plot(np.exp(x1), np.exp(y), "o", c=cl)
+        ax.plot(np.exp(x1), np.exp(yf), c=cl,
+                label="%d Percentile Winds" % np.rint(np.exp(p)))
+    ax.legend(fontsize=8)
+    ax.set_xlabel("Air Density $10^{-1}$ [kg/m$^3$]")
+    ax.set_ylabel("Wind Speed [m/s]")
+    ax.grid()
+    return fig, ax
+
 if __name__ == "__main__":
 
     X, Y = fit_setup()
-    cns, rm = fit(X, Y, 1, "ISMA")
+    cns, rm = fit(X, Y, 4, "SMA")
 
-    yfit = return_yfit(cns, X, "ISMA")
+    yfit = return_yfit(cns, X, "SMA")
+    fig, ax = plot_fits(X, Y, yfit)
 
-    fig, ax = plt.subplots()
-    ax.plot(np.exp(X), np.exp(Y), "*")
-    ax.plot(np.exp(X), np.exp(yfit))
     fig.savefig("testfit.pdf")
