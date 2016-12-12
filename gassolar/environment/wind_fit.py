@@ -2,9 +2,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from gpfit.fit import fit
 from gassolar.environment.wind_speeds import get_windspeed, interpolate
+from gpfit.fit import fit
 from gpfit.max_affine import max_affine
+from gpfit.softmax_affine import softmax_affine
+from gpfit.implicit_softmax_affine import implicit_softmax_affine
 plt.rc("text", usetex=True)
 
 def fit_setup(altitude=(40000, 80000), latitude=45, percentage=90):
@@ -67,15 +69,6 @@ def return_fitSMA(u_1):
 
     return w
 
-def return_fitMA(u):
-
-    w = []
-    for u_1 in u:
-        w1 = 0.946766 * (u_1)**0.809363
-        w2 = 48550.4 * (u_1)**-1.80477
-        w.append(max([w1, w2]))
-    return w
-
 def plot_fit(altitude):
 
     alt = np.linspace(altitude[0], altitude[-1], 100)
@@ -129,14 +122,33 @@ def return_yfit(cnstr, x, fittype):
                             for cn in cnstr])
         y, _ = max_affine(x, params)
 
+    elif fittype == "SMA":
+        alpha = 1./cnstr.left.exp.items()[0][1]
+        exps = [e.items()[0][1] for e in cns.right.exps]
+        params = np.hstack([[np.log(c**(alpha)), e*alpha]
+                            for c, e in zip(cnstr.right.cs, exps)])
+        params = np.append(params, alpha)
+        y, _ = softmax_affine(x, params)
+
+    elif fittype == "ISMA":
+        wvk = [vk for vk in cnstr.varkeys if vk.name == "w"][0]
+        u1vk = [vk for vk in cnstr.varkeys if vk.name == "u_1"][0]
+        alphas = [-1/ex[wvk] for ex in cnstr.left.exps]
+        exps = [ex[u1vk] for ex in cnstr.left.exps]
+        params = np.hstack([[np.log(c**a), e*a] for c, e, a in
+                            zip(cns.left.cs, exps, alphas)])
+        params = np.append(params, alphas)
+        y, _ = implicit_softmax_affine(x, params)
+
     return y
 
 if __name__ == "__main__":
 
     X, Y = fit_setup()
-    cns, rm = fit(X, Y, 2, "MA")
+    cns, rm = fit(X, Y, 1, "ISMA")
 
-    yfit = return_yfit(cns, X, "MA")
+    yfit = return_yfit(cns, X, "ISMA")
+
     fig, ax = plt.subplots()
     ax.plot(np.exp(X), np.exp(Y), "*")
     ax.plot(np.exp(X), np.exp(yfit))
