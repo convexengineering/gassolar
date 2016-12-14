@@ -87,8 +87,7 @@ if __name__ == "__main__":
     constraintlist = []
     data = {}
 
-    # for l in range(20, 60, 1):
-    for l in [40]:
+    for l in range(20, 60, 1):
         print "Fitting for %d latitude" % l
         altitudestart = range(40000, 50500, 500)
         for j, a in enumerate(altitudestart):
