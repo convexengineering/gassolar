@@ -5,13 +5,11 @@ import pandas as pd
 from gassolar.environment.wind_speeds import get_windspeed, interpolate
 from gpfit.fit import fit
 from gpfit.evaluate_fit import evaluate_fit
-from gpfit.max_affine import max_affine
-from gpfit.softmax_affine import softmax_affine
-from gpfit.implicit_softmax_affine import implicit_softmax_affine
 plt.rc("text", usetex=True)
 
 PERCT_NORM = 100.0
-WIND_NORM = 10.0
+WIND_NORM = 100.0
+RHO_NORM = 1.0
 
 def fit_setup(altitude=(40000, 80000), latitude=45):
     """
@@ -40,17 +38,15 @@ def fit_setup(altitude=(40000, 80000), latitude=45):
     ps = []
     for p in percentiles:
         wind.append(np.array(get_windspeed(latitude, p, altitude, 355))
-                             / WIND_NORM)
+                    / WIND_NORM)
         ps.append([p/PERCT_NORM]*len(altitude))
 
     hm = altitude*0.3048
-    density = []
-    for h in hm:
-        indh = df["Altitude"][df["Altitude"] > h].index[0]
-        indl = indh-1
-        xs = [df["Altitude"][indl], df["Altitude"][indh]]
-        ys = [df["Density"][indl], df["Density"][indh]]
-        density.append(interpolate(xs, ys, h))
+    g = 9.80665 # m/s^2
+    R = 287.04 # m^2/K/s^2
+    T11 = 216.65 # K
+    p = 22632*np.exp(-g/R/T11*(hm-11000))
+    density = p/R/T11*RHO_NORM
 
     u1 = np.hstack([density]*len(percentiles))
     u2 = np.hstack(ps)
@@ -87,24 +83,32 @@ if __name__ == "__main__":
     constraintlist = []
     data = {}
 
-    for l in range(20, 60, 1):
+    for l in range(20, 61, 1):
         print "Fitting for %d latitude" % l
         altitudestart = range(40000, 50500, 500)
         for j, a in enumerate(altitudestart):
             X, Y = fit_setup(altitude=(a, 80000), latitude=l)
             tol = True
             i = 0
+            rms = []
             while tol:
-                if i > 5:
+                if i > 100:
                     tol = False
                     continue
                 else:
                     print "rms iter=%d" % i
                 np.random.seed(i)
                 cns, rm = fit(X, Y, 4, "SMA")
+                rms.append(rm)
                 if rm > 0.05:
                     i += 1
                     print "Latitude: %d     RMS Error: %.3f" % (l, rm)
+                    if rm > 0.06:
+                        print "RMS too big... try new altitude range"
+                        tol = False
+                    if i > 10 and np.all(np.round(rms, 3), round(rm, 3)):
+                        print "RPM not changing... try new altitude range"
+                        tol = False
                     continue
                 yfit = evaluate_fit(cns, X, "SMA")
                 if not hasattr(yfit, "__len__"):
@@ -122,10 +126,10 @@ if __name__ == "__main__":
                     [e[list(cns.varkeys["u_%d" % n])[0]] for e in
                      cns.right.exps for n in vkn]).reshape(
                          len(cns.right.cs), len(vkn))
-                params = np.hstack([np.hstack([c] + [ex]) for c, ex in
-                                    zip(cns.right.cs, expos)])
+                params = np.hstack([l] + [np.hstack([c] + [ex]) for c, ex in
+                                          zip(cns.right.cs, expos)])
                 params = np.append(params, alpha)
-                data[l] = params
+                data["%d" % l] = params
                 break
             else:
                 print "RMS Error: %.3f, Alt iter=%d" % (rm, j)
@@ -137,5 +141,6 @@ if __name__ == "__main__":
     colnames = np.hstack([["c%d" % d, "e%d1" % d, "e%d2" % d] for d in
                           range(1, 5, 1)])
     colnames = np.append(colnames, "alpha")
+    colnames = np.insert(colnames, 0, "latitude")
     df.columns = colnames
     df.to_csv("windaltfitdata.csv")
