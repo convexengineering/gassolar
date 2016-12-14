@@ -2,8 +2,7 @@
 from gassolar.solar.solar_irradiance import get_Eirr
 from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero
-from gassolar.environment.wind_speeds import get_windspeed
-from gassolar.environment.air_properties import get_airvars
+from gassolar.solar.solar import FlightState
 
 class Aircraft(Model):
     "vehicle"
@@ -65,48 +64,12 @@ class AircraftPerf(Model):
 
         return self.wing, constraints
 
-class FlightState(Model):
-    """
-    environmental state of aircraft
-
-    inputs
-    ------
-    latitude: earth latitude [deg]
-    altitude: flight altitude [ft]
-    percent: percentile wind speeds [%]
-    day: day of the year [Jan 1st = 1]
-    """
-    def setup(self, latitude=45, percent=90, altitude=15000, day=355):
-
-        wind = get_windspeed(latitude, percent, altitude, day)
-        density, vis = get_airvars(altitude)
-        esirr, td, tn = get_Eirr(latitude, day)
-
-        Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
-        V = Variable("V", "m/s", "true airspeed")
-        rho = Variable("\\rho", density, "kg/m**3", "air density")
-        mu = Variable("\\mu", vis, "N*s/m**2", "dynamic viscosity")
-        ESirr = Variable("(E/S)_{irr}", esirr, "W*hr/m^2",
-                         "Average daytime solar energy")
-        tday = Variable("t_{day}", td, "hr", "Daylight span")
-        tnight = Variable("t_{night}", tn, "hr", "Night span")
-
-        constraints = [V >= Vwind,
-                       rho == rho,
-                       mu == mu,
-                       ESirr == ESirr,
-                       tday == tday,
-                       tnight == tnight]
-
-        return constraints
-
 class FlightSegment(Model):
     "flight segment"
-    def setup(self, aircraft, etap=0.7, latitude=35, percent=80,
-                 altitude=60000, day=355):
+    def setup(self, aircraft, etap=0.7, latitude=35, day=355):
 
         self.aircraft = aircraft
-        self.fs = FlightState(latitude, percent, altitude, day)
+        self.fs = FlightState(latitude, day)
         self.aircraftPerf = self.aircraft.flight_model(self.fs)
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                      self.aircraftPerf, etap)
@@ -156,14 +119,15 @@ class Power(Model):
 
 class Mission(Model):
     "define mission for aircraft"
-    def setup(self, etap=0.7, latitude=35, percent=80, altitude=60000,
-                 day=355):
+    def setup(self, etap=0.7, latitude=35, day=355):
         # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
         solarsimple = Aircraft()
-        fs = FlightSegment(solarsimple, etap, latitude, percent, altitude, day)
+        mission = []
+        for l in range(20, latitude+1, 1):
+            mission.append(FlightSegment(solarsimple, etap, l, day))
 
-        return solarsimple, fs
+        return solarsimple, mission
 
 if __name__ == "__main__":
     M = Mission()
