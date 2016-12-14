@@ -1,10 +1,12 @@
 " Simple Solar-Electric Powered Aircraft Model "
+import pandas as pd
+import numpy as np
 from solar_irradiance import get_Eirr
 from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero, Wing
-from gassolar.environment.wind_speeds import get_windspeed
-from gassolar.environment.air_properties import get_airvars
 from gpkitmodels.helpers import summing_vars
+
+DF = pd.read_csv("/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/windaltfitdata.csv")
 
 class Aircraft(Model):
     "vehicle"
@@ -71,27 +73,6 @@ class BatteryPerf(Model):
             static["E"] >= Poper*state["t_{night}"]/static["\\eta_{discharge}"]]
 
         return constraints
-
-# class Wing(Model):
-#     "simple wing model"
-#     def setup(self):
-#
-#         S = Variable("S", "ft**2", "planform area")
-#         b = Variable("b", "ft", "wing span")
-#         cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
-#         AR = Variable("AR", 27, "-", "aspect ratio")
-#         W = Variable("W", "lbf", "structural weight")
-#         f = Variable("f", 0.35, "-", "fractional structural weight")
-#
-#         constraints = [b**2 == S*AR,
-#                        cmac == S/b,
-#                        W == W,
-#                        f == f]
-#
-#         return constraints
-#
-#     def flight_model(self, state):
-#         return WingAero(self, state)
 
 class SolarCells(Model):
     "solar cell model"
@@ -161,37 +142,55 @@ class FlightState(Model):
     percent: percentile wind speeds [%]
     day: day of the year [Jan 1st = 1]
     """
-    def setup(self, latitude=45, percent=90, altitude=15000, day=355):
+    def setup(self, latitude=45, day=355):
 
-        wind = get_windspeed(latitude, percent, altitude, day)
-        density, vis = get_airvars(altitude)
+        df = DF[DF["latitude"] == latitude]
         esirr, td, tn = get_Eirr(latitude, day)
 
-        Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
+        Vwind = Variable("V_{wind}", "m/s", "wind velocity")
         V = Variable("V", "m/s", "true airspeed")
-        rho = Variable("\\rho", density, "kg/m**3", "air density")
-        mu = Variable("\\mu", vis, "N*s/m**2", "dynamic viscosity")
+        rho = Variable("\\rho", "kg/m**3", "air density")
+        mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity")
         ESirr = Variable("(E/S)_{irr}", esirr, "W*hr/m^2",
                          "Average daytime solar energy")
         tday = Variable("t_{day}", td, "hr", "Daylight span")
         tnight = Variable("t_{night}", tn, "hr", "Night span")
+        pct = Variable("p_{wind}", 0.9, "-", "percentile wind speeds")
+        Vwindref = Variable("V_{wind-ref}", 100.0, "m/s",
+                            "reference wind speed")
+        rhoref = Variable("\\rho_{ref}", 1.0, "kg/m**3",
+                          "reference air density")
+        mfac = Variable("m_{fac}", 1.0, "-", "wind speed margin factor")
 
-        constraints = [V >= Vwind,
-                       rho == rho,
-                       mu == mu,
-                       ESirr == ESirr,
-                       tday == tday,
-                       tnight == tnight]
+        constraints = [
+            V/mfac >= Vwind,
+            rho == rho,
+            mu == mu,
+            ESirr == ESirr,
+            tday == tday,
+            tnight == tnight,
+            (Vwind/Vwindref)**df["alpha"].iloc[0] >= (
+                sum([df["c%d" % i]*(rho/rhoref)**df["e%d1" % i]
+                     * pct**df["e%d2" % i] for i in range(1, 5)]).iloc[0])
+            ]
 
         return constraints
 
+def altitude(density):
+    g = 9.80665 # m/s^2
+    R = 287.04 # m^2/K/s^2
+    T11 = 216.65 # K
+    p11 = 22532 # Pa
+    p = density*R*T11
+    h = (11000 - R*T11/g*np.log(p/p11))/0.3048
+    return h
+
 class FlightSegment(Model):
     "flight segment"
-    def setup(self, aircraft, etap=0.7, latitude=35, percent=80,
-                 altitude=60000, day=355):
+    def setup(self, aircraft, etap=0.7, latitude=35, day=355):
 
         self.aircraft = aircraft
-        self.fs = FlightState(latitude, percent, altitude, day)
+        self.fs = FlightState(latitude=latitude, day=day)
         self.aircraftPerf = self.aircraft.flight_model(self.fs)
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                      self.aircraftPerf, etap)
@@ -219,21 +218,25 @@ class SteadyLevelFlight(Model):
 
 class Mission(Model):
     "define mission for aircraft"
-    def setup(self, etap=0.7, latitude=35, percent=80, altitude=60000, day=355):
+    def setup(self, etap=0.7, latitude=35, day=355):
         # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
         self.solar = Aircraft()
-        fs = FlightSegment(self.solar, etap, latitude, percent, altitude, day)
+        mission = []
+        for l in range(20, latitude+1, 1):
+            mission.append(FlightSegment(self.solar, etap, latitude=l))
         loading = AircraftLoading(self.solar, Wcent)
-        loading.substitutions.update({"N_{max}": 5})
+        loading.substitutions.update({"N_{max}": 2})
 
         constraints = [Wcent >= self.solar["W_{pay}"] + self.solar.battery["W"]]
 
-        return self.solar, fs, loading, constraints
+        return self.solar, mission, loading, constraints
 
 if __name__ == "__main__":
-    M = Mission()
+    M = Mission(latitude=45)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
+    h = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))
+
