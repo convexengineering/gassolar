@@ -20,9 +20,11 @@ class Aircraft(Model):
 
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
+        Wwing = Variable("W_{wing}", "lbf", "wing weight")
 
         constraints = [
             Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
+            Wwing >= (sum(summing_vars([self.wing, self.battery], "W"))),
             self.solarcells["S"] <= self.wing["S"],
             self.wing["c_{MAC}"]**2*0.5*self.wing["\\tau"]*self.wing["b"] >= (
                 self.battery["\\mathcal{V}"])]
@@ -32,14 +34,14 @@ class Aircraft(Model):
     def flight_model(self, state):
         return AircraftPerf(self, state)
 
-    def loading(self, Wcent):
-        return AircraftLoading(self, Wcent)
+    def loading(self, Wcent, Wwing, V, CL):
+        return AircraftLoading(self, Wcent, Wwing, V, CL)
 
 class AircraftLoading(Model):
     "aircraft loading cases"
-    def setup(self, aircraft, Wcent):
+    def setup(self, aircraft, Wcent, Wwing, V, CL):
 
-        loading = aircraft.wing.loading(Wcent)
+        loading = aircraft.wing.loading(Wcent, Wwing, V, CL)
 
         return loading
 
@@ -224,7 +226,7 @@ class SteadyLevelFlight(Model):
 
 class Mission(Model):
     "define mission for aircraft"
-    def setup(self, etap=0.7, latitude=35, day=355):
+    def setup(self, latitude=35, day=355):
         # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
         Wcent = Variable("W_{cent}", "lbf", "center weight")
@@ -232,16 +234,17 @@ class Mission(Model):
         self.solar = Aircraft()
         mission = []
         for l in range(20, latitude+1, 1):
-            mission.append(FlightSegment(self.solar, etap, latitude=l))
-        loading = AircraftLoading(self.solar, Wcent)
-        loading.substitutions.update({"N_{max}": 2})
+            mission.append(FlightSegment(self.solar, latitude=l, day=day))
+        loading = self.solar.loading(Wcent, self.solar["W_{wing}"], mission[-1]["V"], mission[-1]["C_L"])
+        for vk in loading.varkeys["N_{max}"]:
+            loading.substitutions.update({vk: 2})
 
         constraints = [Wcent >= self.solar["W_{pay}"]]
 
         return self.solar, mission, loading, constraints
 
 if __name__ == "__main__":
-    M = Mission(latitude=45)
+    M = Mission(latitude=35)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
     h = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))
