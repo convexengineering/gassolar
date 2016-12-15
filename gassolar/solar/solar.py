@@ -23,7 +23,9 @@ class Aircraft(Model):
 
         constraints = [
             Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
-            self.solarcells["S"] <= self.wing["S"]]
+            self.solarcells["S"] <= self.wing["S"],
+            self.wing["c_{MAC}"]**2*0.5*self.wing["\\tau"]*self.wing["b"] >= (
+                self.battery["\\mathcal{V}"])]
 
         return constraints, self.components
 
@@ -53,8 +55,12 @@ class Battery(Model):
         E = Variable("E", "J", "total battery energy")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery energy density")
+        vbatt = Variable("(E/\\mathcal{V})", 800, "W*hr/l",
+                         "volume battery energy density")
+        Volbatt = Variable("\\mathcal{V}", "m**3", "battery volume")
 
         constraints = [W >= E/hbatt*g,
+                       Volbatt >= E/vbatt,
                        eta_charge == eta_charge,
                        eta_discharge == eta_discharge]
 
@@ -230,7 +236,7 @@ class Mission(Model):
         loading = AircraftLoading(self.solar, Wcent)
         loading.substitutions.update({"N_{max}": 2})
 
-        constraints = [Wcent >= self.solar["W_{pay}"] + self.solar.battery["W"]]
+        constraints = [Wcent >= self.solar["W_{pay}"]]
 
         return self.solar, mission, loading, constraints
 
