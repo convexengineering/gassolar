@@ -39,91 +39,28 @@ plt.rcParams.update({'font.size':19})
 
 """ latitutde """
 fig, ax = plt.subplots()
-lat = np.arange(0, 60, 1)
-S = Mission(altitude=50000)
-S.substitutions.update({"W_{pay}": 10})
-S.substitutions.update({"\\eta_{prop}": 0.75})
-S.substitutions.update({"CDA_0": 0.002})
-S.substitutions.update({"\\rho_{solar}": 0.3})
-S.substitutions.update({"h_{batt}": 400})
-S.cost = S["W"]
-for a in [70, 75, 80, 85, 90, 95]:
-    b = []
-    sen = []
+lat = np.arange(20, 60, 1)
+for a in [80, 90, 95]:
+    W = []
     for l in lat:
-        wind = get_windspeed(l, a, 50000, 355)
-        irr, td, tn = get_Eirr(l, 355)
-        S.substitutions.update({"V_{wind}": wind})
-        S.substitutions.update({"(E/S)_{irr}": irr})
-        S.substitutions.update({"t_{day}": td})
-        S.substitutions.update({"t_{night}": tn})
+        M = Mission(latitude=l)
+        M.substitutions.update({"W_{pay}": 10})
+        for vk in M.varkeys["CDA_0"]:
+            M.substitutions.update({vk: 0.002})
+        for vk in M.varkeys["p_{wind}"]:
+            M.substitutions.update({vk: a/100.0})
+        M.substitutions.update({"\\rho_{solar}": 0.25})
+        M.cost = M["W"]
         try:
-            sol = S.solve("mosek")
-            b.append(sol("W").magnitude)
-            sen.append(sol["sensitivities"]["constants"]["\\rho"])
+            sol = M.solve("mosek")
+            W.append(sol("W").magnitude)
         except RuntimeWarning:
-            b.append(np.nan)
-            sen.append(np.nan)
-    ax.plot(lat, b)
+            W.append(np.nan)
+    ax.plot(lat, W)
 
-ax.set_ylim([0, 30000])
+ax.set_ylim([0, 2000])
 ax.grid()
 ax.set_xlabel("Latitude [deg]")
 ax.set_ylabel("Max Take Off Weight [lbs]")
-ax.legend(["%d Percentile Winds" % a for a in [70, 75, 80, 85, 90, 95]], loc=2, fontsize=15)
-ax.set_title("Altitude = 50,000 ft")
-fig.savefig("mtowvslatsolarh50k.pdf", bbox_inches="tight")
-
-fig, ax = plt.subplots()
-ax.plot(lat, sen)
-ax.set_xlabel("Latitude [deg]")
-ax.set_ylabel("sensitivity to air density")
-ax.set_ylim([0, 600])
-ax.set_title("Altitude = 50,000 ft")
-ax.grid()
-fig.savefig("latsensitivitiesh50.pdf")
-
-""" latitutde span """
-fig, ax = plt.subplots()
-lat = np.arange(0, 60, 1)
-S = Mission(altitude=60000)
-S.substitutions.update({"W_{pay}": 10})
-S.substitutions.update({"\\eta_{prop}": 0.85})
-S.substitutions.update({"CDA_0": 0.001})
-S.cost = S["W"]
-for a in [70, 75, 80, 85, 90, 95]:
-    b1 = []
-    sen = []
-    for l in lat:
-        wind = get_windspeed(l, a, 60000, 355)
-        irr, td, tn = get_Eirr(l, 355)
-        S.substitutions.update({"V_{wind}": wind})
-        S.substitutions.update({"(E/S)_{irr}": irr})
-        S.substitutions.update({"t_{day}": td})
-        S.substitutions.update({"t_{night}": tn})
-        try:
-            sol = S.solve("mosek")
-            b1.append(sol("W").magnitude)
-            sen.append(sol["sensitivities"]["constants"]["\\rho"])
-        except RuntimeWarning:
-            b1.append(np.nan)
-            sen.append(np.nan)
-    ax.plot(lat, b1)
-
-ax.set_ylim([0, 30000])
-ax.grid()
-ax.set_xlabel("Latitude [deg]")
-ax.set_ylabel("Max Take Off Weight [lbs]")
-ax.legend(["%d Percentile Winds" % a for a in [70, 75, 80, 85, 90, 95]], loc=2, fontsize=15)
-ax.set_title("Altitude = 60,000 ft")
-fig.savefig("mtowvslatsolarh60k.pdf", bbox_inches="tight")
-
-fig, ax = plt.subplots()
-ax.plot(lat, sen)
-ax.set_xlabel("Latitude [deg]")
-ax.set_ylabel("sensitivity to air density")
-ax.set_ylim([0, 600])
-ax.grid()
-ax.set_title("Altitude = 60,000 ft")
-fig.savefig("latsensitivitiesh60.pdf")
-
+ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
+fig.savefig("mtowvslatsolar.pdf", bbox_inches="tight")
