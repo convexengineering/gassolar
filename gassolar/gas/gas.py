@@ -18,7 +18,7 @@ class Aircraft(Model):
     def setup(self, Wfueltot, DF70=False):
 
         self.fuselage = Fuselage(Wfueltot)
-        self.wing = Wing(spar="TubeSpar")
+        self.wing = Wing()
         self.engine = Engine(DF70)
         self.empennage = Empennage()
 
