@@ -129,6 +129,10 @@ class Mission(Model):
 
         return solarsimple, mission
 
+    def test(self):
+        self.cost = self["W"]
+        self.solve("mosek")
+
 if __name__ == "__main__":
     M = Mission()
     M.cost = M["W"]

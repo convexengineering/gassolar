@@ -243,6 +243,10 @@ class Mission(Model):
 
         return self.solar, mission, loading, constraints
 
+    def test(self):
+        self.cost = self["W_{total}"]
+        self.solve("mosek")
+
 if __name__ == "__main__":
     M = Mission(latitude=35)
     M.cost = M["W_{total}"]

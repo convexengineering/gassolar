@@ -172,6 +172,10 @@ class Mission(Model):
 
         return JHO, mission, loading, constraints
 
+    def test(self):
+        self.cost = 1/self["t_Mission, Loiter"]
+        self.solve("mosek")
+
 if __name__ == "__main__":
     M = Mission()
     M.cost = 1/M["t_Mission, Loiter"]
