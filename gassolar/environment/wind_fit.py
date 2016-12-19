@@ -69,7 +69,7 @@ def plot_fits(xdata, ydata, yfit, latitude, rm=None):
         ax.plot(np.exp(x1), np.exp(yf)*WIND_NORM, c=cl,
                 label="%d Percentile Winds" % np.rint(np.exp(p)*PERCT_NORM))
     ax.legend(fontsize=8)
-    ax.set_xlabel("Air Density $10^{-1}$ [kg/m$^3$]")
+    ax.set_xlabel("Air Density [kg/m$^3$]")
     ax.set_ylabel("Wind Speed [m/s]")
     ax.grid()
     if rm:
