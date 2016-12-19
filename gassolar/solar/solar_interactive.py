@@ -2,11 +2,13 @@
 import pandas as pd
 import numpy as np
 from numpy import pi
+import matplotlib.pyplot as plt
 import os
 from solar_irradiance import get_Eirr
 from gpkit import Model, Variable, Vectorize
 from gpkitmodels.helpers import summing_vars
 from constant_taper_chord import c_bar
+from gpfit.softmax_affine import softmax_affine
 
 path = "/" + os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace("/solar/", "/environment/")
 DF = pd.read_csv(path + "windaltfitdata.csv")
@@ -458,6 +460,15 @@ def altitude(density):
     h = (11000 - R*T11/g*np.log(p/p11))/0.3048
     return h
 
+def density(altitude):
+    g = 9.80665 # m/s^2
+    R = 287.04 # m^2/K/s^2
+    T11 = 216.65 # K
+    p11 = 22532 # Pa
+    p = 22632*np.exp(-g/R/T11*(altitude*0.3048-11000))
+    den = p/R/T11
+    return den
+
 class FlightSegment(Model):
     "flight segment"
     def setup(self, aircraft, etap=0.7, latitude=35, day=355):
@@ -496,25 +507,56 @@ class Mission(Model):
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
         self.solar = Aircraft()
-        mission = []
+        self.mission = []
         for l in range(20, latitude+1, 1):
-            mission.append(FlightSegment(self.solar, latitude=l, day=day))
-        loading = self.solar.loading(Wcent, self.solar["W_{wing}"], mission[-1]["V"], mission[-1]["C_L"])
+            self.mission.append(FlightSegment(self.solar, latitude=l, day=day))
+        loading = self.solar.loading(Wcent, self.solar["W_{wing}"], self.mission[-1]["V"], self.mission[-1]["C_L"])
         for vk in loading.varkeys["N_{max}"]:
             loading.substitutions.update({vk: 2})
 
         constraints = [Wcent >= self.solar["W_{pay}"]]
 
-        return self.solar, mission, loading, constraints
+        return self.solar, self.mission, loading, constraints
+
+def windalt_plot(latitude, sol):
+    alt = np.linspace(40000, 80000, 20)
+    den = density(alt)
+    x = np.log([np.hstack([den]*6),
+                np.hstack([[p/100.0]*len(den)
+                           for p in range(75, 100, 5) + [99]])]).T
+
+    df = DF[DF["latitude"] == latitude]
+    params = np.append(np.hstack([[
+        np.log((df["c%d" % i]**(1/df["alpha"])).iloc[0]),
+        (df["e%d1" % i]/df["alpha"]).iloc[0],
+        (df["e%d2" % i]/df["alpha"]).iloc[0]] for i in range(1, 5)]),
+                       1/df["alpha"].iloc[0])
+
+    vwind = (np.exp(softmax_affine(x, params)[0])*100).reshape(6, 20)[3]
+    fig, ax = plt.subplots()
+    ax.plot(alt/1000.0, vwind*1.95384)
+    altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
+    vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
+    ax.plot(altsol/1000, vsol, "*")
+    ax.set_xlabel("Altitude [kft]")
+    ax.set_ylabel("Aircraft Velocity [knots]")
+    ax.grid()
+    ax.set_ylim([0, 200])
+    fig.savefig("solaltitude%d.pdf" % latitude)
 
 if __name__ == "__main__":
-    M = Mission(latitude=35)
+    M = Mission(latitude=21)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
-    h = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))
 
     M.cost = M["b"]
     sol = M.solve("mosek")
 
     M.cost = M["S_Mission, Aircraft, SolarCells"]
     sol = M.solve("mosek")
+
+    for l in range(21, 38):
+        M = Mission(latitude=l)
+        M.cost = M["W_{total}"]
+        sol = M.solve("mosek")
+        windalt_plot(l, sol)
