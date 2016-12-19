@@ -1,10 +1,12 @@
 " Simple Solar-Electric Powered Aircraft Model "
 import pandas as pd
 import numpy as np
+from numpy import pi
 import os
 from solar_irradiance import get_Eirr
-from gpkit import Model, Variable
+from gpkit import Model, Variable, Vectorize
 from gpkitmodels.helpers import summing_vars
+from constant_taper_chord import c_bar
 
 path = "/" + os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace("/solar/", "/environment/")
 DF = pd.read_csv(path + "windaltfitdata.csv")
@@ -490,7 +492,6 @@ class SteadyLevelFlight(Model):
 class Mission(Model):
     "define mission for aircraft"
     def setup(self, latitude=35, day=355):
-        # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
@@ -506,14 +507,14 @@ class Mission(Model):
 
         return self.solar, mission, loading, constraints
 
-def test():
-    M = Mission(latitude=35)
-    M.cost = M["W_{total}"]
-    M.solve("mosek")
-
 if __name__ == "__main__":
     M = Mission(latitude=35)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
     h = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))
 
+    M.cost = M["b"]
+    sol = M.solve("mosek")
+
+    M.cost = M["S_Mission, Aircraft, SolarCells"]
+    sol = M.solve("mosek")
