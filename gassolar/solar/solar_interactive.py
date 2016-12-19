@@ -47,7 +47,7 @@ class Wing(Model):
     def setup(self, N=5, lam=0.5, spar="CapSpar", hollow=False):
 
         W = Variable("W", "lbf", "weight")
-        mfac = Variable("m_{fac}", 1.2, "-", "wing weight margin factor")
+        mfac = Variable("m_{fac}", 1.0, "-", "wing weight margin factor")
         S = Variable("S", "ft^2", "surface area")
         AR = Variable("AR", "-", "aspect ratio")
         b = Variable("b", "ft", "wing span")
@@ -390,7 +390,7 @@ class AircraftPerf(Model):
         self.flight_models = [self.wing, self.solarcells, self.battery]
 
         CD = Variable("C_D", "-", "aircraft drag coefficient")
-        cda0 = Variable("CDA_0", 0.005, "-", "non-wing drag coefficient")
+        cda0 = Variable("CDA_0", 0.002, "-", "non-wing drag coefficient")
         Pshaft = Variable("P_{shaft}", "hp", "shaft power")
         Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
         constraints = [
@@ -471,7 +471,7 @@ def density(altitude):
 
 class FlightSegment(Model):
     "flight segment"
-    def setup(self, aircraft, etap=0.7, latitude=35, day=355):
+    def setup(self, aircraft, etap=0.8, latitude=35, day=355):
 
         self.aircraft = aircraft
         self.fs = FlightState(latitude=latitude, day=day)
@@ -542,7 +542,7 @@ def windalt_plot(latitude, sol):
     ax.set_ylabel("Aircraft Velocity [knots]")
     ax.grid()
     ax.set_ylim([0, 200])
-    fig.savefig("solaltitude%d.pdf" % latitude)
+    return fig, ax
 
 if __name__ == "__main__":
     M = Mission(latitude=21)
@@ -559,4 +559,5 @@ if __name__ == "__main__":
         M = Mission(latitude=l)
         M.cost = M["W_{total}"]
         sol = M.solve("mosek")
-        windalt_plot(l, sol)
+        fig, ax, = windalt_plot(l, sol)
+        fig.savefig("solaltitude%d.pdf" % latitude)
