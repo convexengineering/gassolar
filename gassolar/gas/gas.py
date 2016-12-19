@@ -2,7 +2,7 @@
 import numpy as np
 from gpkitmodels.aircraft.GP_submodels.gas_engine import Engine
 from gpkitmodels.aircraft.GP_submodels.wing import Wing
-from gpkitmodels.aircraft.GP_submodels.fuselage import Fuselage
+from gpkitmodels.aircraft.GP_submodels.elliptical_fuselage import Fuselage
 from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
 from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
 from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
@@ -58,7 +58,6 @@ class AircraftLoading(Model):
 
         loading = [aircraft.wing.loading(Wcent)]
         loading.append(aircraft.empennage.loading())
-        loading.append(aircraft.fuselage.loading(Wcent))
 
         tbstate = TailBoomState()
         loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
