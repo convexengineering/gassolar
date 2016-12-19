@@ -537,7 +537,7 @@ def windalt_plot(latitude, sol):
     ax.plot(alt/1000.0, vwind*1.95384)
     altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
     vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
-    ax.plot(altsol/1000, vsol, "*", markersize=20)
+    ax.plot(altsol/1000, vsol, "o", markersize=20, fillstyle="none")
     ax.set_xlabel("Altitude [kft]")
     ax.set_ylabel("Wind Speed [knots]")
     ax.grid()
