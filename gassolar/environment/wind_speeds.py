@@ -1,11 +1,12 @@
 "wind_speeds.py"
 import pandas as pd
 import numpy as np
+import os
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size':19})
 
 def get_windspeed(latitude, perc, altitude, day,
-                  path="/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/windspeeds/"):
+                  path= "/" + os.path.abspath(__file__).replace(os.path.basename(__file__), "") + "windspeeds/"):
     """
     Method to return windspeeds for different latitudes
     altitudes/percentiles

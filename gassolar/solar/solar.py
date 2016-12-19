@@ -1,12 +1,14 @@
 " Simple Solar-Electric Powered Aircraft Model "
 import pandas as pd
 import numpy as np
+import os
 from solar_irradiance import get_Eirr
 from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero, Wing
 from gpkitmodels.helpers import summing_vars
 
-DF = pd.read_csv("/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/windaltfitdata.csv")
+path = "/" + os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace("/solar/", "/environment/")
+DF = pd.read_csv(path + "windaltfitdata.csv")
 
 class Aircraft(Model):
     "vehicle"
