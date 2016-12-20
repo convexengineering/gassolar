@@ -304,34 +304,44 @@ The wind speed at a station is a function of latitude, altitude, season or day o
     V_{wind} = f(\phi, h, DOY, \text{Percentile Wind Speed}).
     \end{equation}
 
-Wind speed data was collected from the ERA Interim atmospheric datasets for the year 2015.\cite{wind} 
-It is assumed that the wind speeds can be approximated by averaging over the entire year. (i.e. $V_{wind} = f(\phi, h, \text{Percentile Wind Speed})$) \\
+Wind speed data was collected from the ERA Interim atmospheric datasets for the years 2005-2015.\cite{wind} 
+It is assumed that the wind speeds can be approximated by using wind data across all longitudes. 
 
-Figure~\ref{f:windlat} shows how the wind speed varies with latitude. 
-The wind profiles versus latitude show a maximum between 35-45 degrees latitude, depending on the altitude.  
-The higher wind speeds at these latitudes impose a high constraint on the flight velocity for both gas and solar-electric powered aircraft.  \\
-
+Because wind speeds vary by season, an analysis was done of how wind speeds varyfrom month to month. (Figure~\ref{f:windvsmonth}) Becasue the constraining case for solar-electric powered aircraft is the winter solstice and because the wind speeds are highest during the winter months only the wind speeds from December will be used for all aircraft sizing and performance analysis. 
 
 \begin{figure}[H]
- \begin{subfigmatrix}{2}% number of columns
-     \subfigure[Altitude = 16,000 ft\label{f:latvswindh16}]{\includegraphics{latvswindh16.pdf}}
-     \subfigure[Altitude = 50,000 ft\label{f:latvswindh50}]{\includegraphics{latvswindh50.pdf}}
- \end{subfigmatrix}
- \caption{\textbf{ Variation of wind speed with latitude at altitudes of 16,000 ft (Figure~\ref{f:latvswindh16}) and 50,000 ft (Figure~\ref{f:latvswindh50}).}}
- \label{f:windlat}
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{windvsmonth.pdf}
+    \caption{ \textbf{ Variation of wind speed by month at 45 degrees latitude at altitudes of 15,000 ft, 50,000 ft and 60,000 ft.  Left bound, right bound and middle lines represent 85th, 95th, and 90th percentile winds. }}
+	\label{f:windvsmonth}
+	\end{center}
 \end{figure}
 
-The wind profiles versus altitude show a local maximum around 35,000 ft and a local minimum around 60,000 ft. (Figure~\ref{f:windalt}) 
+Figure~\ref{f:latvswind} shows how the wind speed varies with latitude in the Northern Hemisphere. 
+The left bound on the graphs represent the 85 percentile winds.  The right bound represents the 95 percentile winds and the middle line represents the 90 percentile winds. 
+Because the gas-powered aircraft is assumed to have a naturally aspirated engine, it will tend to fly around 15,000 ft.  
+The solar-electric powered aircraft will operate around 60,000 ft to avoid cloud coverage.  
+Variations of wind speed with latitude are shown for altitudes at both 15,000 ft at and 60,000 ft.  \\
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{latvswind.pdf}
+    \caption{ \textbf{ Variation of wind speed with latitude at altitudes of 15,000 ft, 50,000 ft and 60,000 ft.  Left bound, right bound and middle lines represent 85th, 95th, and 90th percentile winds. Wind data includes winds during December for the year 2005-2015.}}
+	\label{f:latvswind}
+	\end{center}
+\end{figure}
+
+Wind speeds also vary signifactly with altitude. (Figure~\ref{f:altvswind.pdf})
+The high winds around 30,000-40,000 ft makes it difficult for both solar-electric and gas powered long-endurance aircraft to fly in that range of altitudes.  
 Solar-electric powered aircraft, that do not have aspirated engines, fly around 60,000 ft take advantage of lower wind speeds and limited cloud coverage.
 Gas powered aircraft with aispirated engines can have difficulty operating at 60,000 ft and generally perform better in the lower wind speeds below 25,000 ft.
 
 \begin{figure}[H]
- \begin{subfigmatrix}{2}% number of columns
-     \subfigure[30$^{\circ}$ Latitude\label{f:altvswindl30}]{\includegraphics{altvswindl30.pdf}}
-     \subfigure[45$^{\circ}$ Latitude\label{f:altvswindl45}]{\includegraphics{altvswindl45.pdf}}
- \end{subfigmatrix}
- \caption{\textbf{ Variation of wind speed with altitude at latitudes of 30 degrees (Figure~\ref{f:altvswindl30}) and 45 degrees (Figure~\ref{f:altvswindl45}).}}
- \label{f:windalt}
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{altvswind.pdf}
+    \caption{ \textbf{ Variation of wind speed with altitude at latitudes of 30, 35, and 45 degrees.  Left bound, right bound and middle lines represent 85th, 95th, and 90th percentile winds. Wind data includes winds during December for the year 2005-2015.}}
+	\label{f:altvswind}
+	\end{center}
 \end{figure}
 
 In the GP optimization, wind speed is calculated prior to solving the optimization as a function of latitude, altitude and percentile wind speed. 
