@@ -29,7 +29,7 @@ class Aircraft(Model):
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
 
-        self.empennage.verticaltail.substitutions.update({"V_v": 0.02})
+        self.empennage.substitutions["V_v"] = 0.02
 
         constraints = [
             Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
@@ -273,6 +273,7 @@ class Mission(Model):
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
         self.solar = Aircraft()
+        # self.solar.substitutions["V_v"] = 0.02
         mission = []
         for l in range(20, latitude+1, 1):
             mission.append(FlightSegment(self.solar, latitude=l, day=day))
