@@ -344,7 +344,40 @@ Gas powered aircraft with aispirated engines can have difficulty operating at 60
 	\end{center}
 \end{figure}
 
-In the GP optimization, wind speed is calculated prior to solving the optimization as a function of latitude, altitude and percentile wind speed. 
+Because both air density and wind speed vary with altitude, the optimium altitude for the solar-electric powered aircraft at a given latitude is not clear. 
+Additionally, the local minimum around 60,000 ft feet suggests that altitude should be a variable chosen by the optimizer. 
+To achieve this, the data fitting technique described by Hoburg\cite{fitting}, was used to find functions relating wind speed to air density at a given latitude.  
+Air density was chosen as the dependent variable to eliminate altitude as the intermediate variable betweeen air density and wind speed relation. 
+An example contraint of wind speed and air density at the 35 degree latitude is written out in Equation~\ref{e:windfit35},
+
+
+\begin{align}
+    \label{e:windfit35}
+    \left(\frac{V_{wind}}{V_{ref}}\right)^{7.213} &>= 2918\rho^{7.587}p_{wind}^{9.37} + 1.58e^{-10}\rho^{-6.074}p_{wind}^{60.421} + 4.05e^{-16}\rho^{-9.879}p_{wind}^{13.204} + 1048\rho^{6.33}p_{wind}^{46.232}
+\end{align}
+
+where $V_{ref} = 100$ [m/s] and $p_{wind}$ is the percentile wind speed. The comparison of the fitted equation to the actual data is presented in Figure~\ref{f:windfitl35}. 
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{windfitl35.pdf}
+    \caption{ \textbf{ Comparison of a fitted equation of wind speed to air density and percentile wind speed~\eqref{e:windfit35}. The RMS error for this function and data set is 0.043. Wind speed data includes December wind speeds from 2005-2015 at the 35th degree latitude. }}
+	\label{f:windfitl35}
+	\end{center}
+\end{figure}
+
+Similars equations to~\eqref{e:windfit35} were generated for wind speed data from latitudes 20-60 degrees in the Northern Hemisphere (See Appendix A).  The equations are valid within 45,000-80,000 ft to within 5\% of the actual data. 
+
+Operationally, aircraft, such as the solar-electric powered aircarft, will fly within a band of latitudes (i.e. $\pm$45 degrees latitude).  
+To achieve a band of latitude operationality the aircraft must be able to fly at every latitude between the upper and lower bounds.  
+For this reason, latitude was not included as a varible in the fitted equation.  
+Instead to optimize an aircraft for 35 degrees latitude means that the there are 35 seperate wind constraints that must be satisfied, one for each latitude.
+Because wind speeds are low and solar flux is higher below 20 degrees latitude no constraints for latitudes below 20 degrees are actually included in the optimization. 
+
+For the gas powered aircraft, the altitude is not optimized.  
+Gas-powered aircraft, which are naturally aspirated will be less effecient at higher altitudes.  
+Additionally, wind speeds increase nearly linearly up to 30,000 ft.  
+Therefore, the altitude for gas-powered aircraft is determined as a requirement of the payload and the minimum altitude necessary for the payload to be effective. 
 
 \subsubsection{Atmospheric Quantities}
 
