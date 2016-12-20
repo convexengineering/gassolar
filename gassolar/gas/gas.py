@@ -88,7 +88,7 @@ class AircraftPerf(Model):
         Wstart = Variable("W_{start}", "lbf", "vector-begin weight")
         CD = Variable("C_D", "-", "drag coefficient")
         CDA = Variable("CDA", "-", "area drag coefficient")
-        mfac = Variable("m_{fac}", 1.7, "-", "drag margin factor")
+        mfac = Variable("m_{fac}", 1.0, "-", "drag margin factor")
 
         dvars = []
         for dc, dm in zip(areadragcomps, areadragmodel):
@@ -107,7 +107,7 @@ class AircraftPerf(Model):
 class Cruise(Model):
     "make a cruise flight segment"
     def setup(self, aircraft, N, altitude=15000, latitude=45, percent=90,
-                 day=355, R=200):
+              day=355, R=200):
         fs = FlightSegment(aircraft, N, altitude, latitude, percent, day)
 
         R = Variable("R", R, "nautical_miles", "Range to station")
@@ -118,7 +118,7 @@ class Cruise(Model):
 class Climb(Model):
     "make a climb flight segment"
     def setup(self, aircraft, N, altitude=15000, latitude=45, percent=90,
-                 day=355, dh=15000):
+              day=355, dh=15000):
         fs = FlightSegment(aircraft, N, altitude, latitude, percent, day)
 
         with Vectorize(N):
@@ -140,7 +140,7 @@ class Climb(Model):
 
 class Mission(Model):
     "creates flight profile"
-    def setup(self, DF70=False, **kwargs):
+    def setup(self, DF70=False):
 
         mtow = Variable("MTOW", "lbf", "max-take off weight")
         Wcent = Variable("W_{cent}", "lbf", "center aircraft weight")
