@@ -5,6 +5,9 @@ import os
 from solar_irradiance import get_Eirr
 from gpkit import Model, Variable
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero, Wing
+from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
+from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
+from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
 from gpkitmodels.helpers import summing_vars
 
 path = "/" + os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace("/solar/", "/environment/")
@@ -17,8 +20,10 @@ class Aircraft(Model):
         self.solarcells = SolarCells()
         self.wing = Wing(hollow=True)
         self.battery = Battery()
+        self.empennage = Empennage()
 
-        self.components = [self.solarcells, self.wing, self.battery]
+        self.components = [self.solarcells, self.wing, self.battery,
+                           self.empennage]
 
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
@@ -29,7 +34,19 @@ class Aircraft(Model):
             Wwing >= (sum(summing_vars([self.wing, self.battery], "W"))),
             self.solarcells["S"] <= self.wing["S"],
             self.wing["c_{MAC}"]**2*0.5*self.wing["\\tau"]*self.wing["b"] >= (
-                self.battery["\\mathcal{V}"])]
+                self.battery["\\mathcal{V}"]),
+            self.empennage.horizontaltail["V_h"] <= (
+                self.empennage.horizontaltail["S"]
+                * self.empennage.horizontaltail["l_h"]/self.wing["S"]**2
+                * self.wing["b"]),
+            self.empennage.verticaltail["V_v"] <= (
+                self.empennage.verticaltail["S"]
+                * self.empennage.verticaltail["l_v"]/self.wing["S"]
+                / self.wing["b"]),
+            self.wing["C_{L_{max}}"]/self.wing["m_w"] <= (
+                self.empennage.horizontaltail["C_{L_{max}}"]
+                / self.empennage.horizontaltail["m_h"])
+            ]
 
         return constraints, self.components
 
@@ -43,7 +60,13 @@ class AircraftLoading(Model):
     "aircraft loading cases"
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
-        loading = aircraft.wing.loading(Wcent, Wwing, V, CL)
+        loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
+        loading.append(aircraft.empennage.loading())
+
+        tbstate = TailBoomState()
+        loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
+                                           aircraft.empennage.tailboom,
+                                           aircraft.wing, tbstate))
 
         return loading
 
@@ -121,22 +144,36 @@ class AircraftPerf(Model):
         self.wing = static.wing.flight_model(state)
         self.solarcells = static.solarcells.flight_model(state)
         self.battery = static.battery.flight_model(state)
+        self.htail = static.empennage.horizontaltail.flight_model(state)
+        self.vtail = static.empennage.verticaltail.flight_model(state)
+        self.tailboom = static.empennage.tailboom.flight_model(state)
 
-        self.flight_models = [self.wing, self.solarcells, self.battery]
+        self.flight_models = [self.wing, self.htail, self.vtail,
+                              self.tailboom, self.solarcells, self.battery]
+        areadragmodel = [self.htail, self.vtail, self.tailboom]
+        areadragcomps = [static.empennage.horizontaltail,
+                         static.empennage.verticaltail,
+                         static.empennage.tailboom]
 
         CD = Variable("C_D", "-", "aircraft drag coefficient")
-        cda0 = Variable("CDA_0", 0.005, "-", "non-wing drag coefficient")
+        cda = Variable("CDA", "-", "non-wing drag coefficient")
         Pshaft = Variable("P_{shaft}", "hp", "shaft power")
         Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
-        constraints = [
-            ]
+
+        dvars = []
+        for dc, dm in zip(areadragcomps, areadragmodel):
+            if "C_f" in dm.varkeys:
+                dvars.append(dm["C_f"]*dc["S"]/static.wing["S"])
+            if "C_d" in dm.varkeys:
+                dvars.append(dm["C_d"]*dc["S"]/static.wing["S"])
 
         constraints = [
-            CD >= cda0 + self.wing["C_d"],
             self.solarcells["E"] >= (
                 self.battery["P_{oper}"]*state["t_{day}"]
                 + self.battery["E"]/static.battery["\\eta_{discharge}"]),
-            self.battery["P_{oper}"] >= Pacc + Pshaft
+            self.battery["P_{oper}"] >= Pacc + Pshaft,
+            cda >= sum(dvars),
+            CD >= cda + self.wing["C_d"]
             ]
 
         return self.flight_models, constraints
@@ -229,7 +266,6 @@ class SteadyLevelFlight(Model):
 class Mission(Model):
     "define mission for aircraft"
     def setup(self, latitude=35, day=355):
-        # http://sky-sailor.ethz.ch/docs/Conceptual_Design_of_Solar_Powered_Airplanes_for_continuous_flight2.pdf
 
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
@@ -246,12 +282,12 @@ class Mission(Model):
         return self.solar, mission, loading, constraints
 
 def test():
-    M = Mission(latitude=35)
+    M = Mission(latitude=31)
     M.cost = M["W_{total}"]
     M.solve("mosek")
 
 if __name__ == "__main__":
-    M = Mission(latitude=35)
+    M = Mission(latitude=31)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
     h = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))
