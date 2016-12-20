@@ -209,22 +209,43 @@ Solar electric and gas powered architectures are proposed as solutions to this p
 Because sizing long-endurance aircraft is so multifaceted and the interaction between aerodynamics, structural weight, energy and other disciplines is so intertwined, a systematic and rapid approach is needed to explore this design space.
 Geometric programming, a form of convex optimization, is chosen as a means of evalulating the design space because of its ability to solve optimization problems involving thousands of variables in seconds.  
 
-Long-endurance, gas-powered aircraft are primarily sized by the amount of fuel required to achieve a given endurance. 
-The amount of fuel is determined largely by the endurance requirement, efficiency of the propulsive system, the wind speed, and aircraft drag. 
-The wind speed is a function latitude and required percentile wind speed.
-The efficiency of the propulsive system is determined by the engine and propeller selection.  
-The drag is a function of the shape of the aircraft's speed and shape.
-Solar-electric powered aircraft are primarily sized by the number solar cells and batteries required to fly during the day while storing enough energy to fly through the night. 
-The length of the day and the solar energy available during the day are functions of latitude and season. 
-The number of solar cells and batteries is determined by solar cell efficiency, battery energy density, velocity, and aircraft drag.
-Because of these dependencies, varying even one parameter can drastically change the design and aircraft performance.
+The driving condition that sizes solar-electric powered aircraft is operationality or the ability to operate at multiple locations and during all seasons.  
+To achieve a feasible design, solar-electric powered aircraft must carry enouh solar cells and batteries required to fly during the day while storing enough energy to fly through the night. 
+If this condition can be achieved during the winter solstice, when the solar flux is at a minimum, then it can theoretically fly for months at a time. 
+This becomes more difficult to achieve at higher latitudes as the solar flux durin the winter solstice decreases.  
+Additionally, to station keep the aircraft must fly faster than the local wind speeds.  
+Wind speeds are a function of latitude, altitude, and season and tend to increase at higher latitudes and during winter months. 
+Therefore, a key sizing study of solar-electric powered aircraft is the effect of latitude on aircraft size.  
+Figure~\ref{f:bvslatsolar} shows that in order to fly at higher latitudes during the winter a larger aircraft is required. 
 
-To capture the interaction of all of these parameters and requirements, a geometric programming optimization model is built for both the gas and solar-electric powered, long-endurance aircraft.  
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{bvslatsolar.pdf}
+    \caption{ \textbf{ Trade study showing how aircraft size increases with latitude.  }}
+	\label{f:bvslatsolar}
+	\end{center}
+\end{figure}
+
+The key driving requirement for gas-powered aircraft is endurance.  
+As gas-powered aircraft are endurance limited by the amount of fuel that they can carry, longer endurance requires more fuel and hence a larger aircraft.  
+Becuase gas-powered aircraft are not affected by the solar flux, their station-keeping ability at different latitude only depends on wind speed. 
+Therefore, if a gas-powered aircraft can fly at the latitude with the worst wind speed in can theortically fly anywhere else in the world.  
+The key sizing study for the gas-powered airctaft is how weight increases for longer endurance. (Figure~\ref{f:mtowvsendurance}) 
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{mtowvsendurance.pdf}
+    \caption{ \textbf{ Trade study showing how aircraft weight increases with endurance.  }}
+	\label{f:mtowvsendurance}
+	\end{center}
+\end{figure}
+
+To capture the interaction of all of these parameters and requirements and produce the resutls presented, a geometric programming optimization model is built for both the gas and solar-electric powered, long-endurance aircraft.  
 Equations governing the underlying physics of aerodynamic performance, solar energy collection and storage, and fuel burn are written in a geometric programming form which can then be solved as an optimization problem.
 Then by changing the design parameters, such as endurance, latitude, and percentile wind speeds, multiple solutions can be rapidly generated to observe how the aircraft size and weight is affected by different requirements. 
 
-Using this methodology, trade offs can be observed between different aircraft configurations, power sources, and requirements.  
-The results show that gas-powered aircraft can generally be built lighter and can fly faster and can therefore fly at higher latitudes and in percentile wind speeds.  
+Using this methodology, trade offs are observed between different aircraft configurations, power sources, and requirements.  
+The results show that gas-powered aircraft can generally be built lighter and can fly faster and can therefore fly at higher latitudes and in higher percentile wind speeds.  
 Solar-powered aircraft have greater endurance but are limited operationally by their ability to reach higher speeds.  
 This optimization methodology can quantify the difference in weight and endurance between and gas and solar-electric powered aircraft for the same set of requirements. 
 Similar trade offs are calculated for other requirements and performance metrics to determine under what conditions which platform is best suited to meet a set of requirements.
