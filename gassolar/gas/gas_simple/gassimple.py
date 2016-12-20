@@ -89,7 +89,7 @@ class Mission(Model):
 def test():
     M = Mission()
     M.cost = 1/M["t_Mission, Loiter"]
-    M.solve("mosek")
+    M.solve()
 
 if __name__ == "__main__":
     M = Mission()

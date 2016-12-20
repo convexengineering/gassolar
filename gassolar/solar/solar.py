@@ -10,7 +10,7 @@ from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
 from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
 from gpkitmodels.helpers import summing_vars
 
-path = "/" + os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace("/solar/", "/environment/")
+path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
 DF = pd.read_csv(path + "windaltfitdata.csv")
 
 class Aircraft(Model):
@@ -288,11 +288,10 @@ class Mission(Model):
 def test():
     M = Mission(latitude=31)
     M.cost = M["W_{total}"]
-    M.solve("mosek")
+    M.solve()
 
 if __name__ == "__main__":
     M = Mission(latitude=31)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
     h = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))
-

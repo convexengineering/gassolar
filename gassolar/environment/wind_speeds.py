@@ -5,8 +5,11 @@ import os
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size':19})
 
+PATH = (os.path.abspath(__file__).replace(os.path.basename(__file__), "")
+        + "windspeeds" + os.sep)
+
 def get_windspeed(latitude, perc, altitude, day,
-                  path= "/" + os.path.abspath(__file__).replace(os.path.basename(__file__), "") + "windspeeds/"):
+                  path=PATH):
     """
     Method to return windspeeds for different latitudes
     altitudes/percentiles
@@ -31,7 +34,7 @@ def get_windspeed(latitude, perc, altitude, day,
         if mo > day:
             month = mos[i]
             break
-    path += month + "/"
+    path += month + os.sep
 
     # pressure ranges for which there is data
     pressures = [5, 10, 30] + range(50, 1050, 50)
