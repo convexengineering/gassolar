@@ -8,8 +8,7 @@ plt.rcParams.update({'font.size':19})
 PATH = (os.path.abspath(__file__).replace(os.path.basename(__file__), "")
         + "windspeeds" + os.sep)
 
-def get_windspeed(latitude, perc, altitude, day,
-                  path=PATH):
+def get_windspeed(latitude, perc, altitude, day, path=PATH):
     """
     Method to return windspeeds for different latitudes
     altitudes/percentiles
