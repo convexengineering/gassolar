@@ -29,6 +29,8 @@ class Aircraft(Model):
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
 
+        self.empennage.verticaltail.substitutions.update({"V_v": 0.02})
+
         constraints = [
             Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
             Wwing >= (sum(summing_vars([self.wing, self.battery], "W"))),
@@ -45,7 +47,8 @@ class Aircraft(Model):
                 / self.wing["b"]),
             self.wing["C_{L_{max}}"]/self.wing["m_w"] <= (
                 self.empennage.horizontaltail["C_{L_{max}}"]
-                / self.empennage.horizontaltail["m_h"])
+                / self.empennage.horizontaltail["m_h"]),
+            self.wing["\\tau"]*self.wing["c_{root}"] >= self.empennage.tailboom["d_0"]
             ]
 
         return constraints, self.components
@@ -111,7 +114,7 @@ class SolarCells(Model):
     "solar cell model"
     def setup(self):
 
-        rhosolar = Variable("\\rho_{solar}", 0.3, "kg/m^2",
+        rhosolar = Variable("\\rho_{solar}", 0.27, "kg/m^2",
                             "solar cell area density")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         S = Variable("S", "ft**2", "solar cell area")
@@ -234,7 +237,7 @@ def altitude(density):
 
 class FlightSegment(Model):
     "flight segment"
-    def setup(self, aircraft, etap=0.7, latitude=35, day=355):
+    def setup(self, aircraft, etap=0.8, latitude=35, day=355):
 
         self.aircraft = aircraft
         self.fs = FlightState(latitude=latitude, day=day)
