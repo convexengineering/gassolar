@@ -214,11 +214,6 @@ class FlightState(Model):
 
         constraints = [
             V/mfac >= Vwind,
-            rho == rho,
-            mu == mu,
-            ESirr == ESirr,
-            tday == tday,
-            tnight == tnight,
             (Vwind/Vwindref)**df["alpha"].iloc[0] >= (
                 sum([df["c%d" % i]*(rho/rhoref)**df["e%d1" % i]
                      * pct**df["e%d2" % i] for i in range(1, 5)]).iloc[0])
