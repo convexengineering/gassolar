@@ -381,7 +381,18 @@ Therefore, the altitude for gas-powered aircraft is determined as a requirement 
 
 \subsubsection{Atmospheric Quantities}
 
-The altitude also determines the air density,\cite{density}
+For the solar aircraft air density is being optimized and the operating altitude is computed after the fact using Equations~\ref{e:tropopress} and~\ref{e:tropoalt} \cite{isaatm} that apply to the tropopause, 
+
+\begin{align}
+    \label{e:tropopress}
+    p &= \rhoRT_{11} \\
+    \label{e:tropoalt}
+    h &= 11000 - \frac{RT_{11}}{g}\ln{\frac{p}{p_{11}}} \text{[m]} 
+\end{align}
+
+According to Sutherland's law\cite{fluiddyhandbook}, viscosity varies with temperature.  Because temperature is assumed constant above 11,000 meters\cite{isaatm}, viscosity is assumed to be constant, $\mu=1.42e^{-5}$.
+
+Because altitude is a requirement for the gas powered aircraft, density is precomputed prior to solving the optimization using similar atmospheric equations for the troposphere,\cite{isaatm} 
 
 \begin{align}
     \label{e:Talt}
@@ -390,7 +401,14 @@ The altitude also determines the air density,\cite{density}
     \rho = \frac{T_{\text{sl}}T_{\text{atm}}^{\left( \frac{g}{R_{\text{spec}}L} -1 \right)}}{R T_{\text{sl}}^{\frac{g}{R_{\text{spec}}L}}}.
 \end{align}
 
-Air viscosity is assumed constant across all altitudes, $\mu=1e-5$ [k/m/s].
+Air viscosity is also computer prior so solving and is assumed to vary according to Sutherland's law, 
+
+\begin{equation}
+    \label{e:sutherland}
+    \mu = \mu_0 \frac{T_0 + C}{T+C} \left( \frac{T}{T_0} \right)^{\frac{3}{2}}
+\end{equation}
+
+where $\mu_0 = 1.827e^{-5}$ [Ns/m$^2$], $T_0 = 291.15$ [K], and $C = 120$ [K].
 
 \subsection{Solar-Electric Power}
 
