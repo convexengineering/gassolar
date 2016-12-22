@@ -73,11 +73,11 @@ class Mission(Model):
         loiter = Loiter(gassimple)
         mission = [loiter]
 
-        mtow = Variable("MTOW", 200, "lbf", "max take off weight")
+        mtow = Variable("MTOW", "lbf", "max take off weight")
         Wfueltot = Variable("W_{fuel-tot}", "lbf", "total fuel weight")
 
         constraints = [
-            mtow >= loiter["W_{start}"][0],
+            mtow == loiter["W_{start}"][0],
             mtow >= Wfueltot + gassimple["W_{zfw}"],
             Wfueltot >= sum([fs["W_{fuel-fs}"] for fs in mission]),
             mission[-1]["W_{end}"][-1] >= gassimple["W_{zfw}"],
@@ -94,4 +94,4 @@ def test():
 if __name__ == "__main__":
     M = Mission()
     M.cost = 1/M["t_Mission, Loiter"]
-    Sol = M.solve("mosek")
+    sol = M.solve("mosek")
