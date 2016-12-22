@@ -83,7 +83,8 @@ if __name__ == "__main__":
     constraintlist = []
     data = {}
 
-    for l in range(20, 61, 1):
+    # for l in range(20, 61, 1):
+    for l in [54]:
         print "Fitting for %d latitude" % l
         altitudestart = range(40000, 50500, 500)
         for j, a in enumerate(altitudestart):
@@ -121,9 +122,9 @@ if __name__ == "__main__":
                 print "RMS Error: %.3f after iter=%d, Altitude %d" % (rm, j, a)
                 wvk = [vk for vk in cns.varkeys if vk.name == "w"][0]
                 alpha = [ex[wvk] for ex in cns.left.exps][0]
-                vkn = range(1, len(cns.varkeys))
+                vkn = range(len(cns.right.varkeys))
                 expos = np.array(
-                    [e[list(cns.varkeys["u_%d" % n])[0]] for e in
+                    [e[list(cns.varkeys["u_fit_(%d,)" % n])[0]] for e in
                      cns.right.exps for n in vkn]).reshape(
                          len(cns.right.cs), len(vkn))
                 params = np.hstack([l] + [np.hstack([c] + [ex]) for c, ex in
@@ -143,4 +144,4 @@ if __name__ == "__main__":
     colnames = np.append(colnames, "alpha")
     colnames = np.insert(colnames, 0, "latitude")
     df.columns = colnames
-    df.to_csv("windaltfitdata.csv")
+    # df.to_csv("windaltfitdata1.csv")
