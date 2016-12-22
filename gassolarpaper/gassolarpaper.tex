@@ -385,9 +385,9 @@ For the solar aircraft air density is being optimized and the operating altitude
 
 \begin{align}
     \label{e:tropopress}
-    p &= \rhoRT_{11} \\
+    p &= \rho RT_{11} \\
     \label{e:tropoalt}
-    h &= 11000 - \frac{RT_{11}}{g}\ln{\frac{p}{p_{11}}} \text{[m]} 
+    h &= 11000 - \frac{RT_{11}}{g}\frac{p}{p_{11}} \text{[m]} 
 \end{align}
 
 According to Sutherland's law\cite{fluiddyhandbook}, viscosity varies with temperature.  Because temperature is assumed constant above 11,000 meters\cite{isaatm}, viscosity is assumed to be constant, $\mu=1.42e^{-5}$.
