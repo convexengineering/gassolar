@@ -8,7 +8,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams.update({'font.size':19})
 
-LATITUDE = True
+LATITUDE = False
+LOADING = True
+
+""" loading """
+if LOADING:
+    M = Mission(latitude=31)
+    M.cost = M["W_{total}"]
+    sol = M.solve("mosek")
+    eta = np.linspace(0, 1, 100)
+    gbar = 4/np.pi*(1+(sol("W_{cent}")/sol("W_{wing}")).magnitude)*(1-eta)**0.5
+    l = sol("\\lambda_Mission, Aircraft, Wing")
+    cbar = 2/(1+l)*((l-1)*eta + 1)
+    fig, ax = plt.subplots()
+    ax.plot(eta, cbar)
+    ax.plot(eta, gbar)
+    ax.grid()
+    fig.savefig("../../gassolarpaper/gustvschord.pdf")
 
 """ latitutde """
 if LATITUDE:
