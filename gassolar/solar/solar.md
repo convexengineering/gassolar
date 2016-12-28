@@ -18,11 +18,15 @@ if LOADING:
     sol = M.solve("mosek")
     eta = np.linspace(0, 1, 100)
     gbar = 4/np.pi*(1+(sol("W_{cent}")/sol("W_{wing}")).magnitude)*(1-eta)**0.5
+    print "f_{cent/wing} = %.3f" % (sol("W_{cent}")/sol("W_{wing}")).magnitude
     l = sol("\\lambda_Mission, Aircraft, Wing")
     cbar = 2/(1+l)*((l-1)*eta + 1)
     fig, ax = plt.subplots()
     ax.plot(eta, cbar)
     ax.plot(eta, gbar)
+    ax.set_xlabel("$2y/b$")
+    ax.set_ylabel("local $c_l$ / local chord")
+    ax.legend(["local chord", "local $c_l$"])
     ax.grid()
     fig.savefig("../../gassolarpaper/gustvschord.pdf")
 
