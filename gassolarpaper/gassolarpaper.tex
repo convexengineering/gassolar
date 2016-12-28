@@ -847,7 +847,17 @@ This results in a more comprehensive and detailed optimization model for aircraf
 
 A simple approach to modeling a wing spar is to assume that the wing is a beam under bending loads caused by the lifting distribution along the wing and the weight of the aircraft. 
 A conservative approach to calculating the size of the spar is to assume that the spar carries all of the bending loads.  
-It is assumed that the wing loading distribution, $q$, scales with the local chord,\cite{bending}
+
+For the gas powered aircraft it is assumed that all of the fuel is carried. 
+Therefore the key spar sizing case is a standard wing bending acting under both lifting and gravitational forces, 
+
+\begin{equation}
+    \label{e:wloading}
+    q(y) = L'(y) - Ngm'(y)
+\end{equation}
+
+where $q$ is the spanwise distributed load. 
+The wing loading distribution, $q$, can be approximated by scaling of the local chord,\cite{bending}
 
 \begin{equation}
     \label{e:wingloading}
@@ -867,6 +877,81 @@ where $W_{cent}$ is the sum of distributed loads acting at the center of the air
     \label{e:localchord}
     c(y) = \frac{S_{wing}}{b} \frac{2}{1+\lambda} \left( 1 + (\lambda - 1) \frac{2y}{b} \right)
 \end{equation}
+
+For the solar-electic powered aircraft it is assumed that the batteries are located inside the wings.  
+Therefore, it is assumed that the key sizing case for the solar-electric aircraft spar is a gust load that varies arcross the span.  
+The distributed load across the span is assumed to be 
+
+\begin{equation}
+    \label{e:gustdist}
+    \bar{q} = c_{l_{\alpha}} \alpha_{gust} \frac{1}{C_L} \left( 1 + \frac{W_{cent}}{W_{wing}} \right)
+\end{equation}
+
+where the lifting slope coefficient is, $c_{l_{\alpha}}=2\pi$, and $\alpha_{gust}$ is the local angle of attack caused by the gust. The local angle of attack is approximated by 
+
+\begin{equation}
+    \label{e:gustalpha}
+    \alpha_{gust} = \tan^{-1}\left(\frac{V_{gust}}{V} \right).
+\end{equation}
+
+Because the $\arctan$ function is not GP compatible a monomial approximation was calculating using techniques described by Hoburg\cite{fitting},
+
+\begin{equation}
+    \label{e:arctan}
+    \alpha_{gust} = 0.855922 \left(\frac{V_{gust}}{V} \right)^{0.934041}.
+\end{equation}
+
+This approximation is graphically shown in Figure~\ref{f:arctanfit}.  Even though Equation~\ref{e:arctan} is only valid up to gust speed to aircraft speed ratios of, $\frac{V_{gust}}{V} = 0.7$, ...
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{arctanfit.pdf}
+    \caption{ \textbf{ Comparison of monomial approximation of $f(x) = \arctan{x}$ to real function, $x \in [0,1]$. (RMS error = 0.044) }}
+	\label{f:gustvschord}
+	\end{center}
+\end{figure}
+
+The gust velocity has a profile along the wing\cite{acgust},
+
+\begin{equation}
+    \label{e:gustwind}
+    V_{gust} = V_{ref} \left(1-\cos\left(\frac{2y}{b} \frac{\pi}{2} \right) \right)
+\end{equation}
+
+where the reference velocity is an assumed conservative value\cite{acgust}, $V_{ref} = 10$ [m/s]. The gust velocity profile is computed prior to solve to preserve GP-compatiblity. 
+
+The gust distributed load in Equation~\ref{e:gustdist} is derived from Equation~\ref{e:wloading} by assuming that the lifting distibution is a sum of ellpitical and gust lifing forces,
+
+\begin{align}
+    \label{e:ellpgustload}
+    q(y) &= L'_{elliptical} + L'_{gust} - Ngm'(y)
+    \label{e:allpgustload2}
+    &= \frac{4L}{b\pi} \sqrt{1 - \frac{2y}{b}} + c_{l_{\alpha}} \alpha_{gust} \frac{1}{2} \rho V^2 S - \frac{W_{wing}}{S} c'(y)
+\end{align}
+
+The weight of the wing is assummed to vary linearly with the chord. By assuming that the lift, $L$, can be approximated by $L=W=W_{wing} + W_{cent}$, the non-dimensionalize distubted gust load, $\bar{q}$, can be expressed, 
+
+\begin{equation}
+    \label{e:ellpgustload3}
+    \bar{q}(y) = \frac{q(y)b}{NW_{wing}} = \frac{4}{\pi}\left( 1 + \frac{W_{cent}}{W_{wing}}\right) \sqrt{1-\frac{2y}{b}} + \frac{c_{l_{\alpha}}\alpha_{gust}}{C_L} \left( 1 + \frac{W_{cent}}{W_{wing}}\right) - c'(y)
+\end{equation}
+
+It is assumed that the local elliptical lifting contribution is cancelled out by the local chord for a span loaded wing,
+
+\begin{equation}
+    \label{e:cancel}
+    \frac{4}{\pi}\left( 1 + \frac{W_{cent}}{W_{wing}}\right) \sqrt{1-\frac{2y}{b}} \approx c'(y),
+\end{equation}
+
+thus deriving Equation~\ref{e:gustdist}. The approximation in Equation~\ref{e:cancel} is graphically represented in Figure~\ref{f:gustvschord}
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{gustvschord.pdf}
+    \caption{ \textbf{ Graphical representation of assumption that the local chord is equal to the local lift generated from the elliptical distribution. Assumes the center to wing weight ratio, $\frac{W_{cent}}{W_{wing}} = 0.14$. }}
+	\label{f:gustvschord}
+	\end{center}
+\end{figure}
 
 Using a standard Bernoulli-Euler discretized beam model with $n$ nodes, the shear forces and moments can be computed from the distributed loads with boundary conditions of zero shear forces and moments at the wing tips.\cite{bending}
 
