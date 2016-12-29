@@ -871,13 +871,14 @@ where $y$ is the distance from the root wing location. The loading constant $K_q
     K_q = \frac{N_{max}W_{cent}}{S}
 \end{equation}
 
-where $W_{cent}$ is the sum of distributed loads acting at the center of the aircraft. The local chord for a constant tapered wing\cite{bending} is defined as 
+where $W_{cent}$ is the sum of distributed loads acting at the center of the aircraft and the safety load factor is, $N=5$. The local chord for a constant tapered wing\cite{bending} is defined as 
 
 \begin{equation}
     \label{e:localchord}
     c(y) = \frac{S_{wing}}{b} \frac{2}{1+\lambda} \left( 1 + (\lambda - 1) \frac{2y}{b} \right)
 \end{equation}
 
+where the taper ratio is $\lambda=0.5$. 
 For the solar-electic powered aircraft it is assumed that the batteries are located inside the wings.  
 Therefore, it is assumed that the key sizing case for the solar-electric aircraft spar is a gust load that varies arcross the span.  
 The distributed load across the span is assumed to be 
@@ -936,7 +937,7 @@ The weight of the wing is assummed to vary linearly with the chord. By assuming 
     \bar{q}(y) = \frac{q(y)b}{NW_{wing}} = \frac{4}{\pi}\left( 1 + \frac{W_{cent}}{W_{wing}}\right) \sqrt{1-\frac{2y}{b}} + \frac{c_{l_{\alpha}}\alpha_{gust}}{C_L} \left( 1 + \frac{W_{cent}}{W_{wing}}\right) - c'(y)
 \end{equation}
 
-It is assumed that the local elliptical lifting contribution is cancelled out by the local chord for a span loaded wing,
+where the load factor for the gust load is, $N=2$. It is assumed that the local elliptical lifting contribution is cancelled out by the local chord for a span loaded wing,
 
 \begin{equation}
     \label{e:cancel}
@@ -953,7 +954,7 @@ thus deriving Equation~\ref{e:gustdist}. The approximation in Equation~\ref{e:ca
 	\end{center}
 \end{figure}
 
-Using a standard Bernoulli-Euler discretized beam model with $n$ nodes, the shear forces and moments can be computed from the distributed loads with boundary conditions of zero shear forces and moments at the wing tips.\cite{bending}
+Using a standard Bernoulli-Euler discretized beam model with $n=5$ nodes, the shear forces and moments can be computed from the distributed loads with boundary conditions of zero shear forces and moments at the wing tips.\cite{bending}
 
 \begin{align}
     \label{e:shear}
@@ -992,6 +993,7 @@ If the normalized distributed loads, $\bar{q}(y) = \frac{c(y)}{S/b}$ are compute
     w_{i} &\geq w_{i+1} + \frac{1}{2} (\Theta_i + \Theta_{i-1}) \Delta y 
 \end{align}
 
+where the Young's Modulous of carbon fiber is $E = 20$ [MPa]. 
 For this example a cap spar will be considered.  A cap spar has two carbon fiber caps separated by a foam core as seen in figure~\ref{f:capspar}
 
 \begin{figure}[H]
@@ -1018,7 +1020,7 @@ This equation is not GP compatible.  However, using a first order conservative a
     I \leq 2w_{\text{cap}}t_{\text{cap}}\left(\frac{h_{\text{cap}}}{2}\right)^2
 \end{equation}
 
-There are also geometric constraints imposed on the width and thickness.  The total spar cap thickness cannot be greater than the thickness of the airfoil cross section.  The width of the spar cap is assumed by no greater than some percentage of chord.
+There are also geometric constraints imposed on the width and thickness.  The total spar cap thickness cannot be greater than the thickness of the airfoil cross section, $\tau_t = 0.115$.  The width of the spar cap is assumed by no greater than 30\% of chord, $\tau_w = 0.3$.
 
 \begin{align}
     \label{e:thickness}
@@ -1033,8 +1035,11 @@ Generally, a wing is either stress or deflection constrained. Meaning, the wing 
     \label{e:stresscont}
     \sigma_{\text{carbon fiber}} &\geq M_0 \frac{h_{\text{cap}}+t_{\text{cap}}}{I}\\
     \label{e:defcont}
-    w_n &\leq \left(\frac{w_{max}}{b} \right) b.
+    w_n &\leq \left(\frac{w_{max}}{b/2} \right) b.
 \end{align}
+
+The maximum stress for carbon fiber is, $\sigma_{\text{carbon fiber}} = 475$ [MPa]. 
+The tip deflection is constrainted to be less than 20\% of the half span, $\frac{w_{max}}{b/2} = 0.2$.
 
 Finally, the weight of the spar cap is computed as
 
@@ -1045,42 +1050,11 @@ Finally, the weight of the spar cap is computed as
     W &\geq \sum\limits_{1}^{n-1} \Delta W_i
 \end{align}
 
-This cap model is added to the gas-powered long endurance aircraft optimization model and solved by minimizing the max take off weight.  In addition to the parameters listed in Table~\ref{t:gassolarparams}, the parameters in Table~\ref{t:sparparams} were used to solve the optimization model.  \\
+where $\rho_{\text{carbon fiber}} = 1.4$ [g/cm$^3$].
+This cap model is added to the gas-powered long endurance aircraft optimization model and solved by minimizing the max take off weight.  
 
+\subsection{Elliptcal Fuselage for Gas Powered Aircraft}
 
-\begin{longtable}{lc}
-     \caption{Fixed Optimization Parameters} \\
-     \toprule
-     \toprule
-     Variable &  Value  \\
-     \midrule
-     $\sigma_{\text{carbon fiber}}$ [Pa] & $475e6$ \\
-     $w_{max}/b$          & 0.2    \\ 
-     $N$                  & 5      \\ 
-     $\tau_t$             & 0.115  \\ 
-     $\tau_w$             & 0.3    \\ 
-     $\lambda$            & 0.5    \\ 
-     $n$                  & n      \\ 
-     $\rho_{\text{carbon fiber}}$ [g/m$^3$] & 1.4 \\
-     $E$ [Pa] & $2e7$\\
-     \bottomrule
-     \label{t:sparparams}
-\end{longtable}
-
-Results of the spar design are show in Figure~\ref{f:spardims}.
-
-\begin{figure}[h!]
-	\begin{center}
-	\includegraphics[width=0.6\textwidth]{spardims.pdf}
-    \caption{ \textbf{ The moment of inertia, width, and thickness of the spar caps. This spar design has discrete, non-uniform tapers in width and thickness.  Cap spar is designed to handle a load of 5 times the weight of the aircraft.}}
-	\label{f:spardims}
-	\end{center}
-\end{figure}
- 
-
-
-Incorporation of the wing spar model into the gas powered, long-endurance optimization model demonstrates how higher fidelity models can be added to the optimization model to achieve a more detailed design.  
-To design a complete long-endurance aircraft as a GP more detailed models for the fuselage, empennage, engine and wing can be added to the optimization mode via a similar process as the cap spar model. A structural fraction weight would no longer be needed and a more accurate vehicle optimization could be achieved.
  
 \section{Conclusion}
 
