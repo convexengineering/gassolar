@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from gassolar.environment.wind_speeds import get_windspeed, interpolate
 from gpfit.fit import fit
-from gpfit.evaluate_fit import evaluate_fit
 plt.rc("text", usetex=True)
 
 PERCT_NORM = 100.0
@@ -83,8 +82,7 @@ if __name__ == "__main__":
     constraintlist = []
     data = {}
 
-    # for l in range(20, 61, 1):
-    for l in [54]:
+    for l in range(20, 61, 1):
         print "Fitting for %d latitude" % l
         altitudestart = range(40000, 50500, 500)
         for j, a in enumerate(altitudestart):
@@ -111,7 +109,7 @@ if __name__ == "__main__":
                         print "RPM not changing... try new altitude range"
                         tol = False
                     continue
-                yfit = evaluate_fit(cns, X, "SMA")
+                yfit = cns.evaluate(X)
                 if not hasattr(yfit, "__len__"):
                     i += 1
                     print "Params out of range"
@@ -144,4 +142,4 @@ if __name__ == "__main__":
     colnames = np.append(colnames, "alpha")
     colnames = np.insert(colnames, 0, "latitude")
     df.columns = colnames
-    # df.to_csv("windaltfitdata1.csv")
+    df.to_csv("windaltfitdata.csv")
