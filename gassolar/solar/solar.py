@@ -21,9 +21,10 @@ class Aircraft(Model):
         self.wing = Wing(hollow=True)
         self.battery = Battery()
         self.empennage = Empennage()
+        self.engine = Engine()
 
         self.components = [self.solarcells, self.wing, self.battery,
-                           self.empennage]
+                           self.empennage, self.engine]
 
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
@@ -58,6 +59,21 @@ class Aircraft(Model):
 
     def loading(self, Wcent, Wwing, V, CL):
         return AircraftLoading(self, Wcent, Wwing, V, CL)
+
+class Engine(Model):
+    "the thing that provides power"
+    def setup(self):
+
+        W = Variable("W", "lbf", "engine weight")
+        Pmax = Variable("P_{max}", "W", "max power")
+        Bpm = Variable("B_{PM}", 4140.8, "W/kg", "power mass ratio")
+        m = Variable("m", "kg", "engine mass")
+        g = Variable("g", 9.81, "m/s**2", "gravitational constant")
+
+        constraints = [Pmax == Bpm*m,
+                       W >= m*g]
+
+        return constraints
 
 class AircraftLoading(Model):
     "aircraft loading cases"
@@ -176,7 +192,8 @@ class AircraftPerf(Model):
                 + self.battery["E"]/static.battery["\\eta_{discharge}"]),
             self.battery["P_{oper}"] >= Pacc + Pshaft,
             cda >= sum(dvars),
-            CD >= cda + self.wing["C_d"]
+            CD >= cda + self.wing["C_d"],
+            self.battery["P_{oper}"] <= static.engine["P_{max}"]
             ]
 
         return self.flight_models, constraints
