@@ -1055,7 +1055,53 @@ This cap model is added to the gas-powered long endurance aircraft optimization 
 
 \subsection{Elliptcal Fuselage for Gas Powered Aircraft}
 
- 
+For the gas powered aircraft it is assumed that the fuel is carried in an ellipcially shaped fuselage.  The fuselage will increase the overall weight and drag of the aircraft.  The solar-electric powered aircraft is assumed to carry the batteries in the wings will therefore have no fuselage.  
+
+The driving constraint for the size of the fuselage is to ensure that all of the fuel required for the mission can fit inside the fuselage, 
+
+\begin{equation}
+    \label{e:fusevol}
+    \mathcal{V}_{fuse} \geq \frac{W_{fuel}}{\rho_{fuel}}
+\end{equation}
+
+where the fuel is assumed to be Jet A fuel, $\rho_{fuel} = 6.01$ [lbf/gallon].The volume of the fuselage is constrained by
+
+\begin{equation}
+    \label{e:fusevol2}
+    \mathcal{V}_{fuse} \leq \frac{4}{3}\pi \frac{l}{2}R^2
+\end{equation}
+
+where $l$ is the length of the fuselage and $R$ is the radius. Using the length and radius the surface area can be calculated using an approxmiation,
+
+\begin{equation}
+    \label{e:fusesa}
+    \left( \frac{3}{/pi} S_{fuse} \right)^{1.6075} \geq (4lR)^{1.6075} + (4R^2)^{1.6075}.
+\end{equation}
+
+The weight of the fuselage is based off of the surface area
+
+\begin{equation}
+    \label{e:fuseweight}
+    W = S_{fuse} \rho_{\text{carbon fiber}} g
+\end{equation} 
+
+where $\rho_{\text{carbon fiber}} = 0.085$ [g/cm$^2$].  The surface area is also used to calculate the drag assuming a skin friction based drag model,
+
+\begin{align}
+    \label{e:fusedrag}
+    D &\geq C_f k_{fuse} \frac{1}{2} \rho V^2 S_{fuse} \\
+    C_f &\geq \frac{0.455}{Re^{0.3}}
+\end{align}
+
+where $k_{fuse}$ is the form factor approxmiated as
+
+\begin{equation}
+    \label{e:fuseform}
+    k_{fuse} \geq 1 + \frac{60}{(l/2R)^3} + \frac{(l/2R)}{400}.
+\end{equation}
+
+The equations governing fuselage weight and drag were added to the overall gas powered optimization model.
+
 \section{Conclusion}
 
 Using geometric programming as a form of evaluation of the design space, high level intuition and understanding about design trade studies for long-endurance aircraft and their driving requirements is achieved.  
