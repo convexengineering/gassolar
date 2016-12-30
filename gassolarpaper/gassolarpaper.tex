@@ -1075,7 +1075,7 @@ where $l$ is the length of the fuselage and $R$ is the radius. Using the length 
 
 \begin{equation}
     \label{e:fusesa}
-    \left( \frac{3}{/pi} S_{fuse} \right)^{1.6075} \geq (4lR)^{1.6075} + (4R^2)^{1.6075}.
+    3 \left( \frac{S_{fuse}}{\pi} \right)^{1.6075} \geq 2(2lR)^{1.6075} + ((2R)^2)^{1.6075}.
 \end{equation}
 
 The weight of the fuselage is based off of the surface area
@@ -1089,7 +1089,7 @@ where $\rho_{\text{carbon fiber}} = 0.085$ [g/cm$^2$].  The surface area is also
 
 \begin{align}
     \label{e:fusedrag}
-    D &\geq C_f k_{fuse} \frac{1}{2} \rho V^2 S_{fuse} \\
+    D_{fuse} &\geq C_f k_{fuse} \frac{1}{2} \rho V^2 S_{fuse} \\
     C_f &\geq \frac{0.455}{Re^{0.3}}
 \end{align}
 
@@ -1113,7 +1113,24 @@ The solar-electric powered aircraft has a motor whose weight is based on the app
 
 where $m_M$ is the motor mass, the maximum power, $P_{max}$, is determined by the operating power, and the power to mass ration is, $B_{PM} = 4140.8$ [W/kg].
 
-The engine weight of the gas powered aircraft is governed by a simple power law.
+The engine weight of the gas powered aircraft is governed by a simple power law derived from existing two-stroke and four-stroke engines
+
+\begin{equation}
+    \label{e:powerlaw}
+    \frac{W_{engine}}{W_{engine-ref}} = 1.27847 \left(\frac{P_{max}}{P_{max-ref}} \right)
+\end{equation}
+
+where $W_{engine-ref} = 10$ [lbs] and $P_{max-ref} = 10$ [hp].  Equation~\ref{e:powerlaw} was found using techniques described in Hoburg\cite{fitting}. Equation~\ref{e:powerlaw} is compared to the data in Figure~\ref{f:powervsweightfit}
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{powervsweightfit.pdf}
+    \caption{ \textbf{ Comparison of power law equation and engine data.  RMS error is 0.34.}}
+	\label{f:powervsweightfit}
+	\end{center}
+\end{figure}
+
+\subsection{}
 
 \section{Conclusion}
 
