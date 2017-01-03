@@ -806,9 +806,9 @@ The gas powered optimization model was set to minize max take off weight for dif
 
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width=0.6\textwidth]{solargasmtow.pdf}
+	\includegraphics[width=0.6\textwidth]{mtowvsendsimple.pdf}
     \caption{ \textbf{ Trade study between endurance and max take off weight for a gas powered archicture. }}
-	\label{f:solargasmtow}
+	\label{f:mtowvsendsimple}
 	\end{center}
 \end{figure}
 
@@ -1296,6 +1296,20 @@ One additional constraint is added while the aircraft is in climb,
 \end{equation}
 
 where, $W$, is the weight of the aircraft during climb.  
+
+\section{Results}
+
+With more detailed structural and performance models the accuracy of the optimzation results improves. 
+A comparison of the solar-electirc powered latitude plots with and without strucutral models reveals a more realistic limit to the wing span and aircraft size and a larger effect of latitude on aircraft size. 
+
+\begin{figure}[H]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[No structural model\label{f:nostruct}]{\includegraphics{bvslatsolar.pdf}}
+     \subfigure[With structural model\label{f:wstruct}]{\includegraphics{bvslatsolar.pdf}}
+ \end{subfigmatrix}
+ \caption{\textbf{Plots of span versus latitude with and without detailed structural models.  \ref{nostruct} is without a structural model.  \ref{wstruct} is with a structural model.}}
+ \label{f:latvsmtowtrade}
+\end{figure}
 
 \section{Conclusion}
 
