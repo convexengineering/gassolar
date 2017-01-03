@@ -1053,6 +1053,97 @@ Finally, the weight of the spar cap is computed as
 where $\rho_{\text{carbon fiber}} = 1.4$ [g/cm$^3$].
 This cap model is added to the gas-powered long endurance aircraft optimization model and solved by minimizing the max take off weight.  
 
+\subsection{Empennage}
+
+An empennage model with a single tail constisting of a tail boom, horizontal and vertical tail, was added to both the solar-electric and gas powered aircraft.  
+The empennage adds both weight and drag to the each aircraft.  
+
+The tail boom has a diameter, $d$, root wall thickness, $t_0$, root moment of inertia, $I_0$, modulus $E$, and density $\rho_{\text{carbon fiber}} = 1.4$ [g/cm$^3$], and length, $l_h$. 
+The total mass and root bending inertia are imposed in the optimization model as 
+
+\begin{align}
+    m &\geq \pi \rho_{\text{carbon fiber}} t_0 d l_h \left( 1 + \frac{1}{2} k\right)
+    I_0 &\leq \pi t_0 d^3/8
+\end{align}
+
+where the index $k=0$ corresponds to a uniform wall thickness and stiffness, and $k=1$ corresponds to a linear dropoff to zero.  For both the solar-electric and gas powered aircraft, $k=0.8$.  When the tail boom is loaded at the endpoint, $x=l_h$, by the horizontal tail lift, $L_h$, th end deflection angle follows from standard beam analysis. 
+
+\begin{align}
+    \label{e:boomdefl}
+    \theta &\geq \frac{L_h l_h^2}{EI_0} \frac{1+k}{2}
+    L_h &= \frac{1}{2} C_{L_h} \rho V^2 S_h
+\end{align}
+
+The horiztonal tail is sized to meet a minimum static margin, $SM_{min} = 0.35$ and minimum desirable c.g. travel range,
+
+\begin{equation}
+    \label{e:deltacg}
+    \Delta_{cg} = (x_{cg})_{aft} - (x_{cg})_{fwd} = 0.2
+\end{equation}
+
+A single constraint, whose derivation is explained in Appendix C, minimizes the horizontal tail volume coefficient, $V_h$, while meeting the minimum static margin and minimum c.g. travel range,
+
+\begin{align}
+    \label{e:smcorr}
+    \text{SM}_{\text{min}} + \frac{\Delta x_{cg}}{c} - \frac{C_{M_w}}{C_{L_{max}}} &\leq + V_h \mathcal{F}_{NE}^{-1} \frac{m_h}{m_w} \left( 1 - \frac{d\epsilon}{d\alpha}\right) + V_h \frac{-(C_{L_h})_{min}}{C_{L_{max}}} \\
+    \label{e:htv}
+    V_h &= \frac{S_h}{S} \frac{l_h}{c}
+\end{align}
+
+The vertical tail is sized to meet a conservative volume tail coefficient, $V_v= 0.05$,
+
+\begin{equation}
+    \label{e:vtv}
+    V_v = \frac{S_v}{S} \frac{l_v}{b}
+\end{equation}
+
+where $l_v$ is the vertical tail moment arm and assume to be equal to the horizontal tail moment arm, $l_v = l_h$.
+
+Both the horizontal and vertical tails are assumed to have a carbon fiber skin and solid foam interior where their respective densities are $\rho_{\text{carbon fiber}} = 0.1$ [g/cm$^2$], $\rho_{\text{foam}} = 1.5$ [lbf/ft$^3$]. 
+The weight of the horizontal and vertical tails is
+
+\begin{align}
+    \label{e:htweight}
+    W_h &= \rho_{\text{foam}} \frac{S_h^2}{b_h} \bar{A} + g\rho_{\text{carbon fiber}} S_h \\
+    \label{e:vtweight}
+    W_v &= \rho_{\text{foam}} \frac{S_v^2}{b_v} \bar{A} + g\rho_{\text{carbon fiber}} S_v
+\end{align}
+
+where $b_h$ and $b_v$ are the spans of the horizontal and vertical tails respectively and $\bar{A}$ is the cross sectional area of the NACA 0008 airfoil.
+
+The drag of the empennage was considered as three separate parts with no interference drag.  The drag of the tail boom was calculated using a turbulent flat plate model,
+
+\begin{align}
+    \label{e:boomdrag}
+    D_{boom} &\geq \frac{1}{2} C_f \rho V^2 l_h\pi d \\
+    C_f &\geq \frac{0.445}{Re^{0.3}} \\
+    Re &= \frac{V\rho l_h}{\mu}
+\end{align}
+
+The drag of the horizontal and vertical tails was computed using a GP-compatible fit of XFOIL data for a range of Reynolds numbers and NACA airfoil thicknesses.~\eqref{e:taildrag}
+
+\begin{align}
+    D_h &\geq \frac{1}{2} C_{d_h} \rho V^2 S_h \\
+    D_v &\geq \frac{1}{2} C_{d_v} \rho V^2 S_v \\
+    \label{e:taildrag}
+    Cd^{70.5599} &\geq 7.42688e-90(Re/1e^3)^{-33.0637}
+         (100 \tau )^{18.0419}
+        + 5.02826e-163(Re/1e^3)^{-18.7959}
+         (100\tau)^{53.1879}
+        + 4.22901e-77(Re/1e^3)^{-41.1704}
+         (100\tau)^{28.4609}
+\end{align}
+
+where $\tau = 0.8$ is the airfoil thickness. Assuming steady level flight where neither surface is generating lift, the XFOIL data was generated a zero angle of attack. A comparison of the XFOIL data and Equation~\ref{e:taildrag} is shown in Figure~\ref{f:taildragpolar}
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{taildragpolar.pdf}
+    \caption{ \textbf{ Comparison of XFOIL data for NACA airfoils to GP-compatible generated fitComparison of XFOIL data for NACA airfoils to GP-compatible generated fit.~\eqref{e:taildrag} RMS error is 0.0173.}}
+	\label{f:taildragpolar}
+	\end{center}
+\end{figure}
+
 \subsection{Elliptcal Fuselage for Gas Powered Aircraft}
 
 For the gas powered aircraft it is assumed that the fuel is carried in an ellipcially shaped fuselage.  The fuselage will increase the overall weight and drag of the aircraft.  The solar-electric powered aircraft is assumed to carry the batteries in the wings will therefore have no fuselage.  
@@ -1144,7 +1235,7 @@ GP-compatible curves were generated from the DF70 $BSFC$, $RPM$ and shaft power 
 
 \begin{align}
     \label{e:rpmtobsfc}
-    \left( \frac{BSFC}{BSFC} \right)^{36.2209} &\geq 2.31541\left( \frac{RPM}{RPM_{max}}\right)^{8.06517} + 0.00103364\left( \frac{RPM}{RPM_{max}} \right)^{-38.8545}
+    \left( \frac{BSFC}{BSFC} \right)^{36.2209} &\geq 2.31541\left( \frac{RPM}{RPM_{max}}\right)^{8.06517} + 0.00103364\left( \frac{RPM}{RPM_{max}} \right)^{-38.8545} \\
     \label{e:rpmtopower}
     \left( \frac{P_{shaft}}{P_{max}}\right)^{0.1} &= 0.999495\left( \frac{RPM}{RPM_{max}}\right)^{0.294421}
 \end{align}
@@ -1180,7 +1271,7 @@ where the altitude, $h = 15,000$ [ft]. A comparison of the manufacture data and 
 
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width=0.6\textwidth]{laseline.pdf}
+	\includegraphics[width=0.6\textwidth]{lapseline.pdf}
     \caption{ \textbf{ Comparison of manufacture data to linear regression fit~(\eqref{e:lapsefit}) for the DF70 engine from RCV Engines.}}
 	\label{f:lapsefit}
 	\end{center}
