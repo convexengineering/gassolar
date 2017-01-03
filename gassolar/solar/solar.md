@@ -6,10 +6,12 @@
 from solar import Mission
 import matplotlib.pyplot as plt
 import numpy as np
+from plotting import windalt_plot
 plt.rcParams.update({'font.size':19})
 
-LATITUDE = True
+LATITUDE = False
 LOADING = False
+WIND = True
 
 """ loading """
 if LOADING:
@@ -61,3 +63,15 @@ if LATITUDE:
     ax.set_ylabel("Max Take Off Weight")
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
     fig.savefig("../../gassolarpaper/wtotvslatsolar.pdf", bbox_inches="tight")
+
+""" wind operating """
+if WIND:
+    M = Mission(latitude=31)
+    M.substitutions.update({"W_{pay}": 10})
+    M.substitutions.update({"\\rho_{solar}": 0.25})
+    M.cost = M["W_{total}"]
+    sol = M.solve("mosek")
+    fig, ax = windalt_plot(31, sol)
+    fig.savefig("windaltoper.pdf")
+
+

@@ -5,13 +5,15 @@
 #inPDF: skip
 from solarsimple import Mission
 from gassolar.environment.wind_speeds import get_windspeed
+from gassolar.solar.plotting import windalt_plot
 from solar.solar_irradiance import get_Eirr
 import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams.update({'font.size':19})
 
-CON = True
+CON = False
 LAT = False
+WIND = True
 
 """ contour """
 
@@ -77,3 +79,15 @@ if LAT:
     ax.set_ylabel("Max Take Off Weight [lbs]")
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
     fig.savefig("../../../mtowvslatsolar.pdf", bbox_inches="tight")
+
+""" wind operating """
+if WIND:
+    M = Mission(latitude=31)
+    M.substitutions.update({"W_{pay}": 10})
+    M.substitutions.update({"\\rho_{solar}": 0.25})
+    for vk in M.varkeys["CDA_0"]:
+        M.substitutions.update({vk: 0.002})
+    M.cost = M["W"]
+    sol = M.solve("mosek")
+    fig, ax = windalt_plot(31, sol)
+    fig.savefig("windaltopersimple.pdf")
