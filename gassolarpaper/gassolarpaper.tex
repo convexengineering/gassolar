@@ -925,7 +925,7 @@ The gust distributed load in Equation~\ref{e:gustdist} is derived from Equation~
 
 \begin{align}
     \label{e:ellpgustload}
-    q(y) &= L'_{elliptical} + L'_{gust} - Ngm'(y)
+    q(y) &= L'_{elliptical} + L'_{gust} - Ngm'(y) \\
     \label{e:allpgustload2}
     &= \frac{4L}{b\pi} \sqrt{1 - \frac{2y}{b}} + c_{l_{\alpha}} \alpha_{gust} \frac{1}{2} \rho V^2 S - \frac{W_{wing}}{S} c'(y)
 \end{align}
@@ -1117,10 +1117,10 @@ The engine weight of the gas powered aircraft is governed by a simple power law 
 
 \begin{equation}
     \label{e:powerlaw}
-    \frac{W_{engine}}{W_{engine-ref}} = 1.27847 \left(\frac{P_{max}}{P_{max-ref}} \right)
+    \frac{W_{engine}}{W_{engine-ref}} = 1.27847 \left(\frac{P_{SL-max}}{P_{ref}} \right)^{0.772392}
 \end{equation}
 
-where $W_{engine-ref} = 10$ [lbs] and $P_{max-ref} = 10$ [hp].  Equation~\ref{e:powerlaw} was found using techniques described in Hoburg\cite{fitting}. Equation~\ref{e:powerlaw} is compared to the data in Figure~\ref{f:powervsweightfit}
+where $W_{engine-ref} = 10$ [lbs] and $P_{ref} = 10$ [hp].  Equation~\ref{e:powerlaw} was found using techniques described in Hoburg\cite{fitting}. Equation~\ref{e:powerlaw} is compared to the data in Figure~\ref{f:powervsweightfit}
 
 \begin{figure}[H]
 	\begin{center}
@@ -1130,7 +1130,81 @@ where $W_{engine-ref} = 10$ [lbs] and $P_{max-ref} = 10$ [hp].  Equation~\ref{e:
 	\end{center}
 \end{figure}
 
-\subsection{}
+\subsection{Gas Powered Engine Performance}
+
+Two characteristics of gas engines affect the performance of long-endurance aircraft.  
+The first is break specific fuel consumption, $BSFC$; a lower $BSFC$ will result in increased endurance.  
+The second is the lapse rate.  
+Assuming a propellor driven aircraft and a naturally aisprated engine, as the aircraft reaches higher altitudes, the engine will have decreased available power. 
+To account for these two affects a two-stroke, single cylinder engine, the DF70 from RCV Engines, was selected and its manufacturing data used to generate representative performance curves.  
+It is assumed that engines of a similar class will perform similiarly to the DF70 engine.  
+Thus, this engine performance model is only valid for small engines.
+
+GP-compatible curves were generated from the DF70 $BSFC$, $RPM$ and shaft power data, 
+
+\begin{align}
+    \label{e:rpmtobsfc}
+    \left( \frac{BSFC}{BSFC} \right)^{36.2209} &\geq 2.31541\left( \frac{RPM}{RPM_{max}}\right)^{8.06517} + 0.00103364\left( \frac{RPM}{RPM_{max}} \right)^{-38.8545}
+    \label{e:rpmtopower}
+    \left( \frac{P_{shaft}}{P_{max}}\right)^{0.1} &= 0.999495\left( \frac{RPM}{RPM_{max}}\right)^{0.294421}
+\end{align}
+
+A comparison of the GP-compatible approximations to the manufacturing data from RCV engines is presented in Figure~\ref{f:RCVdata}.
+
+\begin{figure}[H]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[$RPM$ to $BSFC$\label{f:rpmtobsfcfit}]{\includegraphics{rpmtobsfcfit.pdf}}
+     \subfigure[$RPM$ to Power\label{f:rpmtopowerfit}]{\includegraphics{rpmtopowerfit.pdf}}
+ \end{subfigmatrix}
+ \caption{\textbf{Comparison of GP-compatible approximations to RCV manufacturing data for the DF70 engine.  Functions used to represent engine performance for engines of similar size.  RMS error for $BSFC$ function is 0.021.  RMS error for power function is 0.0093. }}
+ \label{f:RCVdata}
+\end{figure}
+
+The lapse rate, $L_{eng}$, is assumed to affect the power out,
+
+\begin{equation}
+    \label{e:lapse}
+    L_{eng} = \frac{P_{max}}{P_{SL-max}}
+\end{equation}
+
+where $P_{SL-max}$ is used to size the engine in Equation~\ref{e:powerlaw} and $P_{max}$ determines the engine performance.~\eqref{e:rpmtopower}
+
+The laspse is calculated from the flight requirement altitude prior to the optimization solve using a linear regression fit from the manufacture data for the DF70 engine from RCV Engines
+
+\begin{equation}
+    \label{e:lapsefit}
+    L_{eng} = -3.1802e^{-5} h + 0.9730
+\end{equation}
+
+where the altitude, $h = 15,000$ [ft]. A comparison of the manufacture data and linear regression fit for the lapse rate is shown in Figure~\ref{f:lapsefit}
+
+\begin{figure}[H]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth]{laseline.pdf}
+    \caption{ \textbf{ Comparison of manufacture data to linear regression fit~(\eqref{e:lapsefit}) for the DF70 engine from RCV Engines.}}
+	\label{f:lapsefit}
+	\end{center}
+\end{figure}
+
+
+\subsection{Climb Model}
+
+Because the gas engine is naturally aspirated, as the aircraft climbs there will be less available power.  
+To ensure that the aircraft climbs at a resonable climb rate a climb rate constraint is enforced in the optimization model, 
+
+\begin{equation}
+    \label{e:climbrate}
+    \dot{h} \geq 100 \text{ [ft/min]}.
+\end{equation}
+
+One additional constraint is added while the aircraft is in climb, 
+
+\begin{equation}
+    \label{e:climb}
+    T \geq \frac{1}{2} C_D \rho V^2 S + W \frac{\dot{h}}{V}
+\end{equation}
+
+where, $W$, is the weight of the aircraft during climb.  
 
 \section{Conclusion}
 
