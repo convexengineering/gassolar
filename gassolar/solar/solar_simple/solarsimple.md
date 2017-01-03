@@ -76,4 +76,4 @@ if LAT:
     ax.set_xlabel("Latitude [deg]")
     ax.set_ylabel("Max Take Off Weight [lbs]")
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
-    fig.savefig("mtowvslatsolar.pdf", bbox_inches="tight")
+    fig.savefig("../../../mtowvslatsolar.pdf", bbox_inches="tight")

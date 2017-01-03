@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams.update({'font.size':19})
 
-LATITUDE = False
-LOADING = True
+LATITUDE = True
+LOADING = False
 
 """ loading """
 if LOADING:
@@ -44,10 +44,10 @@ if LATITUDE:
                 for vk in M.varkeys["p_{wind}"]:
                     M.substitutions.update({vk: a/100.0})
                 M.substitutions.update({"\\rho_{solar}": 0.25})
-                M.cost = M["b_Mission, Aircraft, Wing"]
+                M.cost = M["W_{total}"]
                 try:
                     sol = M.solve("mosek")
-                    W.append(sol("b_Mission, Aircraft, Wing").magnitude)
+                    W.append(sol("W_{total}").magnitude)
                 except RuntimeWarning:
                     W.append(np.nan)
                     runagain = False
@@ -58,6 +58,6 @@ if LATITUDE:
     ax.set_ylim([0, 200])
     ax.grid()
     ax.set_xlabel("Latitude [deg]")
-    ax.set_ylabel("Span [ft]")
+    ax.set_ylabel("Max Take Off Weight")
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
-    fig.savefig("bvslatsolar.pdf", bbox_inches="tight")
+    fig.savefig("../../gassolarpaper/wtotvslatsolar.pdf", bbox_inches="tight")
