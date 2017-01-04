@@ -7,6 +7,7 @@ plt.rcParams.update({'font.size':19})
 
 PATH = (os.path.abspath(__file__).replace(os.path.basename(__file__), "")
         + "windspeeds" + os.sep)
+PATH = "/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/windspeeds/"
 
 def get_windspeed(latitude, perc, altitude, day, path=PATH):
     """

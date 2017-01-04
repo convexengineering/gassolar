@@ -12,8 +12,8 @@ import numpy as np
 plt.rcParams.update({'font.size':19})
 
 CON = False
-LAT = False
-WIND = True
+LAT = True
+WIND = False
 
 """ contour """
 
@@ -78,7 +78,7 @@ if LAT:
     ax.set_xlabel("Latitude [deg]")
     ax.set_ylabel("Max Take Off Weight [lbs]")
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
-    fig.savefig("../../../mtowvslatsolar.pdf", bbox_inches="tight")
+    fig.savefig("../../../gassolarpaper/mtowvslatsolarsimple.pdf", bbox_inches="tight")
 
 """ wind operating """
 if WIND:
@@ -90,4 +90,4 @@ if WIND:
     M.cost = M["W"]
     sol = M.solve("mosek")
     fig, ax = windalt_plot(31, sol)
-    fig.savefig("windaltopersimple.pdf")
+    fig.savefig("../../../gassolarpaper/windaltopersimple.pdf", bbox_inches="tight")
