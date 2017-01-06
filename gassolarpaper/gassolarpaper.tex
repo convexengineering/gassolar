@@ -18,7 +18,6 @@
 %
 % With the above, only Encapsulated PostScript (EPS) images can be used.
 %
-% Typical processing for Portable Document Format (PDF) output:
 %
 %  pdflatex advanced_example
 %  bibtex advanced_example    (bibliography)
@@ -116,33 +115,58 @@
 \begin{tabbing}
   XXXXXXX \= \kill% this line sets tab stop
 $A$ \> wing aspect ratio \\
+$b$ \> wing span [ft] \\
 $BSFC$ \> brake specific fuel consumption [lb/hr/hp] \\
 $c$ \> wing chord [m] \\
 $C_D$ \> drag coefficient \\
 $C_{d_0}$ \> non-wing drag coefficient \\
 $c_{d_p}$ \> wing profile drag coefficient \\
 $C_L$ \> lift coefficient \\
-$\Delta y$ \> wing section length [m] \\
+$C_{l_{\alpha}}$ \> lift slope coefficient \\
+$C_{L_{\text{h}}}$ \> horizontal tail lift coefficient \\
+$C_{L_{\text{max}}}$ \> maximum lift coefficient \\
+$C_{M_{\text{w}}}$ \> wing moment coefficient \\
+$d$ \> tail boom diameter [m] \\
 $\Delta W$ \> wing section weight [N] \\
+$\Delta x_{cg}$ \> center of gravity location [m] \\
+$\Delta y$ \> wing section length [m] \\
 $DOY$ \> day of the year \\
 $e$ \> Oswald efficiency factor \\
 $E$ \> Young's Modulus [Pa] \\
 $E_{\text{battery}}$ \> energy stored in battery [J] \\
-$(E/S)_{\text{sun}}$ \> total solar energy available [Whr/m$^2$] \\
+$E_{\text{sun}}$ \> total solar energy available [Whr] \\
+$(E/S)_{\text{sun}}$ \> available solar energy per unit area [Whr/m$^2$] \\
 $f_{\text{solar}}$ \> planform area fraction covered in solar cells \\
 $f_{\text{structural}}$ \> fractional structural weight\\
+$\mathcal{F}$ \> tail boom flexibility factor \\
 $g$ \> gravitational constant [m/s$^2$] \\
 $h$ \> flight altitude [ft] \\
+$h_{\text{batt}}$ \> battery energy density [Whr/kg] \\
 $h_{\text{cap}}$ \> spar cap separation [m] \\
-$I$ \> moment of inertia [m$^4$] \\
+$I$ \> cap spar moment of inertia [m$^4$] \\
+$I_0$ \> tail boom root moment of inertia [m$^4$] \\
+$k$ \> tail boom taper index \\
 $K_q$ \> wing loading constant [N/m$^2$] \\
 $L$ \> atmospheric lapse rate [K/m] \\
+$L'$ \> local lifting force [N/m] \\
+$L'_{\text{elliptical}}$ \> local lift from elliptical distribution [N/m] \\
+$L'_{\text{gust}}$ \> local lift from gust distribution[N/m] \\
+$L_\text{h}$ \> horizontal tail lift [N] \\
+$l_\text{h}$ \> horizontal tail moment arm [m] \\
+$l_\text{v}$ \> vertical tail moment arm [m] \\
+$m$ \> tail boom mass [kg] \\
+$m'$ \> local wing weight [kg/m] \\
+$m_{\text{h}}$ \> modified horizontal tail lift coefficient \\
+$m_{\text{w}}$ \> modified wing lift coefficient \\
 $\dot{m}_{\text{fuel}}$ \> fuel flow rate [kg/s] \\
 $M$ \> wing bending moment [Nm] \\
 $MTOW$ \> max take-off weight [N] \\
 $n$ \> number of wing segments \\
 $N$ \> number of flight segments \\
-$N_{max}$ \> load factor\\
+$N_{\text{max}}$ \> load factor\\
+$p$ \> air pressure [Pa]\\
+$p_{11}$ \> air pressure at 11,000 meters [Pa]\\
+$p_{\text{wind}}$ \> percentile wind speed \\
 $P_{0}$ \> magnitude of available solar power [W/m$^2$] \\
 $P_{\text{avionics}}$ \> avionics power [hp] \\
 $P_{\text{oper}}$ \> aircraft operating power [hp] \\
@@ -155,41 +179,67 @@ $R_{\text{earth orbit}}$ \> distance from earth to sun \\
 $R_{\text{spec}}$ \> specific gas constant [J/k/K] \\
 $R_{\text{sun}}$ \> radius of the sun \\
 $q$ \> distributed wing loading [N/m] \\
+$\bar{q}$ \> normalized distributed wing loading \\
 $Re$ \> Reynolds number \\
 $S$ \> wing planform area [m$^2$]\\
 $\mathcal{S}$ \> shear forces [N] \\
+$S_{\text{h}}$ \> horizontal tail planform area [m$^2$]\\
 $S_{\text{solar}}$ \> solar cell area [m$^2$]\\
+$S_{\text{v}}$ \> vertical tail planform area [m$^2$]\\
+$\text{SM}_{\text{min}}$ \> minimum static margin \\
 $t$ \> flight time [days] \\
+$t_0$ \> tail boom root wall thickness [m] \\
 $t_{\text{cap}}$ \> spar cap thickness [m] \\
 $t_{\text{day}}$ \> hours of daylight [hr] \\
 $t_{\text{night}}$ \> hours of darkness [hr] \\
 $t_{\text{sun rise}}$ \> time of sun rise [hr] \\
 $t_{\text{sun set}}$ \> time of sun set [hr] \\
 $T$ \> aircraft thrust [N] \\
+$T_{11}$ \> air temperature at 11,000 meters [K] \\
 $T_{\text{atm}}$ \> air temperature at flight altitude [K] \\
 $T_{\text{sl}}$ \> air temperature at sea level [K] \\
 $V$ \> true airspeed [m/s] \\
-$V_{min}$ \>  minimum true airspeed [m/s] \\
+$V_{\text{gust}}$ \>  gust velocity [m/s] \\
+$V_{\text{h}}$ \> horizontal tail lift coefficient \\
+$V_{\text{ref}}$ \>  reference wind airspeed [m/s] \\
+$V_{\text{wind}}$ \>  wind speed [m/s] \\
+$V_{\text{v}}$ \> vertical tail lift coefficient \\
 $w$ \> wing deflection [m] \\
 $W$ \> aircraft weight [N] \\
 $W_{\text{ave}}$ \> average weight over a flight segment [N] \\
 $W_{\text{battery}}$ \> battery weight [N] \\
 $w_{\text{cap}}$ \> spar cap width [m] \\
+$W_{\text{cent}}$ \> center of aircraft weight [N] \\
+$W_{\text{empennage}}$ \> empennage weight [N] \\
+$W_{\text{engine}}$ \> engine weight [N] \\
 $W_{\text{final}}$ \> final aircraft weight [N] \\
 $W_{\text{fuel}}$ \> fuel weight [N] \\
+$W_{\text{fuselage}}$ \> fuselage weight [N] \\
 $W_{\text{initial}}$ \> initial aircraft weight [N] \\
-$w_{max}$ \> maximum deflection limit [m] \\
+$w_{\text{max}}$ \> maximum deflection limit [m] \\
 $W_{\text{payload}}$ \> payload weight [N] \\
+$W_{\text{skin}}$ \> wing skin weight [N] \\
 $W_{\text{solar}}$ \> solar cell weight [N] \\
+$W_{\text{spar}}$ \> wing spar weight [N] \\
 $W_{\text{structural}}$ \> structural weight [N] \\
-$z_{bre}$ \> Breguet Range helper variable \\
+$W_{\text{wing}}$ \> wing weight [N] \\
+$(x_{cg})_{\text{aft}}$ \> aft-most center of gravity position [m] \\
+$(x_{cg})_{\text{fwd}}$ \> forward-most center of gravity position [m] \\
+$y$ \> distance from wing root along span [m] \\
+$z_{\text{bre}}$ \> Breguet Range helper variable \\
+$z_{\text{SM}_1}$ \> static margin helper variable 1 \\
+$z_{\text{SM}_2}$ \> static margin helper variable 2 \\
+$\alpha$ \> angle of attack \\
+$\alpha_{\text{gust}}$ \> local angle of attack from gust velocities [rad] \\
 $\Delta$ \> solar declination angle \\
 $\Delta h_{\text{fuel}}$ \> heat of combustion [J/kg] \\
+$\epsilon$ \> wing's downwash angle \\
 $\eta_{\text{charge}}$ \> battery charging efficiency \\
 $\eta_{\text{discharge}}$ \> battery discharging efficiency \\
-$\eta_{prop}$ \> propulsive efficiency \\
+$\eta_{\text{prop}}$ \> propulsive efficiency \\
 $\eta_{\text{solar}}$ \> solar cell efficiency \\
 $\mu$ \> air viscosity [kg/m/s] \\
+$\mu_0$ \> reference air viscosity [kg/m/s] \\
 $\phi$ \> latitude \\
 $\rho$ \> air density [kg/m$^3$] \\
 $\rho_{\text{carbon fiber}}$ \> density of carbon fiber [kg/m$^3$] \\
@@ -198,6 +248,7 @@ $\sigma_{\text{carbon fiber}}$ \> maximum carbon fiber stress [Pa] \\
 $\tau_t$ \> wing thickness to chord ratio \\
 $\tau_w$ \> cap spar width to chord ratio \\
 $\theta$ \> angle normal to surface \\
+$\theta_{\text{boom}}$ \> tail boom deflection angle \\
 $\Theta$ \> bending deflection angle 
  \end{tabbing}
 
@@ -297,14 +348,14 @@ Therefore, the aircraft speed is constrained for both the gas and solar-electric
 
 \begin{equation}
     \label{e:availreq}
-    V \geq V_{wind}.
+    V \geq V_{\text{wind}}.
 \end{equation}
 
 The wind speed at a station is a function of latitude, altitude, season or day of the year, and percentile wind speed,
 
 \begin{equation}
     \label{e:windspeed}
-    V_{wind} = f(\phi, h, DOY, \text{Percentile Wind Speed}).
+    V_{\text{wind}} = f(\phi, h, DOY, p_{\text{wind}}).
     \end{equation}
 
 Wind speed data was collected from the ERA Interim atmospheric datasets for the years 2005-2015.\cite{wind} 
@@ -395,10 +446,10 @@ The contraint of wind speed and air density at the 35 degree latitude is shown i
 
 \begin{equation}
     \label{e:windfit35}
-    \left(\frac{V_{wind}}{V_{ref}}\right)^{7.213} \geq 2918\rho^{7.587}p_{wind}^{9.37} + 1.58e^{-10}\rho^{-6.074}p_{wind}^{60.421} + 4.05e^{-16}\rho^{-9.879}p_{wind}^{13.204} + 1048\rho^{6.33}p_{wind}^{46.232}
+    \left(\frac{V_{\text{wind}}}{V_{\text{ref}}}\right)^{7.213} \geq 2918\rho^{7.587}p_{\text{wind}}^{9.37} + 1.58e^{-10}\rho^{-6.074}p_{\text{wind}}^{60.421} + 4.05e^{-16}\rho^{-9.879}p_{\text{wind}}^{13.204} + 1048\rho^{6.33}p_{\text{wind}}^{46.232}
 \end{equation}
 
-where $V_{ref} = 100$ [m/s] and $p_{wind}$ is the percentile wind speed. The comparison of the fitted equation to the actual data is presented in Figure~\ref{f:windfitl35}. 
+where $V_{\text{ref}} = 100$ [m/s] and $p_{\text{wind}}$ is the percentile wind speed. The comparison of the fitted equation to the actual data is presented in Figure~\ref{f:windfitl35}. 
 
 \begin{figure}[H]
 	\begin{center}
@@ -421,12 +472,12 @@ For the solar aircraft air density is being optimized and the operating altitude
 
 \begin{align}
     \label{e:tropopress}
-    p &= \rho RT_{11} \\
+    p &= \rho R_{\text{spec}}T_{11} \\
     \label{e:tropoalt}
-    h &= 11,000 - \frac{RT_{11}}{g}\frac{p}{p_{11}} 
+    h &= 11,000 - \frac{R_{\text{spec}}T_{11}}{g}\frac{p}{p_{11}} 
 \end{align}
 
-According to Sutherland's law\cite{fluiddyhandbook}, viscosity varies with temperature.  Because temperature is assumed constant above 11,000 meters\cite{isaatm}, viscosity is assumed to be constant, $\mu=1.42\text{e}-5$. \\
+According to Sutherland's law\cite{fluiddyhandbook}, viscosity varies with temperature.  Because temperature is assumed constant above 11,000 meters\cite{isaatm}, viscosity is assumed to be constant, $\mu=\num{1.42d-5}$. \\
 
 Because altitude is a requirement for the gas powered aircraft, density is precomputed prior to solving the optimization using atmospheric equations specific to the troposphere,\cite{isaatm} 
 
@@ -459,9 +510,9 @@ Under these assumptions, if the aircraft can fly for one day and one night, then
         E_{\text{battery}} &\geq P_{\text{oper}}t_{\text{night}}/\eta_{\text{discharge}}
     \end{align}
     
-    It is assumed that the charge and discharge efficiencies are constant, $\eta_{charge} = \eta_{discharge} = 0.98$. 
-    It is also assumed that the solar cell efficiency is constant, $\eta_{solar} = 0.3$. 
-    A battery with an energy density of $h_{batt} = 350$, is selected for the solar-powered aircraft. 
+    It is assumed that the charge and discharge efficiencies are constant, $\eta_{\text{charge}} = \eta_{\text{discharge}} = 0.98$. 
+    It is also assumed that the solar cell efficiency is constant, $\eta_{\text{solar}} = 0.3$. 
+    A battery with an energy density of $h_{\text{batt}} = 350$ [Whr/kg], is selected for the solar-powered aircraft. 
 
     To enforce these constraints, two variables were created: $P_{\text{oper}}$ and $S_{\text{solar}}$. 
     $P_{\text{oper}}$ is defined as the average power required to operate the aircaft. \eqref{e:solarpoper} 
@@ -488,7 +539,7 @@ Under these assumptions, if the aircraft can fly for one day and one night, then
 
     \begin{equation}
         \label{e:solares}
-        E_{\text{sun}} = \int_{t_{sunrise}}^{t_{sunset}} P_{\text{sun}} dt
+        E_{\text{sun}} = \int_{t_{\text{sun rise}}}^{t_{\text{sun set}}} P_{\text{sun}} dt
     \end{equation}
 
     Figure~\ref{f:lat45} shows a sample distribution of the available solar power during the spring equinox at 45 degrees latitude. 
@@ -619,9 +670,9 @@ where $W_{\text{ave}}$ is the average weight of the aircraft during the flight s
 
 \begin{align}
     \label{e:brzbre}
-    z_{bre} &\geq \frac{P_{\text{shaft}}t BSFC g}{W}\\
+    z_{\text{bre}} &\geq \frac{P_{\text{shaft}}t BSFC g}{W}\\
     \label{e:brtaylor}
-    \frac{W_{\text{fuel}}}{W_{final}} &\geq z_{bre} + \frac{z_{bre}^2}{2} + \frac{z_{bre}^3}{6} + \frac{z_{bre}^4}{24} + \dots
+    \frac{W_{\text{fuel}}}{W_\text{final}} &\geq z_{\text{bre}} + \frac{z_{\text{bre}}^2}{2} + \frac{z_{\text{bre}}^3}{6} + \frac{z_{\text{bre}}^4}{24} + \dots
 \end{align}
 
     Equations~\ref{e:brzbre} and~\ref{e:brtaylor} are monomial and posynmial respectively and therefore GP compatible. \\
@@ -632,9 +683,9 @@ where $W_{\text{ave}}$ is the average weight of the aircraft during the flight s
     \label{e:slfweightd}
     \sqrt{W_i W_{i+1}} &= \frac{1}{2} \rho_i V_i^2 C_{L_i} S \\
     \label{e:brzbred}
-    z_{bre_i} &\geq \frac{P_{shaft_i}t_i BSFC g}{\sqrt{W_i W_{i+1}}}\\
+    z_{bre_i} &\geq \frac{P_{\text{shaft}_i}t_i BSFC g}{\sqrt{W_i W_{i+1}}}\\
     \label{e:brtaylord}
-    \frac{W_{fuel_i}}{W_{i+1}} &\geq z_{bre_i} + \frac{z_{bre_i}^2}{2} + \frac{z_{bre_i}^3}{6} + \frac{z_{bre_i}^3}{24} 
+    \frac{W_{\text{fuel}_i}}{W_{i+1}} &\geq z_{bre_i} + \frac{z_{bre_i}^2}{2} + \frac{z_{bre_i}^3}{6} + \frac{z_{bre_i}^3}{24} 
     \end{align}
 
     For evaluation of long-endurance, gas-powered aircraft a discretization of $N=5$ is used. Additionally, it is assumed that the break specific fuel consumption is constant, $BSFC = 0.6$ [lb/hr/hp].
@@ -654,10 +705,10 @@ The shaft power produced by the engine or motor and can expressed as
 
 \begin{equation}
     \label{e:slfpower}
-    P_{\text{shaft}} = \frac{TV}{\eta_{prop}}
+    P_{\text{shaft}} = \frac{TV}{\eta_{\text{prop}}}
     \end{equation}
 
-    where the propulsive efficiency is assumed to be a constant, $\eta_{prop} = 0.75$. Equations~\ref{e:slfthrust},~\ref{e:slfweight}, and~\ref{e:slfpower} are all monomials and therefore GP-compatible.
+    where the propulsive efficiency is assumed to be a constant, $\eta_{\text{prop}} = 0.75$. Equations~\ref{e:slfthrust},~\ref{e:slfweight}, and~\ref{e:slfpower} are all monomials and therefore GP-compatible.
 
 \subsection{Aerodynamics}
 
@@ -712,7 +763,7 @@ A similiar weight breakdown is done for the solar-electric powered aircraft,
 \begin{align}
     \label{e:weightsmtow}
     MTOW &\geq W_{\text{structural}} + W_{\text{payload}} + W_{\text{solar}} + W_{\text{battery}} \\
-    W_{\text{solar}} &\geq \rho_{solar} S_{solar} g \\
+    W_{\text{solar}} &\geq \rho_{\text{solar}} S_{\text{solar}} g \\
     W_{\text{battery}} &\geq \frac{E_{\text{battery}}}{h_{\text{battery}}} g
 \end{align}
 
@@ -787,10 +838,10 @@ One way to analyze the trade space is to determine the structural weight of the 
 
 \begin{equation}
     \label{e:structualfraction}
-    W_{structural} \geq f_{structural}MTOW.
+    W_{\text{structural}} \geq f_{\text{structural}}MTOW.
 \end{equation}
 
-where the structural fraction is assumed to be, $f_{structural} = 0.35$. Using this assumption and models described in section III, a comparison of the long-endurance trade space is achieved by comparing solar-electric and gas powered aircraft for different parameters. 
+where the structural fraction is assumed to be, $f_{\text{structural}} = 0.35$. Using this assumption and models described in section III, a comparison of the long-endurance trade space is achieved by comparing solar-electric and gas powered aircraft for different parameters. 
 
 % \begin{longtable}{llll}
 % \caption{Fixed Optimization Parameters} \\
@@ -891,7 +942,7 @@ It is assumed that the key spar sizing case is standard wing bending during stea
 
 \begin{equation}
     \label{e:wloading}
-    q(y) = L'(y) - Ngm'(y)
+    q(y) = L'(y) - N_{\text{max}}gm'(y)
 \end{equation}
 
 where $q$ is the spanwise distributed load. 
@@ -906,27 +957,27 @@ where $y$ is the distance from the root wing location. The loading constant $K_q
 
 \begin{equation}
     \label{e:kq}
-    K_q = \frac{N_{max}W_{cent}}{S}
+    K_q = \frac{N_{\text{max}}W_{\text{cent}}}{S}
 \end{equation}
 
-where $W_{cent}$ is the sum of distributed loads acting at the center of the aircraft and the safety load factor is an input $N=5$. The local chord for a constant tapered wing\cite{bending} is defined as 
+where $W_{\text{cent}}$ is the sum of distributed loads acting at the center of the aircraft and the safety load factor is an input $N=5$. The local chord for a constant tapered wing\cite{bending} is defined as 
 
 \begin{equation}
     \label{e:localchord}
-    c(y) = \frac{S_{wing}}{b} \frac{2}{1+\lambda} \left( 1 + (\lambda - 1) \frac{2y}{b} \right)
+    c(y) = \frac{S}{b} \frac{2}{1+\lambda} \left( 1 + (\lambda - 1) \frac{2y}{b} \right)
 \end{equation}
 
 where the taper ratio is $\lambda=0.5$.  Thus, the precomputed distributed load 
 
 \begin{equation}
     \label{e:qbar}
-    \bar{q} = \frac{N_{max}W_{cent}}{b}\frac{2}{1+\lambda} \left( 1 + (\lambda - 1) \frac{2y}{b} \right)
+    \bar{q} = \frac{N_{\text{max}}W_{\text{cent}}}{b}\frac{2}{1+\lambda} \left( 1 + (\lambda - 1) \frac{2y}{b} \right)
 \end{equation}
 
-is inputted into a standard beam model to predict the bending moments and deflections. The center weight $W_{cent}$ for the gas powered aircraft is
+is inputted into a standard beam model to predict the bending moments and deflections. The center weight $W_{\text{cent}}$ for the gas powered aircraft is
 
 \begin{equation}
-    W_{cent} \geq W_{fuel} + W_{fuselage} + W_{engine} + W_{payload}
+    W_{\text{cent}} \geq W_{\text{fuel}} + W_{\text{fuselage}} + W_{\text{engine}} + W_{\text{payload}} + W_{\text{empennage}}
 \end{equation}
 
 \subsubsection{Loading Case for Solar-electric Powered Aircraft}
@@ -935,55 +986,55 @@ Because it is assumed that the batteries are located inside the wings for the so
 
 \begin{align}
     \label{e:ellpgustload}
-    q(y) &= L'_{elliptical} + L'_{gust} - Ngm'(y) \\
+    q(y) &= L'_{\text{elliptical}} + L'_{\text{gust}} - N_{\text{max}}gm'(y) \\
     \label{e:allpgustload2}
-    &= \frac{4L}{b\pi} \sqrt{1 - \frac{2y}{b}} + c_{l_{\alpha}} \alpha_{gust} \frac{1}{2} \rho V^2 S - \frac{W_{wing}}{S} c'(y)
+    &= \frac{4L}{b\pi} \sqrt{1 - \frac{2y}{b}} + c_{l_{\alpha}} \alpha_{\text{gust}} \frac{1}{2} \rho V^2 S - \frac{W_{\text{wing}}}{S} c(y)
 \end{align}
 
 such that the weight of the wing is assummed to vary linearly with the chord. 
-By approximating the lift as $L=W=W_{wing} + W_{cent}$, the non-dimensionalize distubted gust load $\bar{q}$, can be expressed as
+By approximating the lift as $L=W=W_{\text{wing}} + W_{\text{cent}}$, the non-dimensionalize distubted gust load $\bar{q}$, can be expressed as
 
 \begin{equation}
     \label{e:ellpgustload3}
-    \bar{q}(y) = \frac{q(y)b}{NW_{wing}} = \frac{4}{\pi}\left( 1 + \frac{W_{cent}}{W_{wing}}\right) \sqrt{1-\frac{2y}{b}} + \frac{c_{l_{\alpha}}\alpha_{gust}}{C_L} \left( 1 + \frac{W_{cent}}{W_{wing}}\right) - c'(y)
+    \bar{q}(y) = \frac{q(y)b}{NW_{\text{wing}}} = \frac{4}{\pi}\left( 1 + \frac{W_{\text{cent}}}{W_{\text{wing}}}\right) \sqrt{1-\frac{2y}{b}} + \frac{c_{l_{\alpha}}\alpha_{\text{gust}}}{C_L} \left( 1 + \frac{W_{\text{cent}}}{W_{\text{wing}}}\right) - c(y)
 \end{equation}
 
 where the load factor for the gust load is an input $N=2$. It is assumed that the local elliptical lifting contribution is cancelled out by the local weight for a span loaded wing,
 
 \begin{equation}
     \label{e:cancel}
-    \frac{4}{\pi}\left( 1 + \frac{W_{cent}}{W_{wing}}\right) \sqrt{1-\frac{2y}{b}} \approx c'(y),
+    \frac{4}{\pi}\left( 1 + \frac{W_{\text{cent}}}{W_{\text{wing}}}\right) \sqrt{1-\frac{2y}{b}} \approx c(y),
 \end{equation}
 
 resulting in the GP-compatible loading distribution for the gust loading case,
 
 \begin{equation}
     \label{e:gustdist}
-    \bar{q} \geq c_{l_{\alpha}} \alpha_{gust} \frac{1}{C_L} \left( 1 + \frac{W_{cent}}{W_{wing}} \right)
+    \bar{q} \geq c_{l_{\alpha}} \alpha_{\text{gust}} \frac{1}{C_L} \left( 1 + \frac{W_{\text{cent}}}{W_{\text{wing}}} \right)
 \end{equation}
 
-where the lifting slope coefficient is, $c_{l_{\alpha}}=2\pi$, and $\alpha_{gust}$ is the local angle of attack caused by the gust. The center weight $W_{cent}$ and wing weight $W_{wing}$ for the solar aircraft are
+where the lifting slope coefficient is, $c_{l_{\alpha}}=2\pi$, and $\alpha_{\text{gust}}$ is the local angle of attack caused by the gust. The center weight $W_{\text{cent}}$ and wing weight $W_{\text{wing}}$ for the solar aircraft are
 
 \begin{align}
-    W_{wing} &\geq W_{\text{cap}} + W_{skin} + W_{battery}\\
-    W_{cent} &\geq W_{payload} + W_{engine}.
+    W_{\text{wing}} &\geq W_{\text{cap}} + W_{\text{skin}} + W_{\text{battery}}\\
+    W_{\text{cent}} &\geq W_{\text{payload}} + W_{\text{engine}} + W_{\text{empennage}}.
 \end{align}
 
 Because the gust velocity is assumed to be vertical to the flight path, the local angle of attack is approximated by 
 
 \begin{equation}
     \label{e:gustalpha}
-    \alpha_{gust} = \tan^{-1}\left(\frac{V_{gust}}{V} \right).
+    \alpha_{\text{gust}} = \tan^{-1}\left(\frac{V_{\text{gust}}}{V} \right).
 \end{equation}
 
 Because the $\arctan$ function is not GP compatible, a monomial approximation was calculating using techniques described by Hoburg\cite{fitting},
 
 \begin{equation}
     \label{e:arctan}
-    \alpha_{gust} = 0.855922 \left(\frac{V_{gust}}{V} \right)^{0.934041}.
+    \alpha_{\text{gust}} = 0.855922 \left(\frac{V_{\text{gust}}}{V} \right)^{0.934041}.
 \end{equation}
 
-This approximation is graphically shown in Figure~\ref{f:arctanfit} for the range of $V_{gust}/V \in [0, 0.7]$.  
+This approximation is graphically shown in Figure~\ref{f:arctanfit} for the range of $V_{\text{gust}}/V \in [0, 0.7]$.  
 
 \begin{figure}[H]
 	\begin{center}
@@ -997,15 +1048,15 @@ The gust velocity has a profile along the wing\cite{acgust},
 
 \begin{equation}
     \label{e:gustwind}
-    V_{gust} = V_{ref} \left(1-\cos\left(\frac{2y}{b} \frac{\pi}{2} \right) \right)
+    V_{\text{gust}} = V_{\text{ref}} \left(1-\cos\left(\frac{2y}{b} \frac{\pi}{2} \right) \right)
 \end{equation}
 
-where the reference velocity is an assumed conservative value\cite{acgust}, $V_{ref} = 10$ [m/s]. The gust velocity profile is computed prior to solve to preserve GP-compatiblity.
+where the reference velocity is an assumed conservative value\cite{acgust}, $V_{\text{ref}} = 10$ [m/s]. The gust velocity profile is computed prior to solve to preserve GP-compatiblity.
 
 % \begin{figure}[H]
 % 	\begin{center}
 % 	\includegraphics[width=0.6\textwidth]{gustvschord.pdf}
-%     \caption{ \textbf{ Graphical representation of assumption that the local chord is equal to the local lift generated from the elliptical distribution. Assumes the center to wing weight ratio, $\frac{W_{cent}}{W_{wing}} = 0.14$. }}
+%     \caption{ \textbf{ Graphical representation of assumption that the local chord is equal to the local lift generated from the elliptical distribution. Assumes the center to wing weight ratio, $\frac{W_{\text{cent}}}{W_{wing}} = 0.14$. }}
 % 	\label{f:gustvschord}
 % 	\end{center}
 % \end{figure}
@@ -1085,17 +1136,17 @@ There are also geometric constraints imposed on the width and thickness.  The to
 
 \begin{align}
     \label{e:thickness}
-    c'(y)\tau_t &\geq h_{\text{cap}} + 2t_{\text{cap}} \\
+    c(y)\tau_t &\geq h_{\text{cap}} + 2t_{\text{cap}} \\
     \label{e:width}
-    c'(y)\tau_w &\geq w_{\text{cap}} 
+    c(y)\tau_w &\geq w_{\text{cap}} 
     \end{align}
 
 To match the discretized beam model, the spar cross section can also be written in a discretized form such that each section has a unique width and thickness. 
 
 \begin{align}
-    I_i \leq 2w_{\text{cap}_i}t_{\text{cap}_i}\left(\frac{h_{\text{cap}_i}}{2}\right)^2 \\
-    c'(y)\tau_t &\geq h_{\text{cap}_i} + 2t_{\text{cap}_i} \\
-    c'(y)\tau_w &\geq w_{\text{cap}_i} 
+    I_i &\leq 2w_{\text{cap}_i}t_{\text{cap}_i}\left(\frac{h_{\text{cap}_i}}{2}\right)^2 \\
+    c(y)\tau_t &\geq h_{\text{cap}_i} + 2t_{\text{cap}_i} \\
+    c(y)\tau_w &\geq w_{\text{cap}_i} 
 \end{align}
 
 The wing spar at the root must be strong enough to withstand the bending root moment and stiff enough to not exceed some deflection limit.  Both constraints can be imposed in the optimization model as
@@ -1104,11 +1155,11 @@ The wing spar at the root must be strong enough to withstand the bending root mo
     \label{e:stresscont}
     \sigma_{\text{carbon fiber}} &\geq M_0 \frac{h_{\text{cap}}+t_{\text{cap}}}{I}\\
     \label{e:defcont}
-    w_n &\leq \left(\frac{w_{max}}{b/2} \right) b.
+    w_n &\leq \left(\frac{w_{\text{max}}}{b/2} \right) b.
 \end{align}
 
 The maximum stress for carbon fiber is, $\sigma_{\text{carbon fiber}} = 475$ [MPa]. 
-The tip deflection is constrainted to be less than 20\% of the half span, $\frac{w_{max}}{b/2} = 0.2$.
+The tip deflection is constrainted to be less than 20\% of the half span, $\frac{w_{\text{max}}}{b/2} = 0.2$.
 
 Finally, the weight of the spar cap is computed as
 
@@ -1116,7 +1167,7 @@ Finally, the weight of the spar cap is computed as
     \label{e:sparmass}
     \Delta W_i &\geq \rho_{\text{carbon fiber}} w_{\text{cap}_i}t_{\text{cap}_i} \frac{b/2}{n-1}g \\
     \label{e:sparmasssum}
-    W &\geq 2 \sum\limits_{1}^{n-1} \Delta W_i
+    W_{\text{spar}} &\geq 2 \sum\limits_{1}^{n-1} \Delta W_i
 \end{align}
 
 where $\rho_{\text{carbon fiber}} = 1.4$ [g/cm$^3$].
@@ -1127,7 +1178,7 @@ It is assumed that the wing skin is made of carbon fiber.  The weight of the win
 
 \begin{equation}
     \label{e:wingskinweight}
-    W_{\text{skin}} \geq 2 \rho_{\text{carbon fiber}} S t g 
+    W_{\text{skin}} \geq 2 \rho_{\text{carbon fiber}} S g 
 \end{equation}
 
 where $\rho_{\text{carbon fiber}} = 0.043$ [g/cm$^2$].
@@ -1137,90 +1188,90 @@ where $\rho_{\text{carbon fiber}} = 0.043$ [g/cm$^2$].
 An empennage model with a single tail constisting of a tail boom, horizontal and vertical tail, is added to both the solar-electric and gas powered aircraft.  
 The empennage adds both weight and drag to the each aircraft.  
 
-The tail boom has a diameter $d$, root wall thickness $t_0$, root moment of inertia $I_0$, modulus $E$, and density $\rho_{\text{carbon fiber}} = 1.4$ [g/cm$^3$], and length $l_h$. 
+The tail boom has a diameter $d$, root wall thickness $t_0$, root moment of inertia $I_0$, modulus $E$, and density $\rho_{\text{carbon fiber}} = 1.4$ [g/cm$^3$], and length $l_{\text{h}}$. 
 The total mass and root bending inertia are imposed in the optimization model as 
 
 \begin{align}
-    m &\geq \pi \rho_{\text{carbon fiber}} t_0 d l_h \left( 1 + \frac{1}{2} k\right) \\
+    m &\geq \pi \rho_{\text{carbon fiber}} t_0 d l_{\text{h}} \left( 1 + \frac{1}{2} k\right) \\
     I_0 &\leq \pi t_0 d^3/8
 \end{align}
 
-where the index $k=0$ corresponds to a uniform wall thickness and stiffness, and $k=1$ corresponds to a linear dropoff to zero.  For both the solar-electric and gas powered aircraft $k=0.8$.  When the tail boom is loaded at the endpoint $x=l_h$, by the horizontal tail lift $L_h$, the end deflection angle follows from standard beam analysis. 
+where the index $k=0$ corresponds to a uniform wall thickness and stiffness, and $k=1$ corresponds to a linear dropoff to zero.  For both the solar-electric and gas powered aircraft $k=0.8$.  When the tail boom is loaded at the endpoint $x=l_{\text{h}}$, by the horizontal tail lift $L_{\text{h}}$, the end deflection angle follows from standard beam analysis. 
 
 \begin{align}
     \label{e:boomdefl}
-    \theta &\geq \frac{L_h l_h^2}{EI_0} \frac{1+k}{2} \\
-    L_h &= \frac{1}{2} C_{L_h} \rho V^2 S_h
+    \theta &\geq \frac{L_{\text{h}} l_{\text{h}}^2}{EI_0} \frac{1+k}{2} \\
+    L_{\text{h}} &= \frac{1}{2} C_{L_{\text{h}}} \rho V^2 S_{\text{h}}
 \end{align}
 
-The horiztonal tail is sized to meet a minimum static margin $\text{SM}_{min} = 0.35$ and minimum desirable c.g. travel range,
+The horiztonal tail is sized to meet a minimum static margin $\text{SM}_{\text{min}} = 0.35$ and minimum desirable c.g. travel range,
 
 \begin{equation}
     \label{e:deltacg}
-    \Delta x_{cg} = (x_{cg})_{aft} - (x_{cg})_{fwd} = 0.2
+    \Delta x_{cg} = (x_{cg})_{\text{aft}} - (x_{cg})_{\text{fwd}} = 0.2
 \end{equation}
 
-A single constraint, whose derivation is explained in Appendix C, minimizes the horizontal tail volume coefficient $V_h$, while meeting the minimum static margin and minimum c.g. travel range,
+A single constraint, whose derivation is explained in Appendix C, minimizes the horizontal tail volume coefficient $V_{\text{w}}$, while meeting the minimum static margin and minimum c.g. travel range,
 
 \begin{align}
     \label{e:smcorr}
-    \text{SM}_{\text{min}} + \frac{\Delta x_{cg}}{c} - \frac{C_{M_w}}{C_{L_{max}}} &\leq V_h \mathcal{F}_{NE}^{-1} \frac{m_h}{m_w} \left( 1 - \frac{d\epsilon}{d\alpha}\right) + V_h \frac{-(C_{L_h})_{min}}{C_{L_{max}}} \\
+    \text{SM}_{\text{min}} + \frac{\Delta x_{cg}}{c} - \frac{C_{M_{	ext{w}}}}{C_{L_{\text{max}}}} &\leq V_{\text{w}} \mathcal{F}_{NE}^{-1} \frac{m_{\text{h}}}{m_{\text{w}}} \left( 1 - \frac{d\epsilon}{d\alpha}\right) + V_{\text{w}} \frac{-(C_{L_{\text{h}}})_{\text{min}}}{C_{L_{\text{max}}}} \\
     \label{e:htv}
-    V_h &= \frac{S_h}{S} \frac{l_h}{c}
+    V_{\text{w}} &= \frac{S_{\text{h}}}{S} \frac{l_{\text{h}}}{c}
 \end{align}
 
 Because this equation is not posynomial, it was reformulated as conservative monomial approximation
 
 \begin{align}
-    1 &\geq z_{\text{SM}_1} \left(\frac{m_w \mathcal{F}_{NE}}{m_h V_h})\right) + \frac{d\epsilon}{d\alpha} \\
-    z_{\text{SM}_2} &\leq V_h\frac{(C_{L_h})_{min}}{C_{L_{max}}} \\
+    1 &\geq z_{\text{SM}_1} \left(\frac{m_{\text{w}} \mathcal{F}_{NE}}{m_{\text{h}} V_{\text{w}}})\right) + \frac{d\epsilon}{d\alpha} \\
+    z_{\text{SM}_2} &\leq V_{\text{w}}\frac{(C_{L_{\text{h}}})_{\text{min}}}{C_{L_{\text{max}}}} \\
     \label{e:smcorrmon}
-    z_{\text{SM}_1}^{0.48} z_{\text{SM}_1}^{0.52} &\geq \text{SM}_{\text{min}} + \frac{\Delta x_{cg}}{c} - \frac{C_{M_w}}{C_{L_{max}}}
+    z_{\text{SM}_1}^{0.48} z_{\text{SM}_1}^{0.52} &\geq \text{SM}_{\text{min}} + \frac{\Delta x_{cg}}{c} - \frac{C_{M_{	ext{w}}}}{C_{L_{\text{max}}}}
 \end{align}
 
 where the values, 0.48 and 0.52, are chosen as an approximate percentage that each term is of the right hand side of Equation~\eqref{e:smcorrmon}. 
 
-The vertical tail is sized to meet a conservative volume tail coefficient, $V_v= 0.05$,\cite{aircraftrules}
+The vertical tail is sized to meet a conservative volume tail coefficient, $V_{\text{v}}= 0.05$,\cite{aircraftrules}
 
 \begin{equation}
     \label{e:vtv}
-    V_v = \frac{S_v}{S} \frac{l_v}{b}
+    V_{\text{v}} = \frac{S_{\text{v}}}{S} \frac{l_{\text{v}}}{b}
 \end{equation}
 
-where $l_v$ is the vertical tail moment arm and assume to be equal to the horizontal tail moment arm, $l_v = l_h$.
+where $l_{\text{v}}$ is the vertical tail moment arm and assume to be equal to the horizontal tail moment arm, $l_{\text{v}} = l_{\text{h}}$.
 
 Both the horizontal and vertical tails are assumed to have a carbon fiber skin and solid foam interior where their respective densities are $\rho_{\text{carbon fiber}} = 0.1$ [g/cm$^2$], $\rho_{\text{foam}} = 1.5$ [lbf/ft$^3$]. 
 The weight of the horizontal and vertical tails is
 
 \begin{align}
     \label{e:htweight}
-    W_h &= \rho_{\text{foam}} \frac{S_h^2}{b_h} \bar{A} + g\rho_{\text{carbon fiber}} S_h \\
+    W_{\text{h}} &= \rho_{\text{foam}} \frac{S_{\text{h}}^2}{b_{\text{h}}} \bar{A} + g\rho_{\text{carbon fiber}} S_{\text{h}} \\
     \label{e:vtweight}
-    W_v &= \rho_{\text{foam}} \frac{S_v^2}{b_v} \bar{A} + g\rho_{\text{carbon fiber}} S_v
+    W_{\text{v}} &= \rho_{\text{foam}} \frac{S_{\text{v}}^2}{b_{\text{v}}} \bar{A} + g\rho_{\text{carbon fiber}} S_{\text{v}}
 \end{align}
 
-where $b_h$ and $b_v$ are the spans of the horizontal and vertical tails respectively and $\bar{A}$ is the cross sectional area of the NACA 0008 airfoil.
+where $b_{\text{h}}$ and $b_{\text{v}}$ are the spans of the horizontal and vertical tails respectively and $\bar{A}$ is the cross sectional area of the NACA 0008 airfoil.
 
 The drag of the empennage was considered as three separate parts with no interference drag.  The drag of the tail boom was calculated using a turbulent flat plate model,
 
 \begin{align}
     \label{e:boomdrag}
-    D_{boom} &\geq \frac{1}{2} C_f \rho V^2 l_h\pi d \\
+    D_{boom} &\geq \frac{1}{2} C_f \rho V^2 l_{\text{h}}\pi d \\
     C_f &\geq \frac{0.445}{Re^{0.3}} \\
-    Re &= \frac{V\rho l_h}{\mu}
+    Re &= \frac{V\rho l_{\text{h}}}{\mu}
 \end{align}
 
 The drag of the horizontal and vertical tails was computed using a GP-compatible fit of XFOIL data for a range of Reynolds numbers and NACA airfoil thicknesses, ~\eqref{e:taildrag}.
 
 \begin{align}
-    D_h &\geq \frac{1}{2} C_{d_h} \rho V^2 S_h \\
-    D_v &\geq \frac{1}{2} C_{d_v} \rho V^2 S_v \\
+    D_{\text{h}} &\geq \frac{1}{2} C_{d_{\text{h}}} \rho V^2 S_{\text{h}} \\
+    D_{\text{v}} &\geq \frac{1}{2} C_{d_{\text{v}}} \rho V^2 S_{\text{v}} \\
     \label{e:taildrag}
     Cd^{70.5599} &\geq \num{7.42688d-90} \left( \frac{Re}{\num{1d3}} \right)^{-33.0637}(100 \tau)^{18.0419}  \\
                  & + \num{5.02826d-163}\left(\frac{Re}{\num{1d3}}\right)^{-18.7959} (100\tau)^{53.1879} \\
                  &+ \num{4.22901d-77}\left(\frac{Re}{\num{1d3}}\right)^{-41.1704} (100\tau)^{28.4609} \\
-    Re_{v} &= \frac{V\rho S_v/b_v}{\mu} \\
-    Re_{h} &= \frac{V\rho S_h/b_h}{\mu} 
+    Re_{v} &= \frac{V\rho S_{\text{v}}/b_{\text{v}}}{\mu} \\
+    Re_{h} &= \frac{V\rho S_{\text{h}}/b_{\text{h}}}{\mu} 
 \end{align}
 
 where $\tau = 0.8$ is the airfoil thickness. Assuming steady level flight where neither surface is generating lift, the XFOIL data was generated for a zero angle of attack. A comparison of the XFOIL data and Equation~\eqref{e:taildrag} is shown in Figure~\ref{f:taildragpolar}
@@ -1241,10 +1292,10 @@ The driving constraint for the size of the fuselage is to ensure that all of the
 
 \begin{equation}
     \label{e:fusevol}
-    \mathcal{V}_{fuse} \geq \frac{W_{fuel}}{\rho_{fuel}}
+    \mathcal{V}_{fuse} \geq \frac{W_\text{fuel}}{\rho_\text{fuel}}
 \end{equation}
 
-where the fuel is assumed to be Jet A fuel with density $\rho_{fuel} = 6.01$ [lbf/gallon].  The volume of the fuselage is constrained by
+where the fuel is assumed to be Jet A fuel with density $\rho_\text{fuel} = 6.01$ [lbf/gallon].  The volume of the fuselage is constrained by
 
 \begin{equation}
     \label{e:fusevol2}
@@ -1286,16 +1337,16 @@ The solar-electric powered aircraft has a motor whose weight is based on the app
 
 \begin{equation}
     \label{e:electricengine}
-    P_{max} = B_{PM} m_{M}
+    P_{\text{max}} = B_{PM} m_{M}
 \end{equation}
 
-where $m_M$ is the motor mass, $P_{max} \geq P_{oper}$ is the maximum operating power, and the power to mass ration is $B_{PM} = 4140.8$ [W/kg].
+where $m_M$ is the motor mass, $P_{\text{max}} \geq P_{oper}$ is the maximum operating power, and the power to mass ration is $B_{PM} = 4140.8$ [W/kg].
 
 The engine weight of the gas powered aircraft is governed by a simple power law derived from existing two-stroke and four-stroke engines\cite{gasengine}
 
 \begin{equation}
     \label{e:powerlaw}
-    \frac{W_{engine}}{W_{engine-ref}} = 1.27847 \left(\frac{P_{SL-max}}{P_{ref}} \right)^{0.772392}
+    \frac{W_{\text{engine}}}{W_{engine-ref}} = 1.27847 \left(\frac{P_{SL-max}}{P_{ref}} \right)^{0.772392}
 \end{equation}
 
 where $W_{engine-ref} = 10$ [lbs] and $P_{ref} = 10$ [hp].  Equation~\eqref{e:powerlaw} was found using techniques described in Hoburg\cite{fitting}. Equation~\eqref{e:powerlaw} is compared to the data in Figure~\ref{f:powervsweightfit}
@@ -1322,12 +1373,12 @@ GP-compatible curves were generated from the DF70 $BSFC$, $RPM$ and shaft power 
 
 \begin{align}
     \label{e:rpmtobsfc}
-    \left( \frac{BSFC}{BSFC_{min}} \right)^{36.2209} &\geq 2.31541\left( \frac{RPM}{RPM_{max}}\right)^{8.06517} + 0.00103364\left( \frac{RPM}{RPM_{max}} \right)^{-38.8545} \\
+    \left( \frac{BSFC}{BSFC_{\text{min}}} \right)^{36.2209} &\geq 2.31541\left( \frac{RPM}{RPM_{\text{max}}}\right)^{8.06517} + 0.00103364\left( \frac{RPM}{RPM_{\text{max}}} \right)^{-38.8545} \\
     \label{e:rpmtopower}
-    \left( \frac{P_{shaft}}{P_{max}}\right)^{0.1} &= 0.999495\left( \frac{RPM}{RPM_{max}}\right)^{0.294421}
+    \left( \frac{P_{shaft}}{P_{\text{max}}}\right)^{0.1} &= 0.999495\left( \frac{RPM}{RPM_{\text{max}}}\right)^{0.294421}
 \end{align}
 
-where $RPM_{max} = 7698$, and $BSFC_{min} = 0.3162$ [lb/hp/hr]. 
+where $RPM_{\text{max}} = 7698$, and $BSFC_{\text{min}} = 0.3162$ [lb/hp/hr]. 
 Using these approximations the required shaft power determines the $BSFC$.
 A comparison of the GP-compatible approximations to the manufacturing data from RCV engines is presented in Figure~\ref{f:RCVdata}.
 
@@ -1355,7 +1406,7 @@ The lapse rate $L_{eng}$, is assumed to affect the maximum power output,
 
 \begin{equation}
     \label{e:lapse}
-    L_{eng} = \frac{P_{max}}{P_{SL-max}}.
+    L_{eng} = \frac{P_{\text{max}}}{P_{SL-max}}.
 \end{equation}
 
 The laspse is calculated from the required flight altitude $h=15,000$ [ft], prior to the optimization solve using a linear regression fit from the manufacture data for the DF70 engine from RCV Engines
@@ -1470,15 +1521,17 @@ The each wind speed constraint follows the following form
 
 \begin{equation}
     \label{e:windspeedgen}
-    \left(\frac{V_{wind}}{V_{ref}}\right)^{\alpha} \geq c_1 \rho^{e_{1,1}}p_{wind}^{e_{1,2}} + c_2 \rho^{e_{2,1}}p_{wind}^{e_{2,2}} + c_3 \rho^{e_{3,1}}p_{wind}^{e_{3,2}} + c_4 \rho^{e_{4,1}}p_{wind}^{e_{4,2}}
+    \left(\frac{V_{\text{wind}}}{V_{\text{ref}}}\right)^{\alpha} \geq c_1 \rho^{e_{1,1}}p_{\text{wind}}^{e_{1,2}} + c_2 \rho^{e_{2,1}}p_{\text{wind}}^{e_{2,2}} + c_3 \rho^{e_{3,1}}p_{\text{wind}}^{e_{3,2}} + c_4 \rho^{e_{4,1}}p_{\text{wind}}^{e_{4,2}}
 \end{equation}
 
 Table~\ref{t:windvals} lists the values of the coefficients and exponents of Equation~\eqref{e:windspeedgen} for latitudes 20-60. 
 
-\begin{longtable}{lccccccccccccc}
+\begin{table}[h]
+\resizebox{\textwidth}{!}{%
+    \begin{tabular}{lccccccccccccc}
+    \toprule
+    \toprule
     \caption{Wind Fit Data} \\
-    \toprule
-    \toprule
     \label{t:windvals}
     Latitude & $c_1$ & $e_{1,1}$ & $e_{1,2}$ & $c_2$ & $e_{2,1}$ & $e_{2,2}$ & $c_3$ & $e_{3,1}$ & $e_{3,2}$ & $c_4$ & $e_{4,1}$ & $e_{4,2}$ & $\alpha$ \\
     \midrule
@@ -1524,7 +1577,8 @@ Table~\ref{t:windvals} lists the values of the coefficients and exponents of Equ
 59 & 0.0242 & 0.892 & 28.4 & 0.000155 & -1.21 & 16.1 & 0.945 & -0.0147 & 0.0161 & 0.188 & 1.98 & 1.32 & 0.0233\\
 60 & 0.0173 & 0.691 & 28.1 & 0.948 & -0.0136 & 0.015 & 0.209 & 2.15 & 1.6 & 7.54e-05 & -1.41 & 14.3 & 0.0222 \\
 \bottomrule
-\end{longtable}
+\end{tabular}}
+\end{table}
 
 \section*{Appendix B}
 
@@ -1542,15 +1596,16 @@ The redesigned airfoil was named \emph{JH01}. We would like to thank Mark Drela 
  \caption{\textbf{ Pressure coefficient plots at the minimum and maximum expected $C_L$ at Reynolds number, $Re=3e5$.  }}
  \label{f:jhcps}
 \end{figure}
-\section*{Appendix D}
+
+\section*{Appendix C}
 
 To derivation of Equation~\eqref{e:smcorr} begins with the moment about the aircraft's center of mass
 
 \begin{align}
     \label{e:mcenter}
-    M_{cg} &= M_w + (x_{cg} - x_{ac})L_w - l_h L_h \\
+    M_{cg} &= M_{\text{w}} + (x_{cg} - x_{ac})L_{\text{w}} - l_{\text{h}} L_{\text{h}} \\
     \label{e:eq6}
-    \frac{M_{cg}}{qSc} = C_m &= C_{m_W} + \frac{x_{cg} - x_{ac}}{c} C_{L_W} - V_h C_{L_h}
+    \frac{M_{cg}}{qSc} = C_m &= C_{m_{\text{w}}} + \frac{x_{cg} - x_{ac}}{c} C_{L_W} - V_{\text{w}} C_{L_{\text{h}}}
 \end{align}
 
 It is assumed that the tailboom's effective root locatioon is at the wing's aerodynamic center $x_{ac}$, and that the tail's pitching moment about its own aerodynamic center is negligible. 
@@ -1558,65 +1613,65 @@ It is assumed that the tailboom's effective root locatioon is at the wing's aero
 Using moment and lift approximations
 
 \begin{align}
-    C_{m_W} &= constant \\
-    C_{L_W} &= C_{L_{W_0}} + m_W \alpha \\
+    C_{m_{\text{w}}} &= constant \\
+    C_{L_W} &= C_{L_{W_0}} + m_{\text{w}} \alpha \\
     \label{e:eq10}
-    C_{L_h} &= C_{L_{h_0}} + m_h \left[\left( 1 - \frac{d\epsilon}{d\alpha}\right) - \theta \right] + C_{L_{h_{\delta}}}\delta_e \\
-    m_W &= \frac{2\pi}{1 + 2/AR_w} \\
-    m_h &= \frac{2\pi}{1 + 2/AR_h}
+    C_{L_{\text{h}}} &= C_{L_{h_0}} + m_{\text{h}} \left[\left( 1 - \frac{d\epsilon}{d\alpha}\right) - \theta \right] + C_{L_{h_{\delta}}}\delta_e \\
+    m_{\text{w}} &= \frac{2\pi}{1 + 2/AR_{\text{w}}} \\
+    m_{\text{h}} &= \frac{2\pi}{1 + 2/AR_{\text{h}}}
 \end{align}
 
 where $\epsilon$ is the wing's downwash angle seen at the tail. Using a vortex approximation and neglecting taper effects, we can estimate
 
 \begin{equation}
-    \frac{d\epsilon}{d\alpha} = \frac{m_W}{4\pi} \frac{c}{l_h}
+    \frac{d\epsilon}{d\alpha} = \frac{m_{\text{w}}}{4\pi} \frac{c}{l_{\text{h}}}
 \end{equation}
 
 so that \eqref{e:eq10} can be wrtten as
 
 \begin{equation}
-    C_{L_h} = m_h \left[\left( 1 - \frac{d\epsilon}{d\alpha}\right) - \frac{qS_hl_h^2}{EI_0}(1-\frac{1}{2}k) C_{L_h}\right] + C_{L_{h_{\delta}}}(\delta_e - \delta_{e_0}) 
+    C_{L_{\text{h}}} = m_{\text{h}} \left[\left( 1 - \frac{d\epsilon}{d\alpha}\right) - \frac{qS_{\text{h}}l_{\text{h}}^2}{EI_0}(1-\frac{1}{2}k) C_{L_{\text{h}}}\right] + C_{L_{h_{\delta}}}(\delta_e - \delta_{e_0}) 
 \end{equation}
 
 This can be further simplified by defining a tailboom flexibility factor $\mathcal{F}$.
 
 \begin{align}
-    C_{L_h} &= \mathcal{F}^{-1} m_h \left( 1 - \frac{d\epsilon}{d\alpha}\right) \alpha + \mathcal{F}^{-1} C_{L_{h_{\delta}}}(\delta_e - \delta_{e_0}) \\
-    \mathcal{F} &= 1 + m_h \frac{qS_hl_h^2}{EI_0}(1-\frac{1}{2}k) 
+    C_{L_{\text{h}}} &= \mathcal{F}^{-1} m_{\text{h}} \left( 1 - \frac{d\epsilon}{d\alpha}\right) \alpha + \mathcal{F}^{-1} C_{L_{h_{\delta}}}(\delta_e - \delta_{e_0}) \\
+    \mathcal{F} &= 1 + m_{\text{h}} \frac{qS_{\text{h}}l_{\text{h}}^2}{EI_0}(1-\frac{1}{2}k) 
 \end{align}
 
 Using the wing lift coefficient and the recast tail lift coefficient, the pitching moment is equation and derivative are given as follows.
 
 \begin{align}
-    C_m &= C_{m_W} + \frac{x_{cg} - x_{ac}}{c} (C_{L_{W_0}} + m_W \alpha) - V_h \left[ \mathcal{F}^{-1} m_h \left( 1 - \frac{d\epsilon}{d\alpha}\right) \alpha + \mathcal{F}^{-1} C_{L_{h_{\delta}}}(\delta_e - \delta_{e_0})\right]
-    \frac{dC_m}{d\alpha} & = \frac{x_{cg} - x_{ac}}{c} m_W  - V_h \mathcal{F}^{-1} m_h \left( 1 - \frac{d\epsilon}{d\alpha}\right) 
+    C_m &= C_{m_{\text{w}}} + \frac{x_{cg} - x_{ac}}{c} (C_{L_{W_0}} + m_{\text{w}} \alpha) - V_{\text{w}} \left[ \mathcal{F}^{-1} m_{\text{h}} \left( 1 - \frac{d\epsilon}{d\alpha}\right) \alpha + \mathcal{F}^{-1} C_{L_{h_{\delta}}}(\delta_e - \delta_{e_0})\right] \\
+    \frac{dC_m}{d\alpha} & = \frac{x_{cg} - x_{ac}}{c} m_{\text{w}}  - V_{\text{w}} \mathcal{F}^{-1} m_{\text{h}} \left( 1 - \frac{d\epsilon}{d\alpha}\right) 
 \end{align}
 
-Now by dividing by $dC_{L_W}/d\alpha = m_h$, which defines the static margin
+Now by dividing by $dC_{L_W}/d\alpha = m_{\text{h}}$, which defines the static margin
 
 \begin{equation}
-    -\frac{dC_m/d\alpha}{dC_{L_W}/d\alpha} = \text{SM} = V_h \mathcal{F}^{-1} \frac{m_h}{m_W} \left( 1 - \frac{d\epsilon}{d\alpha}\right) - \frac{x_{cg} - x_{ac}}{c}
+    -\frac{dC_m/d\alpha}{dC_{L_W}/d\alpha} = \text{SM} = V_{\text{w}} \mathcal{F}^{-1} \frac{m_{\text{h}}}{m_{\text{w}}} \left( 1 - \frac{d\epsilon}{d\alpha}\right) - \frac{x_{cg} - x_{ac}}{c}
 \end{equation}
 
 The case for meeting the minimum static margin requirement is at the never-exceed dynamic pressure $q_{NE}$ and when the c.g is at its aft-most position.
 
 \begin{equation}
-    \text{SM}_{min} = V_h \mathcal{F}_{NE}^{-1} \frac{m_h}{m_W} \left( 1 - \frac{d\epsilon}{d\alpha}\right) - \frac{(x_{cg})_{aft} - x_{ac}}{c} 
+    \text{SM}_{\text{min}} = V_{\text{w}} \mathcal{F}_{NE}^{-1} \frac{m_{\text{h}}}{m_{\text{w}}} \left( 1 - \frac{d\epsilon}{d\alpha}\right) - \frac{(x_{cg})_{\text{aft}} - x_{ac}}{c} 
 \end{equation}
 
 Dividing Equation~\eqref{e:eq6} by $C_{L_W}$, gives a requirement on the tail lift coefficient required to achieve a pitch trim condition $C_m=1$
 
 \begin{equation}
-    0 = \frac{C_{m_W}}{C_{L_W}} + \frac{x_{cg} - x_{ac}}{c} - V_h \frac{C_{L_h}}{C_{L_W}}
+    0 = \frac{C_{m_{\text{w}}}}{C_{L_W}} + \frac{x_{cg} - x_{ac}}{c} - V_{\text{w}} \frac{C_{L_{\text{h}}}}{C_{L_W}}
 \end{equation}
 
-The pitch authority requirement is that at the foward-most c.g. position and maximum lift with the tail lift coefficient equal to the most-negative allowable value $(C_{L_h})_{min}$. Combining the static margin and pitch authority requirement results in the horizontal tail sizing equation 
+The pitch authority requirement is that at the foward-most c.g. position and maximum lift with the tail lift coefficient equal to the most-negative allowable value $(C_{L_{\text{h}}})_{\text{min}}$. Combining the static margin and pitch authority requirement results in the horizontal tail sizing equation 
 
 \begin{align}
-    \text{SM}_{\text{min}} + \frac{\Delta x_{cg}}{c} - \frac{C_{M_w}}{C_{L_{max}}} &\leq + V_h \mathcal{F}_{NE}^{-1} \frac{m_h}{m_w} \left( 1 - \frac{d\epsilon}{d\alpha}\right) + V_h \frac{-(C_{L_h})_{min}}{C_{L_{max}}} \\
+    \text{SM}_{\text{min}} + \frac{\Delta x_{cg}}{c} - \frac{C_{M_{\text{w}}}}{C_{L_{\text{max}}}} &\leq V_{\text{w}} \mathcal{F}_{NE}^{-1} \frac{m_{\text{h}}}{m_{\text{w}}} \left( 1 - \frac{d\epsilon}{d\alpha}\right) + V_{\text{w}} \frac{-(C_{L_{\text{h}}})_{\text{min}}}{C_{L_{\text{max}}}} \\
 \end{align}
 
-where $\Delta x_{cg} = (x_{cg})_{aft} - (x_{cg})_{fwd}$.
+where $\Delta x_{cg} = (x_{cg})_{\text{aft}} - (x_{cg})_{\text{fwd}}$.
 
 \end{document}
 

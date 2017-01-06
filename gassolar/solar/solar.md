@@ -9,9 +9,9 @@ import numpy as np
 from plotting import windalt_plot
 plt.rcParams.update({'font.size':19})
 
-LATITUDE = True
+LATITUDE = False
 LOADING = False
-WIND = False
+WIND = True
 
 """ loading """
 if LOADING:
@@ -57,11 +57,11 @@ if LATITUDE:
                 W.append(np.nan)
         ax.plot(lat, W)
     
-    ax.set_ylim([0, 1000])
-    ax.set_xlim([0, 60])
+    ax.set_ylim([0, 400])
+    ax.set_xlim([20, 60])
     ax.grid()
     ax.set_xlabel("Latitude [deg]")
-    ax.set_ylabel("Max Take Off Weight")
+    ax.set_ylabel("Max Take Off Weight [lbf]")
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
     fig.savefig("../../gassolarpaper/mtowvslatsolar.pdf", bbox_inches="tight")
 
@@ -73,6 +73,6 @@ if WIND:
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
     fig, ax = windalt_plot(31, sol)
-    fig.savefig("../../gassolarpaper/windaltoper.pdf")
+    fig.savefig("../../gassolarpaper/windaltoper.pdf", bbox_inches="tight")
 
 

@@ -11,8 +11,8 @@ import numpy as np
 plt.rcParams.update({'font.size':19})
 
 END = False 
-LAT = False 
-DRAG = True
+LAT = True
+DRAG = False
 BSFC = False
 
 """ MTOW vs Endurance """
