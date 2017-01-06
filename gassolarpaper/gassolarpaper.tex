@@ -115,18 +115,23 @@
 \begin{tabbing}
   XXXXXXX \= \kill% this line sets tab stop
 $A$ \> wing aspect ratio \\
+$\bar{A}$ \> non-dimensional cross sectional area \\
 $b$ \> wing span [ft] \\
 $BSFC$ \> brake specific fuel consumption [lb/hr/hp] \\
 $c$ \> wing chord [m] \\
 $C_D$ \> drag coefficient \\
 $C_{d_0}$ \> non-wing drag coefficient \\
+$C_{d_{\text{h}}}$ \> horizontal tail profile drag coefficient \\
 $c_{d_p}$ \> wing profile drag coefficient \\
+$C_{d_{\text{v}}}$ \> vertical tail profile drag coefficient \\
+$C_f$ \> skin friction coefficient \\
 $C_L$ \> lift coefficient \\
 $C_{l_{\alpha}}$ \> lift slope coefficient \\
 $C_{L_{\text{h}}}$ \> horizontal tail lift coefficient \\
 $C_{L_{\text{max}}}$ \> maximum lift coefficient \\
 $C_{M_{\text{w}}}$ \> wing moment coefficient \\
 $d$ \> tail boom diameter [m] \\
+$D_{\text{boom}}$ \> tail boom drag [N] \\
 $\Delta W$ \> wing section weight [N] \\
 $\Delta x_{cg}$ \> center of gravity location [m] \\
 $\Delta y$ \> wing section length [m] \\
@@ -152,6 +157,7 @@ $L'$ \> local lifting force [N/m] \\
 $L'_{\text{elliptical}}$ \> local lift from elliptical distribution [N/m] \\
 $L'_{\text{gust}}$ \> local lift from gust distribution[N/m] \\
 $L_\text{h}$ \> horizontal tail lift [N] \\
+$l_\text{fuse}$ \> fuselage length [m] \\
 $l_\text{h}$ \> horizontal tail moment arm [m] \\
 $l_\text{v}$ \> vertical tail moment arm [m] \\
 $m$ \> tail boom mass [kg] \\
@@ -176,13 +182,18 @@ $P_{\text{sun surface}}$ \> power emitted at the sun's surface [W/m$^2$] \\
 $r_0$ \> average distance from earth to sun \\
 $R$ \> aircraft range [nmi] \\
 $R_{\text{earth orbit}}$ \> distance from earth to sun \\
+$R_{\text{fuse}}$ \> fuselage radius [m] \\
 $R_{\text{spec}}$ \> specific gas constant [J/k/K] \\
 $R_{\text{sun}}$ \> radius of the sun \\
 $q$ \> distributed wing loading [N/m] \\
 $\bar{q}$ \> normalized distributed wing loading \\
-$Re$ \> Reynolds number \\
+$Re$ \> aircraft Reynolds number \\
+$Re_{\text{boom}}$ \> tail boom Reynolds number \\
+$Re_{\text{h}}$ \> horizontal tail Reynolds number \\
+$Re_{\text{v}}$ \> vertical tail Reynolds number \\
 $S$ \> wing planform area [m$^2$]\\
 $\mathcal{S}$ \> shear forces [N] \\
+$S_{\text{fuse}}$ \> fuselage wetted surface area [m$^2$]\\
 $S_{\text{h}}$ \> horizontal tail planform area [m$^2$]\\
 $S_{\text{solar}}$ \> solar cell area [m$^2$]\\
 $S_{\text{v}}$ \> vertical tail planform area [m$^2$]\\
@@ -199,6 +210,7 @@ $T_{11}$ \> air temperature at 11,000 meters [K] \\
 $T_{\text{atm}}$ \> air temperature at flight altitude [K] \\
 $T_{\text{sl}}$ \> air temperature at sea level [K] \\
 $V$ \> true airspeed [m/s] \\
+$\mathcal{V}_{\text{fuse}}$ \>  fuselage volume [m$^3$] \\
 $V_{\text{gust}}$ \>  gust velocity [m/s] \\
 $V_{\text{h}}$ \> horizontal tail lift coefficient \\
 $V_{\text{ref}}$ \>  reference wind airspeed [m/s] \\
@@ -215,6 +227,7 @@ $W_{\text{engine}}$ \> engine weight [N] \\
 $W_{\text{final}}$ \> final aircraft weight [N] \\
 $W_{\text{fuel}}$ \> fuel weight [N] \\
 $W_{\text{fuselage}}$ \> fuselage weight [N] \\
+$W_{\text{h}}$ \> horizontal tail weight [N] \\
 $W_{\text{initial}}$ \> initial aircraft weight [N] \\
 $w_{\text{max}}$ \> maximum deflection limit [m] \\
 $W_{\text{payload}}$ \> payload weight [N] \\
@@ -222,6 +235,7 @@ $W_{\text{skin}}$ \> wing skin weight [N] \\
 $W_{\text{solar}}$ \> solar cell weight [N] \\
 $W_{\text{spar}}$ \> wing spar weight [N] \\
 $W_{\text{structural}}$ \> structural weight [N] \\
+$W_{\text{v}}$ \> vertical tail weight [N] \\
 $W_{\text{wing}}$ \> wing weight [N] \\
 $(x_{cg})_{\text{aft}}$ \> aft-most center of gravity position [m] \\
 $(x_{cg})_{\text{fwd}}$ \> forward-most center of gravity position [m] \\
@@ -243,9 +257,12 @@ $\mu_0$ \> reference air viscosity [kg/m/s] \\
 $\phi$ \> latitude \\
 $\rho$ \> air density [kg/m$^3$] \\
 $\rho_{\text{carbon fiber}}$ \> density of carbon fiber [kg/m$^3$] \\
+$\rho_{\text{foam}}$ \> density of foam [lbf/ft$^3$] \\
 $\rho_{\text{solar}}$ \> solar cell density [kg/m$^2$] \\
 $\sigma_{\text{carbon fiber}}$ \> maximum carbon fiber stress [Pa] \\
+$\tau_{\text{h}}$ \> horiztonal tail thickness to chord ratio \\
 $\tau_t$ \> wing thickness to chord ratio \\
+$\tau_{\text{v}}$ \> vertical tail thickness to chord ratio \\
 $\tau_w$ \> cap spar width to chord ratio \\
 $\theta$ \> angle normal to surface \\
 $\theta_{\text{boom}}$ \> tail boom deflection angle \\
@@ -1256,9 +1273,9 @@ The drag of the empennage was considered as three separate parts with no interfe
 
 \begin{align}
     \label{e:boomdrag}
-    D_{boom} &\geq \frac{1}{2} C_f \rho V^2 l_{\text{h}}\pi d \\
+    D_{	ext{boom}} &\geq \frac{1}{2} C_f \rho V^2 l_{\text{h}}\pi d \\
     C_f &\geq \frac{0.445}{Re^{0.3}} \\
-    Re &= \frac{V\rho l_{\text{h}}}{\mu}
+    Re_{\text{boom}} &= \frac{V\rho l_{\text{h}}}{\mu}
 \end{align}
 
 The drag of the horizontal and vertical tails was computed using a GP-compatible fit of XFOIL data for a range of Reynolds numbers and NACA airfoil thicknesses, ~\eqref{e:taildrag}.
@@ -1267,14 +1284,14 @@ The drag of the horizontal and vertical tails was computed using a GP-compatible
     D_{\text{h}} &\geq \frac{1}{2} C_{d_{\text{h}}} \rho V^2 S_{\text{h}} \\
     D_{\text{v}} &\geq \frac{1}{2} C_{d_{\text{v}}} \rho V^2 S_{\text{v}} \\
     \label{e:taildrag}
-    Cd^{70.5599} &\geq \num{7.42688d-90} \left( \frac{Re}{\num{1d3}} \right)^{-33.0637}(100 \tau)^{18.0419}  \\
-                 & + \num{5.02826d-163}\left(\frac{Re}{\num{1d3}}\right)^{-18.7959} (100\tau)^{53.1879} \\
-                 &+ \num{4.22901d-77}\left(\frac{Re}{\num{1d3}}\right)^{-41.1704} (100\tau)^{28.4609} \\
-    Re_{v} &= \frac{V\rho S_{\text{v}}/b_{\text{v}}}{\mu} \\
-    Re_{h} &= \frac{V\rho S_{\text{h}}/b_{\text{h}}}{\mu} 
+    C_{d_{\text{(v,h)}}}^{70.5599} &\geq \num{7.42688d-90} \left( \frac{Re_{\text{(v,h)}}_{\text{(v,h)}}}{\num{1d3}} \right)^{-33.0637}(100 \tau_{\text{(v,h)}})^{18.0419}  \\
+                 & + \num{5.02826d-163}\left(\frac{Re_{\text{(v,h)}}}{\num{1d3}}\right)^{-18.7959} (100\tau_{\text{(v,h)}})^{53.1879} \\
+                 &+ \num{4.22901d-77}\left(\frac{Re_{\text{(v,h)}}}{\num{1d3}}\right)^{-41.1704} (100\tau_{\text{(v,h)}})^{28.4609} \\
+    Re_{\text{v}} &= \frac{V\rho S_{\text{v}}/b_{\text{v}}}{\mu} \\
+    Re_{\text{h}} &= \frac{V\rho S_{\text{h}}/b_{\text{h}}}{\mu} 
 \end{align}
 
-where $\tau = 0.8$ is the airfoil thickness. Assuming steady level flight where neither surface is generating lift, the XFOIL data was generated for a zero angle of attack. A comparison of the XFOIL data and Equation~\eqref{e:taildrag} is shown in Figure~\ref{f:taildragpolar}
+where $\tau_{\text{(v,h)}} = 0.8$ is the airfoil thickness. Assuming steady level flight where neither surface is generating lift, the XFOIL data was generated for a zero angle of attack. A comparison of the XFOIL data and Equation~\eqref{e:taildrag} is shown in Figure~\ref{f:taildragpolar}
 
 \begin{figure}[H]
 	\begin{center}
@@ -1299,28 +1316,28 @@ where the fuel is assumed to be Jet A fuel with density $\rho_\text{fuel} = 6.01
 
 \begin{equation}
     \label{e:fusevol2}
-    \mathcal{V}_{fuse} \leq \frac{4}{3}\pi \frac{l}{2}R^2
+    \mathcal{V}_{fuse} \leq \frac{4}{3}\pi \frac{l_{\text{fuse}}}{2}R_{\text{fuse}}^2
 \end{equation}
 
-where $l$ is the length of the fuselage and $R$ is the radius. Using the length and radius the surface area can be calculated using Thomsen's approxmiation,\cite{ellipsoidSA}
+where $l_{\text{fuse}}$ is the length of the fuselage and $R_{\text{fuse}}$ is the radius. Using the length and radius the surface area can be calculated using Thomsen's approxmiation,\cite{ellipsoidSA}
 
 \begin{equation}
     \label{e:fusesa}
-    3 \left( \frac{S_{fuse}}{\pi} \right)^{1.6075} \geq 2(2lR)^{1.6075} + ((2R)^2)^{1.6075}.
+    3 \left( \frac{S_{\text{fuse}}}{\pi} \right)^{1.6075} \geq 2(2l_{\text{fuse}}R_{\text{fuse}})^{1.6075} + ((2R_{\text{fuse}})^2)^{1.6075}.
 \end{equation}
 
 The weight of the fuselage is based off of the surface area
 
 \begin{equation}
     \label{e:fuseweight}
-    W = S_{fuse} \rho_{\text{carbon fiber}} g
+    W_{\text{fuse}} = S_{\text{fuse}} \rho_{\text{carbon fiber}} g
 \end{equation} 
 
 where $\rho_{\text{carbon fiber}} = 0.085$ [g/cm$^2$].  The surface area is also used to calculate the drag assuming a skin friction based drag model,
 
 \begin{align}
     \label{e:fusedrag}
-    D_{fuse} &\geq C_f k_{fuse} \frac{1}{2} \rho V^2 S_{fuse} \\
+    D_{\text{fuse}} &\geq C_f k_{\text{fuse}} \frac{1}{2} \rho V^2 S_{\text{fuse}} \\
     C_f &\geq \frac{0.455}{Re^{0.3}}
 \end{align}
 
@@ -1328,7 +1345,7 @@ where $k_{fuse}$ is the form factor approxmiated by
 
 \begin{equation}
     \label{e:fuseform}
-    k_{fuse} \geq 1 + \frac{60}{(l/2R)^3} + \frac{(l/2R)}{400}.
+    k_{\text{fuse}} \geq 1 + \frac{60}{(l_{\text{fuse}}/2R_{\text{fuse}})^3} + \frac{(l_{\text{fuse}}/2R_{\text{fuse}})}{400}.
 \end{equation}
 
 \subsection{Engine Weight}
