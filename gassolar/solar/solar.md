@@ -57,7 +57,8 @@ if LATITUDE:
                 W.append(np.nan)
         ax.plot(lat, W)
     
-    ax.set_ylim([0, 200])
+    ax.set_ylim([0, 1000])
+    ax.set_xlim([0, 60])
     ax.grid()
     ax.set_xlabel("Latitude [deg]")
     ax.set_ylabel("Max Take Off Weight")

@@ -71,10 +71,10 @@ def plot_fits(xdata, ydata, yfit, latitude, rm=None):
     ax.set_xlabel("Air Density [kg/m$^3$]")
     ax.set_ylabel("Wind Speed [m/s]")
     ax.grid()
-    if rm:
-        ax.set_title("Latitude %d, RMS Error = %.3f" % (l, rm))
-    else:
-        ax.set_title("Latitude %d" % l)
+    # if rm:
+    #     ax.set_title("Latitude %d, RMS Error = %.3f" % (l, rm))
+    # else:
+    #     ax.set_title("Latitude %d" % l)
     return fig, ax
 
 if __name__ == "__main__":
@@ -82,7 +82,8 @@ if __name__ == "__main__":
     constraintlist = []
     data = {}
 
-    for l in range(20, 61, 1):
+    # for l in range(20, 61, 1):
+    for l in [35]:
         print "Fitting for %d latitude" % l
         altitudestart = range(40000, 50500, 500)
         for j, a in enumerate(altitudestart):
@@ -133,7 +134,7 @@ if __name__ == "__main__":
             else:
                 print "RMS Error: %.3f, Alt iter=%d" % (rm, j)
         fig, ax = plot_fits(X, Y, yfit, l, rm=rm)
-        fig.savefig("windfitl%d.pdf" % l)
+        fig.savefig("windfitl%d.pdf" % l, bbox_inches="tight")
         plt.close()
 
     df = pd.DataFrame(data).transpose()
@@ -142,4 +143,4 @@ if __name__ == "__main__":
     colnames = np.append(colnames, "alpha")
     colnames = np.insert(colnames, 0, "latitude")
     df.columns = colnames
-    df.to_csv("windaltfitdata.csv")
+    # df.to_csv("windaltfitdata.csv")

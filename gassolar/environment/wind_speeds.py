@@ -96,8 +96,8 @@ if __name__ == "__main__":
     Ax.set_ylim([0, 70])
     Ax.grid()
     Ax.legend(loc=2, fontsize=15)
-    Ax.set_title("85%-95% Wind Speeds in Dec")
-    Fig.savefig("latvswind.pdf", bbox_inches="tight")
+    # Ax.set_title("85%-95% Wind Speeds in Dec")
+    Fig.savefig("../../gassolarpaper/latvswind.pdf", bbox_inches="tight")
 
     Fig, Ax = plt.subplots()
     Alt = range(1000, 80000, 1000)
@@ -112,8 +112,8 @@ if __name__ == "__main__":
     Ax.set_ylim([0, 80000])
     Ax.grid()
     Ax.legend(loc=1, fontsize=15)
-    Ax.set_title("85%-95% Wind Speeds in Dec")
-    Fig.savefig("altvswind.pdf", bbox_inches="tight")
+    # Ax.set_title("85%-95% Wind Speeds in Dec")
+    Fig.savefig("../../gassolarpaper/altvswind.pdf", bbox_inches="tight")
 
     Fig, Ax = plt.subplots()
     Mos = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
@@ -136,5 +136,5 @@ if __name__ == "__main__":
     Ax.set_ylim([0, 50])
     Ax.grid()
     Ax.legend(loc=1, fontsize=15)
-    Ax.set_title("85%-95% Wind Speeds at 45 deg Lat")
-    Fig.savefig("windvsmonth.pdf", bbox_inches="tight")
+    # Ax.set_title("85%-95% Wind Speeds at 45 deg Lat")
+    Fig.savefig("../../gassolarpaper/windvsmonth.pdf", bbox_inches="tight")

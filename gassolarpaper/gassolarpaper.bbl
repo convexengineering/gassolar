@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 \newcommand{\enquote}[1]{``#1''}
 
 \bibitem{gp}
@@ -12,8 +12,18 @@ Hoburg, W., {\em Aircraft Design Optimization as a Geometric Program\/}, Ph.D.
 \bibitem{wind}
 for Medium-Range Weather~Forecasts, E.~C., \enquote{ERA Interim, Daily,} .
 
-\bibitem{density}
-\enquote{Density of Air,} .
+\bibitem{fitting}
+Warren~Hoburg, P.~K., \enquote{Data fitting with
+  geometric-programming-compatible softmax functions,} {\em Optimization and
+  Engineering\/}, 2016.
+
+\bibitem{isaatm}
+Cavcar, M., \enquote{The International Standard Atmosphere (ISA),} Anadolu
+  University, 26470 Eskisehir, Turkey.
+
+\bibitem{fluiddyhandbook}
+Johnson, R.~W., {\em The Handbook of Fluid Dynamics\/}, chap. Chapter 11, CRC
+  Press, 1998.
 
 \bibitem{solar}
 McMordie, R.~K., {\em Solar Energy Fundamentals\/}, The Fairmont Printing
@@ -22,16 +32,29 @@ McMordie, R.~K., {\em Solar Energy Fundamentals\/}, The Fairmont Printing
 \bibitem{br2}
 Lutze, F.~H., \enquote{AOE 3104 Vehicle Performance,} .
 
-\bibitem{fitting}
-Warren~Hoburg, P.~K., \enquote{Data fitting with
-  geometric-programming-compatible softmax functions,} {\em Optimization and
-  Engineering\/}, 2016.
-
 \bibitem{raymer}
 Raymer, D.~P., {\em Aircraft Design: A Conceptual Approach\/}, American
   Institute of Aeronautics and Astronautics, Inc., 4th ed., 2006.
 
 \bibitem{bending}
 Drela, M., \enquote{Wing Bending Calculations,} .
+
+\bibitem{acgust}
+Duven, J.~E., \enquote{Dynamic Gust Loads,} dec 2014.
+
+\bibitem{aircraftrules}
+Drela, M., \enquote{Basic Aircraft Design Rules,} apr 2006.
+
+\bibitem{ellipsoidSA}
+KurtHeckman, \enquote{Ellipsoid - Surface Area,} nov 2016.
+
+\bibitem{electricengine}
+Mauro~Gatti, F.~G., \enquote{Preliminary Design Analysis Methodology for
+  Electric Multirotor,} {\em 2nd IFAC Workshop on Research, Education and
+  Development of Unmanned Aerial Systems\/}, Vol.~46, No.~30, nov 2013,
+  pp.~58--63.
+
+\bibitem{gasengine}
+of~North~Dakota, U., \enquote{UAS Engines,} .
 
 \end{thebibliography}
