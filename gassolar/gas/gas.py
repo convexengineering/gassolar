@@ -29,6 +29,8 @@ class Aircraft(Model):
         Wpay = Variable("W_{pay}", 10, "lbf", "payload weight")
         Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight")
 
+        self.empennage.substitutions["V_h"] = 0.55
+        self.empennage.substitutions["m_h"] = 0.4
         constraints = [
             Wzfw >= sum(summing_vars(components, "W")) + Wpay + Wavn,
             self.empennage.horizontaltail["V_h"] <= (
@@ -39,9 +41,11 @@ class Aircraft(Model):
                 self.empennage.verticaltail["S"]
                 * self.empennage.verticaltail["l_v"]/self.wing["S"]
                 / self.wing["b"]),
-            self.wing["C_{L_{max}}"]/self.wing["m_w"] <= (
-                self.empennage.horizontaltail["C_{L_{max}}"]
-                / self.empennage.horizontaltail["m_h"])
+            # self.wing["C_{L_{max}}"]/self.wing["m_w"] <= (
+            #     self.empennage.horizontaltail["C_{L_{max}}"]
+            #     / self.empennage.horizontaltail["m_h"])
+            self.empennage.horizontaltail["C_{L_{max}}"] == 1.5,
+            self.wing["\\tau"]*self.wing["c_{root}"] >= self.empennage.tailboom["d_0"]
             ]
 
         return components, constraints
@@ -59,10 +63,10 @@ class AircraftLoading(Model):
         loading = [aircraft.wing.loading(Wcent)]
         loading.append(aircraft.empennage.loading())
 
-        tbstate = TailBoomState()
-        loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
-                                           aircraft.empennage.tailboom,
-                                           aircraft.wing, tbstate))
+        # tbstate = TailBoomState()
+        # loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
+        #                                    aircraft.empennage.tailboom,
+        #                                    aircraft.wing, tbstate))
 
         return loading
 
