@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import os
 from solar_irradiance import get_Eirr
-from gpkit import Model, Variable
+from gpkit import Model, Variable, SignomialsEnabled
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero, Wing
 from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
 from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
@@ -32,6 +32,8 @@ class Aircraft(Model):
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
 
         self.empennage.substitutions["V_v"] = 0.02
+        # self.empennage.substitutions["V_h"] = 0.5388
+        # self.empennage.substitutions["m_h"] = 5.514
 
         constraints = [
             Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
@@ -50,6 +52,7 @@ class Aircraft(Model):
             self.wing["C_{L_{max}}"]/self.wing["m_w"] <= (
                 self.empennage.horizontaltail["C_{L_{max}}"]
                 / self.empennage.horizontaltail["m_h"]),
+            # self.empennage.horizontaltail["C_{L_{max}}"] == 1.5,
             self.wing["\\tau"]*self.wing["c_{root}"] >= self.empennage.tailboom["d_0"]
             ]
 
@@ -286,7 +289,6 @@ class Mission(Model):
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
         self.solar = Aircraft()
-        # self.solar.substitutions["V_v"] = 0.02
         mission = []
         for l in range(20, latitude+1, 1):
             mission.append(FlightSegment(self.solar, latitude=l, day=day))
@@ -306,5 +308,6 @@ def test():
 if __name__ == "__main__":
     M = Mission(latitude=31)
     M.cost = M["W_{total}"]
-    sol = M.solve("mosek")
+    # sol = M.solve("mosek")
+    sol = M.localsolve("mosek")
     h = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))
