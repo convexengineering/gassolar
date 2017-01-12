@@ -32,6 +32,7 @@ class Aircraft(Model):
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
 
         self.empennage.substitutions["V_h"] = 0.55
+        self.empennage.substitutions["V_v"] = 0.02
         self.empennage.substitutions["m_h"] = 5.514
 
         constraints = [
