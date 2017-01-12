@@ -30,6 +30,7 @@ class Aircraft(Model):
         Wpay = Variable("W_{pay}", 10, "lbf", "payload")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
+        Wcent = Variable("W_{cent}", "lbf", "center weight")
 
         self.empennage.substitutions["V_h"] = 0.55
         self.empennage.substitutions["V_v"] = 0.02
@@ -37,7 +38,10 @@ class Aircraft(Model):
 
         constraints = [
             Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
-            Wwing >= (sum(summing_vars([self.wing, self.battery], "W"))),
+            Wwing >= (sum(summing_vars([self.wing, self.battery,
+                                        self.solarcells], "W"))),
+            Wcent >= Wpay + sum(summing_vars([self.empennage, self.engine],
+                                             "W")),
             self.solarcells["S"] <= self.wing["S"],
             self.wing["c_{MAC}"]**2*0.5*self.wing["\\tau"]*self.wing["b"] >= (
                 self.battery["\\mathcal{V}"]),
@@ -286,19 +290,16 @@ class Mission(Model):
     "define mission for aircraft"
     def setup(self, latitude=35, day=355):
 
-        Wcent = Variable("W_{cent}", "lbf", "center weight")
-
         self.solar = Aircraft()
         mission = []
         for l in range(20, latitude+1, 1):
             mission.append(FlightSegment(self.solar, latitude=l, day=day))
-        loading = self.solar.loading(Wcent, self.solar["W_{wing}"], mission[-1]["V"], mission[-1]["C_L"])
+        loading = self.solar.loading(self.solar["W_{cent}"], self.solar["W_{wing}"], mission[-1]["V"], mission[-1]["C_L"])
+        # loading = self.solar.loading(self.solar["W_{cent}"], mission[-1]["\\rho"], mission[-1]["V"], self.solar.wing["S"])
         for vk in loading.varkeys["N_{max}"]:
             loading.substitutions.update({vk: 2})
 
-        constraints = [Wcent >= self.solar["W_{pay}"]]
-
-        return self.solar, mission, loading, constraints
+        return self.solar, mission, loading
 
 def test():
     M = Mission(latitude=31)
