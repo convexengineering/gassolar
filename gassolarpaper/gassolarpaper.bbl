@@ -1,21 +1,37 @@
 \begin{thebibliography}{10}
 \newcommand{\enquote}[1]{``#1''}
 
+\bibitem{solartech}
+G.~Abbe, H.~S., \enquote{Technological development trends in Solar‐powered
+  Aircraft Systems,} {\em Renewable and Sustainable Energy Reviews\/}, Vol.~60,
+  jul 2016, pp.~770--783.
+
 \bibitem{gp}
-Boyd, S., \enquote{A Tutorial on Geometric Programming,} {\em Optimization and
-  Engineering\/}, Vol.~8, No.~1, 2007, pp.~67--127.
+S.~Boyd, Kim~S., V. L. H.~A., \enquote{A Tutorial on Geometric Programming,}
+  {\em Optimization and Engineering\/}, Vol.~8, No.~1, 2007, pp.~67--127.
 
 \bibitem{hoburgthesis}
 Hoburg, W., {\em Aircraft Design Optimization as a Geometric Program\/}, Ph.D.
   thesis, University of California, Berkeley, 2013.
 
+\bibitem{zephyr}
+\enquote{Zephyr: Focus of an aircraft. Endurance of a Satellite,}
+  https://airbusdefenceandspace.com/wp-content/uploads/2016/12/1014\_16\_zephyr\_datasheet\_e\_horizontal\_a4\_lores-for-distribution.pdf,
+  2016.
+
 \bibitem{wind}
-for Medium-Range Weather~Forecasts, E.~C., \enquote{ERA Interim, Daily,} .
+Berrisford, P., Dee, D., Poli, P., Brugge, R., Fielding, K., Fuentes, M., K{\r
+  a}llberg, P., Kobayashi, S., Uppala, S., and Simmons, A., \enquote{The
+  ERA-Interim archive Version 2.0,} Shinfield Park, Reading, November 2011.
 
 \bibitem{fitting}
 Warren~Hoburg, P.~K., \enquote{Data fitting with
   geometric-programming-compatible softmax functions,} {\em Optimization and
   Engineering\/}, 2016.
+
+\bibitem{orion}
+\enquote{Orion: Medium-Altitude Long-Endurance Unmanned Aircraft,}
+  http://www.aurora.aero/wp-content/uploads/2015/10/Orion-Brochure\_web\_X3.pdf.
 
 \bibitem{isaatm}
 Cavcar, M., \enquote{The International Standard Atmosphere (ISA),} Anadolu
@@ -30,23 +46,45 @@ McMordie, R.~K., {\em Solar Energy Fundamentals\/}, The Fairmont Printing
   Press, Inc., 2012.
 
 \bibitem{br2}
-Lutze, F.~H., \enquote{AOE 3104 Vehicle Performance,} .
+Lutze, F.~H., \enquote{AOE 3104 Vehicle Performance,}
+  http://www.dept.aoe.vt.edu/~lutze/AOE3104/range\\\&endurance.pdf.
+
+\bibitem{bsfcperf}
+Goering, Carroll~E., M. L. S. D. W.~S. and Turnquist, P.~K., {\em Off-Road
+  Vehicle Engineering Principles\/}, chap. 2: Engine Performance Measures,
+  American Society of Agricultural Engineers, 2003.
 
 \bibitem{raymer}
 Raymer, D.~P., {\em Aircraft Design: A Conceptual Approach\/}, American
   Institute of Aeronautics and Astronautics, Inc., 4th ed., 2006.
 
+\bibitem{solarparam}
+A.~Noth, R.~Siegwart, W.~E., \enquote{Design of Solar Powered Airplanes for
+  Continuous Flight,} Tech. Rep. 1.1, Swiss Federal Institute of Technology
+  Zurich, dec 2007.
+
 \bibitem{bending}
-Drela, M., \enquote{Wing Bending Calculations,} .
+Drela, M., \enquote{Wing Bending Calculations,}
+  https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/systems-labs-06/spl10.pdf.
 
 \bibitem{acgust}
-Duven, J.~E., \enquote{Dynamic Gust Loads,} dec 2014.
+Duven, J.~E., \enquote{Dynamic Gust Loads,} Advisory Circular 25.341-1, U.S.
+  Department of Transportation, dec 2014.
+
+\bibitem{carbonfiber}
+Composites, A., \enquote{Mechanical Properties of Carbon Fiber Composite
+  Materials, Fiber / Epoxy resin (120°C Cure),}
+  https://www.acpsales.com/upload/Mechanical-Properties-of-Carbon-Fiber-Composite-Materials.pdf,
+  dec 2014.
 
 \bibitem{aircraftrules}
-Drela, M., \enquote{Basic Aircraft Design Rules,} apr 2006.
+Drela, M., \enquote{Basic Aircraft Design Rules,}
+  https://ocw.mit.edu/courses/aeronautics-and-astronautics/16-01-unified-engineering-i-ii-iii-iv-fall-2005-spring-2006/systems-labs-06/spl8.pdf,
+  apr 2006.
 
 \bibitem{ellipsoidSA}
-KurtHeckman, \enquote{Ellipsoid - Surface Area,} nov 2016.
+Heckman, K., \enquote{Ellipsoid - Surface Area,}
+  https://www.vcalc.com/wiki/vCalc/Ellipsoid+-+Surface+Area, nov 2016.
 
 \bibitem{electricengine}
 Mauro~Gatti, F.~G., \enquote{Preliminary Design Analysis Methodology for
@@ -55,6 +93,11 @@ Mauro~Gatti, F.~G., \enquote{Preliminary Design Analysis Methodology for
   pp.~58--63.
 
 \bibitem{gasengine}
-of~North~Dakota, U., \enquote{UAS Engines,} .
+of~North~Dakota, U., \enquote{UAS Engines,}
+  http://media.aero.und.edu/uasresearch.org/documents/195-197\_Reference-Section\_Engines.pdf.
+
+\bibitem{enginelapse}
+Hoover, A.~L., \enquote{Density altitude and aircraft performance,}
+  https://yakimawpa.files.wordpress.com/2011/01/density-altitude-and-aircraft-performance-handout.pdf.
 
 \end{thebibliography}

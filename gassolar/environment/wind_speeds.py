@@ -95,7 +95,7 @@ if __name__ == "__main__":
     Ax.set_xlabel("Wind speed [m/s]")
     Ax.set_ylim([0, 70])
     Ax.grid()
-    Ax.legend(loc=2)
+    Ax.legend(loc=2, fontsize=15)
     # Ax.set_title("85%-95% Wind Speeds in Dec")
     Fig.savefig("../../gassolarpaper/latvswind.pdf", bbox_inches="tight")
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     Ax.set_xlabel("Wind speed [m/s]")
     Ax.set_ylim([0, 80000])
     Ax.grid()
-    Ax.legend(loc=1)
+    Ax.legend(loc=1, fontsize=15)
     # Ax.set_title("85%-95% Wind Speeds in Dec")
     Fig.savefig("../../gassolarpaper/altvswind.pdf", bbox_inches="tight")
 
@@ -135,6 +135,6 @@ if __name__ == "__main__":
     Ax.set_ylabel("Wind speed [m/s]")
     Ax.set_ylim([0, 50])
     Ax.grid()
-    Ax.legend(loc=1)
+    Ax.legend(loc=1, fontsize=15)
     # Ax.set_title("85%-95% Wind Speeds at 45 deg Lat")
     Fig.savefig("../../gassolarpaper/windvsmonth.pdf", bbox_inches="tight")

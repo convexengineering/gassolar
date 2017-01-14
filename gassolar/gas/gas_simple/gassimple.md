@@ -9,14 +9,14 @@ from gassolar.environment.wind_speeds import get_windspeed
 from gpkit.tools.autosweep import sweep_1d
 import matplotlib.pyplot as plt
 import numpy as np
-plt.rcParams.update({'font.size':19})
 
-END = False
-LAT = True
+END = True
+LAT = False
 COMP = False
 
 """ Endurance """
 if END:
+    plt.rcParams.update({'font.size':15})
     M = Mission()
     M.cost = M["MTOW"]
     M.substitutions.update({"W_{pay}": 10})
@@ -58,6 +58,7 @@ if END:
 """ Simple Detailed Comparison """
 
 if COMP:
+    plt.rcParams.update({'font.size':15})
     M = Mission()
     G = Gas()
     M.cost = M["MTOW"]
@@ -115,7 +116,7 @@ if COMP:
     ax.set_ylim([0, 1000])
     ax.set_xlabel("Endurance [days]")
     ax.set_ylabel("Max Take Off Weight [lbf]")
-    ax.legend(["Simple", "Detailed"])
+    ax.legend(["Simple", "Detailed"], loc=2, fontsize=15)
     fig.savefig("../../../gassolarpaper/simpdetcomp.pdf", bbox_inches="tight")
 
 """ contour """

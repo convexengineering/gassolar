@@ -17,13 +17,13 @@ COMP = False
 
 if CON:
     plt.rcParams.update({'font.size':19})
-    rhosolar = np.linspace(0.15, 0.5, 15)
+    etasolar = np.linspace(0.15, 0.5, 15)
     hbatts = np.linspace(250, 400, 15)
-    x = np.array([rhosolar]*15)
+    x = np.array([etasolar]*15)
     y = np.array([hbatts]*15).T
     z = np.zeros([15, 15])
-    for av in [80, 85, 90]:
-        for l in [25, 30, 35]:
+    for av in [80, 85, 90, 95]:
+        for l in [25, 30, 35, 40]:
             fig, ax = plt.subplots()
             M = Mission(latitude=l)
             M.substitutions.update({"W_{pay}": 10})
@@ -32,8 +32,9 @@ if CON:
             for vk in M.varkeys["p_{wind}"]:
                 M.substitutions.update({vk: av/100.0})
             M.cost = M["b_Mission, Aircraft, Wing"]
-            for i, rhos in enumerate(rhosolar):
-                M.substitutions.update({"\\eta_{solar}": rhos})
+            for i, etas in enumerate(etasolar):
+                for vk in M.varkeys["\\eta_{solar}"]: 
+                    M.substitutions.update({vk: etas})
                 for j, hbs in enumerate(hbatts):
                     M.substitutions.update({"h_{batt}": hbs})
                     try:

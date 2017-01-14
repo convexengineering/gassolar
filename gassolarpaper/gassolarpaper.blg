@@ -3,60 +3,55 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: gassolarpaper.aux
 The style file: aiaa.bst
 Database file #1: biblibrary.bib
-Warning--entry type for "wind" isn't style-file defined
---line 124 of file biblibrary.bib
-Warning--entry type for "bending" isn't style-file defined
---line 158 of file biblibrary.bib
-Warning--entry type for "br2" isn't style-file defined
---line 182 of file biblibrary.bib
-Warning--entry type for "acgust" isn't style-file defined
---line 206 of file biblibrary.bib
-Warning--entry type for "gasengine" isn't style-file defined
---line 225 of file biblibrary.bib
-Warning--entry type for "ellipsoidSA" isn't style-file defined
---line 230 of file biblibrary.bib
-Warning--entry type for "aircraftrules" isn't style-file defined
---line 237 of file biblibrary.bib
+Too many commas in name 1 of "S. Boyd, Kim S., Vandenberghe L., Hassibi, A." for entry gp
+while executing---line 1245 of file aiaa.bst
+Too many commas in name 1 of "S. Boyd, Kim S., Vandenberghe L., Hassibi, A." for entry gp
+while executing---line 1245 of file aiaa.bst
 Warning--empty pages in fluiddyhandbook
-You've used 15 entries,
+Name 1 in "Goering, Carroll E., Marvin L Stone, David W. Smith, and Paul K. Turnquist" has a comma at the end for entry bsfcperf
+while executing---line 1245 of file aiaa.bst
+Too many commas in name 1 of "Goering, Carroll E., Marvin L Stone, David W. Smith, and Paul K. Turnquist" for entry bsfcperf
+while executing---line 1245 of file aiaa.bst
+Warning--empty pages in bsfcperf
+You've used 22 entries,
             2292 wiz_defined-function locations,
-            646 strings with 5873 characters,
-and the built_in function-call counts, 2015 in all, are:
-= -- 130
-> -- 61
-< -- 4
-+ -- 30
-- -- 15
-* -- 129
-:= -- 293
-add.period$ -- 26
-call.type$ -- 15
+            691 strings with 7783 characters,
+and the built_in function-call counts, 3101 in all, are:
+= -- 216
+> -- 115
+< -- 7
++ -- 52
+- -- 30
+* -- 226
+:= -- 466
+add.period$ -- 39
+call.type$ -- 22
 change.case$ -- 2
 chr.to.int$ -- 3
-cite$ -- 16
-duplicate$ -- 117
-empty$ -- 272
-format.name$ -- 15
-if$ -- 450
+cite$ -- 24
+duplicate$ -- 172
+empty$ -- 384
+format.name$ -- 30
+if$ -- 689
 int.to.chr$ -- 0
-int.to.str$ -- 15
-missing$ -- 9
-newline$ -- 49
-num.names$ -- 15
-pop$ -- 64
+int.to.str$ -- 22
+missing$ -- 12
+newline$ -- 70
+num.names$ -- 20
+pop$ -- 83
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 59
+skip$ -- 69
 stack$ -- 0
-substring$ -- 46
-swap$ -- 24
-text.length$ -- 3
+substring$ -- 73
+swap$ -- 38
+text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
-warning$ -- 1
-while$ -- 18
-width$ -- 17
-write$ -- 116
-(There were 8 warnings)
+warning$ -- 2
+while$ -- 24
+width$ -- 24
+write$ -- 180
+(There were 4 error messages)
