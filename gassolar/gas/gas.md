@@ -10,7 +10,7 @@ from gpkit.tools.autosweep import sweep_1d
 import numpy as np
 plt.rcParams.update({'font.size':19})
 
-END = False 
+END = False
 LAT = True
 DRAG = False
 BSFC = False
@@ -18,11 +18,12 @@ BSFC = False
 """ MTOW vs Endurance """
 
 if END:
+    plt.rcParams.update({'font.size':15})
     M = Mission()
     M.cost = M["MTOW"]
     fig, ax = plt.subplots()
     lower = 1
-    upper = 10 
+    upper = 12 
     xmin_ = np.linspace(lower, upper, 100)
     tol = 0.05
     for p in [85, 90, 95]:
@@ -53,6 +54,7 @@ if END:
 
 """ latitutde mtow """
 if LAT:
+    plt.rcParams.update({'font.size':15})
     fig, ax = plt.subplots()
     lat = np.arange(0, 60, 1)
     M = Mission()
@@ -74,10 +76,14 @@ if LAT:
                 mtow.append(np.nan)
         ax.plot(lat, mtow)
     
-    ax.set_ylim([0, 1000])
+    ax.set_ylim([0, 600])
+    ax.set_xlim([20, 50])
     ax.grid()
     ax.set_xlabel("Latitude [deg]")
     ax.set_ylabel("Max Take Off Weight [lbf]")
+    labels = ["$\\pm$" + item.get_text() for item in ax.get_xticklabels()]
+    labels = ["$\\pm$%d" % l for l in np.linspace(20, 50, len(labels))]
+    ax.set_xticklabels(labels)
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
     fig.savefig("../../gassolarpaper/mtowvslatgas.pdf", bbox_inches="tight")
 

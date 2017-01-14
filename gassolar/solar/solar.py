@@ -32,7 +32,7 @@ class Aircraft(Model):
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
-        self.empennage.substitutions["V_h"] = 0.55
+        self.empennage.substitutions["V_h"] = 0.45
         self.empennage.substitutions["V_v"] = 0.02
         self.empennage.substitutions["m_h"] = 5.514
 
@@ -297,7 +297,7 @@ class Mission(Model):
         loading = self.solar.loading(self.solar["W_{cent}"], self.solar["W_{wing}"], mission[-1]["V"], mission[-1]["C_L"])
         # loading = self.solar.loading(self.solar["W_{cent}"], mission[-1]["\\rho"], mission[-1]["V"], self.solar.wing["S"])
         for vk in loading.varkeys["N_{max}"]:
-            loading.substitutions.update({vk: 2})
+            loading.substitutions.update({vk: 1.5})
 
         return self.solar, mission, loading
 

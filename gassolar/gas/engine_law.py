@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+plt.rcParams.update({'font.size':15})
 WEIGHT = 10.0
 POWER = 10.0
 
@@ -22,6 +23,6 @@ ax.plot(u*WEIGHT, w*POWER, "o", markerfacecolor="None")
 ax.plot(weight, np.exp(yfit)*POWER)
 ax.set_xlabel("Engine Weight [lbs]")
 ax.set_ylabel("Maximum Shaft Power [hp]")
-ax.legend(["Sample Data", "Power Fit"])
+ax.legend(["Sample Data", "Power Fit"], loc=2)
 ax.grid()
-fig.savefig("../../gassolarpaper/powervsweightfit.pdf")
+fig.savefig("../../gassolarpaper/powervsweightfit.pdf", bbox_inches="tight")

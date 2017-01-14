@@ -5,6 +5,7 @@ import pandas as pd
 from gassolar.environment.wind_speeds import get_windspeed, interpolate
 from gpfit.fit import fit
 plt.rc("text", usetex=True)
+plt.rcParams.update({'font.size':15})
 
 PERCT_NORM = 100.0
 WIND_NORM = 100.0
@@ -64,10 +65,10 @@ def plot_fits(xdata, ydata, yfit, latitude, rm=None):
     fig, ax = plt.subplots()
     for p, y, yf, cl in zip(x2, ydata.reshape(len(x2), len(x1)),
                             yfit.reshape(len(x2), len(x1)), colors):
-        ax.plot(np.exp(x1), np.exp(y)*WIND_NORM, "o", c=cl)
+        ax.plot(np.exp(x1), np.exp(y)*WIND_NORM, "o", markeredgecolor=cl, markerfacecolor="none")
         ax.plot(np.exp(x1), np.exp(yf)*WIND_NORM, c=cl,
                 label="%d Percentile Winds" % np.rint(np.exp(p)*PERCT_NORM))
-    ax.legend(fontsize=8)
+    ax.legend(loc=2, fontsize=15)
     ax.set_xlabel("Air Density [kg/m$^3$]")
     ax.set_ylabel("Wind Speed [m/s]")
     ax.grid()

@@ -11,9 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams.update({'font.size':19})
 
-END = False 
-LAT = False 
-COMP = True
+END = False
+LAT = True
+COMP = False
 
 """ Endurance """
 if END:
@@ -197,8 +197,12 @@ if LAT:
         ax.plot(lat, mtow)
     
     ax.set_ylim([0, 1000])
+    ax.set_xlim([20, 50])
     ax.grid()
-    ax.set_xlabel("Latitude [deg]")
+    labels = ["$\\pm$" + item.get_text() for item in ax.get_xticklabels()]
+    labels = ["$\\pm$%d" % l for l in np.linspace(20, 50, len(labels))]
+    ax.set_xticklabels(labels)
+    ax.set_xlabel("Latitude Requirement [deg]")
     ax.set_ylabel("Max Take Off Weight [lbf]")
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
     fig.savefig("../../../gassolarpaper/mtowvslatgassimple.pdf", bbox_inches="tight")

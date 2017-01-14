@@ -6,68 +6,126 @@
 from solar import Mission
 import matplotlib.pyplot as plt
 import numpy as np
-from plotting import windalt_plot
-plt.rcParams.update({'font.size':19})
+from plotting import windalt_plot, labelLines
 
-LATITUDE = False
-LOADING = False
-WIND = True
+LATITUDE = True
+WIND = False
 CON = False
+COMP = False
 
 """ contour """
 
 if CON:
-    for av in [85, 90, 95]:
-        for l in [35, 40, 45]:
+    plt.rcParams.update({'font.size':19})
+    rhosolar = np.linspace(0.15, 0.5, 15)
+    hbatts = np.linspace(250, 400, 15)
+    x = np.array([rhosolar]*15)
+    y = np.array([hbatts]*15).T
+    z = np.zeros([15, 15])
+    for av in [80, 85, 90]:
+        for l in [25, 30, 35]:
             fig, ax = plt.subplots()
             M = Mission(latitude=l)
-            M.substitutions.update({"\\rho_{solar}": 
-                                   ("sweep", np.linspace(0.15, 0.5, 10))})
-            M.substitutions.update({"h_{batt}": 
-                                   ("sweep", np.linspace(250, 400, 10))})
             M.substitutions.update({"W_{pay}": 10})
             for vk in M.varkeys["\\eta_{prop}"]:
                 M.substitutions.update({vk: 0.75})
             for vk in M.varkeys["p_{wind}"]:
                 M.substitutions.update({vk: av/100.0})
-            M.cost = M["b"]
-            sol = M.solve("mosek", skipsweepfailures=True)
-            x = np.reshape(sol("f_{structures}"), [10, 10])
-            y = np.reshape(sol("h_{batt}"), [10, 10])
-            z = np.reshape(sol("b"), [10, 10])
-            levels = np.array(range(50, 2000, 50)+ [2300])
+            M.cost = M["b_Mission, Aircraft, Wing"]
+            for i, rhos in enumerate(rhosolar):
+                M.substitutions.update({"\\eta_{solar}": rhos})
+                for j, hbs in enumerate(hbatts):
+                    M.substitutions.update({"h_{batt}": hbs})
+                    try:
+                        sol = M.solve("mosek")
+                        z[i, j] = sol("b_Mission, Aircraft, Wing").magnitude
+                        print "Pass: Latitude = %d, Percentile Winds = %d" % (l, av)
+                    except RuntimeWarning:
+                        z[i, j] = np.nan
+                        print "Fail: Latitude = %d, Percentile Winds = %d" % (l, av)
+            levels = np.array(range(30, 2000, 10)+ [2300])
             if av == 90:
-                v = np.array(range(50, 700, 50)+ [2300])
+                v = np.array(range(30, 700, 10)+ [2300])
             else:
-                v = np.array(range(50, 400, 50)+ [2300])
+                v = np.array(range(30, 400, 10)+ [2300])
             a = ax.contour(x, y, z, levels, colors="k")
             ax.clabel(a, v, inline=1, fmt="%d [ft]")
             ax.set_xlabel("Solar Cell Efficiency")
             ax.set_ylabel("Battery Energy Density [Whr/kg]")
-            fig.savefig("../../gassolarpaper/bcontourl%da%d.pdf" % (l, 85), 
+            fig.savefig("../../gassolarpaper/bcontourl%da%d.pdf" % (l, av), 
                         bbox_inches="tight")
 
-""" loading """
-if LOADING:
-    M = Mission(latitude=31)
-    M.cost = M["W_{total}"]
-    sol = M.solve("mosek")
-    eta = np.linspace(0, 1, 100)
-    gbar = 4/np.pi*(1+(sol("W_{cent}")/sol("W_{wing}")).magnitude)*(1-eta)**0.5
-    print "f_{cent/wing} = %.3f" % (sol("W_{cent}")/sol("W_{wing}")).magnitude
-    l = sol("\\lambda_Mission, Aircraft, Wing")
-    cbar = 2/(1+l)*((l-1)*eta + 1)
+""" objective comparison """
+if COMP:
+    plt.rcParams.update({'font.size':15})
     fig, ax = plt.subplots()
-    ax.plot(eta, cbar)
-    ax.plot(eta, gbar)
-    ax.set_xlabel("$2y/b$")
-    ax.set_ylabel("local $c_l$ / local chord")
-    ax.legend(["local chord", "local $c_l$"])
+    ax2 = ax.twinx()
+    lat = np.arange(20, 40, 1)
+    l1 = []
+    l2 = []
+    for obj in ["b_Mission, Aircraft, Wing", "S_Mission, Aircraft, SolarCells"]:
+        W = []
+        SS = []
+        runagain = True
+        for l in lat:
+            if runagain:
+                M = Mission(latitude=l)
+                M.substitutions.update({"W_{pay}": 10})
+                for vk in M.varkeys["p_{wind}"]:
+                    M.substitutions.update({vk: 90/100.0})
+                M.substitutions.update({"\\rho_{solar}": 0.25})
+                M.cost = M[obj]
+                try:
+                    sol = M.solve("mosek")
+                    W.append(sol("b_Mission, Aircraft, Wing").magnitude)
+                    SS.append(sol("S_Mission, Aircraft, SolarCells").magnitude)
+                except RuntimeWarning:
+                    W.append(np.nan)
+                    SS.append(np.nan)
+                    runagain = False
+            else:
+                W.append(np.nan)
+                SS.append(np.nan)
+        if obj[0] == "b":
+            la = "Obj: $b$"
+            ty = ""
+        else:
+            la = "Obj: $S_{\\mathrm{solar}}$"
+            ty = "--"
+        ll = ax.plot(lat, W, "b%s" % ty, label=la)
+        ll1 = ax2.plot(lat, SS, 'r%s' % ty, label=la)
+        if obj[0] == "b":
+            l1.append(ll)
+            l2.append(ll1)
+        else:
+            l1.append(ll1)
+            l2.append(ll)
+    
+    for tl in ax.get_yticklabels():
+        tl.set_color('b')
+    for tl in ax2.get_yticklabels():
+        tl.set_color('r')
+    ax.set_ylim([0, 200])
+    ax.set_xlim([20, 40])
+    l1 = [l[0] for l in l1]
+    l2 = [l[0] for l in l2]
+    labelLines(l1, fontsize=10, zorder=2.5, va="top", color="k", align=False, xvals=[25.5, 29])
+    labelLines(l2, fontsize=10, zorder=2.5, va="bottom", color="k", align=False, xvals=[29, 25.5])
+    # ax.text(22.5, 55, "Wing Span [ft]")
+    # ax.text(30.5, 10, "Solar Cells Area [ft$^2$]")
     ax.grid()
-    fig.savefig("../../gassolarpaper/gustvschord.pdf")
+    ax.set_xlabel("Latitude Requirement [deg]")
+    ax.set_ylabel("Wing Span $b$ [ft]", color="b")
+    ax2.set_ylabel("Solar Cell Area $S_{\\mathrm{solar}}$ [ft$^2$]", color="r")
+    labels = ["$\\pm$" + item.get_text() for item in ax.get_xticklabels()]
+    labels = ["$\\pm$%d" % l for l in np.linspace(20, 40, len(labels))]
+    ax.set_xticklabels(labels)
+    # ax.legend(["Objective: Wing Span", "Objective: Solar Cell Area"], loc=2, fontsize=15)
+    fig.savefig("../../gassolarpaper/solarobjcomp.pdf", bbox_inches="tight")
 
 """ latitutde """
 if LATITUDE:
+    plt.rcParams.update({'font.size':15})
     fig, ax = plt.subplots()
     lat = np.arange(20, 60, 1)
     for a in [80, 90, 95]:
@@ -80,9 +138,11 @@ if LATITUDE:
                 for vk in M.varkeys["p_{wind}"]:
                     M.substitutions.update({vk: a/100.0})
                 M.substitutions.update({"\\rho_{solar}": 0.25})
+                # M.cost = M["b_Mission, Aircraft, Wing"]
                 M.cost = M["W_{total}"]
                 try:
                     sol = M.solve("mosek")
+                    # W.append(sol("b_Mission, Aircraft, Wing").magnitude)
                     W.append(sol("W_{total}").magnitude)
                 except RuntimeWarning:
                     W.append(np.nan)
@@ -91,11 +151,14 @@ if LATITUDE:
                 W.append(np.nan)
         ax.plot(lat, W)
     
-    ax.set_ylim([0, 400])
-    ax.set_xlim([20, 60])
+    ax.set_ylim([0, 600])
+    ax.set_xlim([20, 45])
     ax.grid()
-    ax.set_xlabel("Latitude [deg]")
+    ax.set_xlabel("Latitude Requirement [deg]")
     ax.set_ylabel("Max Take Off Weight [lbf]")
+    labels = ["$\\pm$" + item.get_text() for item in ax.get_xticklabels()]
+    labels = ["$\\pm$%d" % l for l in np.linspace(20, 45, len(labels))]
+    ax.set_xticklabels(labels)
     ax.legend(["%d Percentile Winds" % a for a in [80, 90, 95]], loc=2, fontsize=15)
     fig.savefig("../../gassolarpaper/mtowvslatsolar.pdf", bbox_inches="tight")
 

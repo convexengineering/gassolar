@@ -9,6 +9,7 @@ path = "/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/envi
 DF = pd.read_csv(path + "windaltfitdata.csv")
 
 def windalt_plot(latitude, sol):
+    plt.rcParams.update({'font.size':15})
     alt = np.linspace(40000, 80000, 20)
     den = density(alt)
     x = np.log([np.hstack([den]*6),
@@ -28,7 +29,10 @@ def windalt_plot(latitude, sol):
     altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
     vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
     ax.plot(altsol/1000, vsol, "o", markersize=10, label="operating point")
-    ax.legend(numpoints=1)
+    ax.annotate('operating point', xy=(altsol/1000.0, vsol),
+                xytext=(altsol/1000.0-15.0, vsol-15),
+                arrowprops=dict(facecolor='black', shrink=0.05, width=1.5,
+                                headwidth=10))
     ax.set_xlabel("Altitude [kft]")
     ax.set_ylabel("Wind Speed [knots]")
     ax.grid()
@@ -52,3 +56,82 @@ def density(altitude):
     p = 22632*np.exp(-g/R/T11*(altitude*0.3048-11000))
     den = p/R/T11
     return den
+
+
+from math import atan2,degrees
+import numpy as np
+
+#Label line with line2D label data
+def labelLine(line,x,label=None,align=True,**kwargs):
+
+    ax = line.get_axes()
+    xdata = line.get_xdata()
+    ydata = line.get_ydata()
+    if (x < xdata[0]) or (x > xdata[-1]):
+        print('x label location is outside data range!')
+        return
+
+    #Find corresponding y co-ordinate and angle of the
+    ip = 1
+    for i in range(len(xdata)):
+        if x < xdata[i]:
+            ip = i
+            break
+
+    y = ydata[ip-1] + (ydata[ip]-ydata[ip-1])*(x-xdata[ip-1])/(xdata[ip]-xdata[ip-1])
+    if not label:
+        label = line.get_label()
+
+    if align:
+        #Compute the slope
+        dx = xdata[ip] - xdata[ip-1]
+        dy = ydata[ip] - ydata[ip-1]
+        ang = degrees(atan2(dy,dx))
+
+        #Transform to screen co-ordinates
+        pt = np.array([x,y]).reshape((1,2))
+        trans_angle = ax.transData.transform_angles(np.array((ang,)),pt)[0]
+
+    else:
+        trans_angle = 0
+
+    #Set a bunch of keyword arguments
+    if 'color' not in kwargs:
+        kwargs['color'] = line.get_color()
+
+    if ('horizontalalignment' not in kwargs) and ('ha' not in kwargs):
+        kwargs['ha'] = 'center'
+
+    if ('verticalalignment' not in kwargs) and ('va' not in kwargs):
+        kwargs['va'] = 'center'
+
+    if 'backgroundcolor' not in kwargs:
+        kwargs['backgroundcolor'] = ax.get_axis_bgcolor()
+
+    if 'clip_on' not in kwargs:
+        kwargs['clip_on'] = True
+
+    if 'zorder' not in kwargs:
+        kwargs['zorder'] = 2.5
+
+    ax.text(x,y,label,rotation=trans_angle,**kwargs)
+
+def labelLines(lines,align=True,xvals=None,**kwargs):
+
+    ax = lines[0].get_axes()
+    labLines = []
+    labels = []
+
+    #Take only the lines which have labels other than the default ones
+    for line in lines:
+        label = line.get_label()
+        if "_line" not in label:
+            labLines.append(line)
+            labels.append(label)
+
+    if xvals is None:
+        xmin,xmax = ax.get_xlim()
+        xvals = np.linspace(xmin,xmax,len(labLines)+2)[1:-1]
+
+    for line,x,label in zip(labLines,xvals,labels):
+        labelLine(line,x,label,align,**kwargs)
