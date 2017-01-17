@@ -91,6 +91,8 @@
  \newcommand{\package}[1]{\texttt{#1}}
  \newcommand{\file}[1]{\texttt{#1}}
  \newcommand{\BibTeX}{\textsc{Bib}\TeX}
+ \usepackage{hyperref}
+ \hypersetup{citecolor = blue}
 
 \begin{document}
 
@@ -1390,9 +1392,10 @@ Two characteristics of gas engines affect the performance of long-endurance airc
 The first is break specific fuel consumption, $BSFC$; a lower $BSFC$ will result in increased endurance.  
 The second is the lapse rate.  
 Assuming a propeller driven aircraft and a naturally aispirated engine, as the aircraft reaches higher altitudes, the engine will have decreased available power. 
-To account for these two affects a two-stroke, double cylinder engine, the DF70 from RCV Engines, was selected and its manufacturing data used to generate representative performance curves.  
+To account for these two affects a two-stroke, double cylinder engine, the DF70 from RCV Engines Ltd, England, was selected as a representative engine.  
+RCV Engines Ltd manufacturing data that was used to generate representative performance curves.\cite{rcvengines}
 It is assumed that engines of a similar class will perform similarly to the DF70 engine.  
-Thus, this engine performance model is only valid for small engines.
+Thus, this engine performance model is only valid for IC engines.
 
 \subsubsection{Break Specific Fuel Consumption Constraint}
 
@@ -1400,17 +1403,17 @@ A GP-compatible curve was generated from the DF70 data to relate $BSFC$ and shaf
 
 \begin{equation}
     \label{e:rpmtobsfc}
-    \left( \frac{BSFC}{BSFC_{\text{min}}} \right)^{35.7041} \geq 2.24902\left( \frac{P_{\text{shaft}}}{P_{\text{max}}}\right)^{2.72257} + 0.00124367\left( \frac{P_{\text{shaft}}}{P_{\text{max}}} \right)^{-13.0099} \\
+    \left( \frac{BSFC}{BSFC_{\text{min}}} \right)^{18.5563} \geq \num{8.66321d-3}\left( \frac{P_{\text{shaft}}}{P_{\text{max}}}\right)^{-7.70161} + 1.38628\left( \frac{P_{\text{shaft}}}{P_{\text{max}}} \right)^{1.12921} \\
 \end{equation}
 
-where $BSFC_{\text{min}} = 0.3162$ [lb/hp/hr]. 
+where $BSFC_{\text{min}} = 0.3162$ [lb/hp/hr].\cite{rcvengines}
 Using this approximations the required shaft power determines the $BSFC$.
-A comparison of the GP-compatible approximations to the manufacturing data from RCV engines is presented in Figure~\ref{f:powervsweightfit}.
+A comparison of the GP-compatible approximations to the manufacturing data from RCV engines is presented in Figure~\ref{f:powervsweightfit}. A comparison of the DF70 data provided by RCV Engine Ltd in Figure~\ref{f:powervsweightfit} to the $BSFC$ to power curves in Goering\cite{bsfcperf} verify that this performance curve is representative of engines of a similar class. 
 
 \begin{figure}[H]
 	\begin{center}
 	\includegraphics[width=0.6\textwidth]{powertobsfcfit.pdf}
- \caption{\textbf{Comparison of GP-compatible approximation to RCV manufacturing data for the DF70 engine.  Function is representative of engine performance for engines of similar size.  The log-space RMS error is 0.021. }}
+ \caption{\textbf{Comparison of GP-compatible approximation to RCV manufacturing data for the DF70 engine.  Function is representative of engine performance for engines of similar size.  The log-space RMS error is 0.007. }}
 	\label{f:powervsweightfit}
 	\end{center}
 \end{figure}
@@ -1428,7 +1431,7 @@ The lapse is calculated from the required flight altitude $h=15,000$ [ft], prior
 
 \begin{equation}
     \label{e:lapsefit}
-    L_{\text{eng}} = 1 - \frac{0.035}{1000 \text{[ft]}} h.
+    L_{\text{eng}} = 1 - \frac{0.035}{1000 \text{ [ft]}} h.
 \end{equation}
 
 \subsection{Climb Constraints}
@@ -1564,9 +1567,9 @@ The each wind speed constraint follows the following form
 
 Table~\ref{t:windvals} lists the values of the coefficients and exponents of Equation~\eqref{e:windspeedgen} for latitudes 20-60. 
 
-\begin{table}[h]
-\resizebox{\textwidth}{!}{%
-    \begin{tabular}{lccccccccccccc} \\
+\tiny
+\begin{longtable}{lccccccccccccc} \\
+\label{t:windvals} \\
     \toprule
     \toprule
     \caption{Wind Speed Function Coefficients and Exponents} \\
@@ -1614,9 +1617,8 @@ Table~\ref{t:windvals} lists the values of the coefficients and exponents of Equ
 59 & 0.0242 & 0.892 & 28.4 & 0.000155 & -1.21 & 16.1 & 0.945 & -0.0147 & 0.0161 & 0.188 & 1.98 & 1.32 & 0.0233\\
 60 & 0.0173 & 0.691 & 28.1 & 0.948 & -0.0136 & 0.015 & 0.209 & 2.15 & 1.6 & 7.54e-05 & -1.41 & 14.3 & 0.0222 \\
 \bottomrule
-\label{t:windvals} 
-\end{tabular}}
-\end{table}
+\end{longtable}
+\normalsize
 
 \section*{Appendix B}
 

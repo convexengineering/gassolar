@@ -13,45 +13,45 @@ while executing---line 1245 of file aiaa.bst
 Too many commas in name 1 of "Goering, Carroll E., Marvin L Stone, David W. Smith, and Paul K. Turnquist" for entry bsfcperf
 while executing---line 1245 of file aiaa.bst
 Warning--empty pages in bsfcperf
-You've used 22 entries,
+You've used 23 entries,
             2292 wiz_defined-function locations,
-            691 strings with 7783 characters,
-and the built_in function-call counts, 3101 in all, are:
-= -- 216
-> -- 115
+            695 strings with 7882 characters,
+and the built_in function-call counts, 3220 in all, are:
+= -- 225
+> -- 119
 < -- 7
-+ -- 52
-- -- 30
-* -- 226
-:= -- 466
-add.period$ -- 39
-call.type$ -- 22
++ -- 54
+- -- 31
+* -- 233
+:= -- 483
+add.period$ -- 41
+call.type$ -- 23
 change.case$ -- 2
 chr.to.int$ -- 3
-cite$ -- 24
-duplicate$ -- 172
-empty$ -- 384
-format.name$ -- 30
-if$ -- 689
+cite$ -- 25
+duplicate$ -- 178
+empty$ -- 400
+format.name$ -- 31
+if$ -- 716
 int.to.chr$ -- 0
-int.to.str$ -- 22
+int.to.str$ -- 23
 missing$ -- 12
-newline$ -- 70
-num.names$ -- 20
-pop$ -- 83
+newline$ -- 73
+num.names$ -- 21
+pop$ -- 88
 preamble$ -- 1
 purify$ -- 0
 quote$ -- 0
-skip$ -- 69
+skip$ -- 72
 stack$ -- 0
-substring$ -- 73
-swap$ -- 38
+substring$ -- 74
+swap$ -- 39
 text.length$ -- 6
 text.prefix$ -- 0
 top$ -- 0
 type$ -- 0
 warning$ -- 2
-while$ -- 24
-width$ -- 24
-write$ -- 180
+while$ -- 25
+width$ -- 25
+write$ -- 188
 (There were 4 error messages)

@@ -10,9 +10,9 @@ from gpkit.tools.autosweep import sweep_1d
 import numpy as np
 plt.rcParams.update({'font.size':19})
 
-END = False
+END = True
 LAT = True
-DRAG = False
+DRAG = True
 BSFC = False
 
 """ MTOW vs Endurance """
