@@ -10,8 +10,7 @@ from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
 from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
 from gpkitmodels.helpers import summing_vars
 
-# path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
-path = "/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/"
+path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
 DF = pd.read_csv(path + "windaltfitdata.csv")
 
 class Aircraft(Model):
