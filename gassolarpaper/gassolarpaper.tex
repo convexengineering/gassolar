@@ -509,61 +509,71 @@ where $\mu_0 = 1.827\text{e}-5$ [Ns/m$^2$], $T_0 = 291.15$ [K], and $C = 120$ [K
 
 \subsection{Solar-Electric Power}
 
-The driving equations for the solar-electric powered aircraft are determined by the energy required to fly throughout the day while charging the batteries enough to last through the night.  
-Equations~\ref{e:solarreq} and~\ref{e:solarbatt} capture the solar requirement by enforcing that the total solar energy harvested by the solar cells during the day must be greater than the energy used to operate the aircraft during the day while charging enough batteries to fly during the night.\cite{solartech}
-Under these assumptions, if the aircraft can fly for one day and one night, then it could theoretically fly for many days under similar circumstances. 
+At a given time of year DOY, and latitude $\phi$, there exists an availble solar irradiated energy $(E/S)_{\text{sun}}$ per unit area during one day
 
-    \begin{align}
-        \label{e:solarreq}
-        (E/S)_{\text{sun}} \eta_{\text{solar}} S_{\text{solar}} &\geq P_{\text{oper}}t_{\text{day}} + E_{\text{battery}}/\eta_{\text{charge}} \\
-        \label{e:solarbatt}
-        E_{\text{battery}} &\geq P_{\text{oper}}t_{\text{night}}/\eta_{\text{discharge}}
-    \end{align}
-    
-    It is assumed that the charge and discharge efficiencies are constant, $\eta_{\text{charge}} = \eta_{\text{discharge}} = 0.98$. 
-    It is also assumed that the solar cell efficiency is constant, $\eta_{\text{solar}} = 0.3$. 
-    A battery with an energy density of $h_{\text{batt}} = 350$ [Whr/kg], is selected for the solar-powered aircraft. 
+\begin{equation}
+    \label{e:solarfunc}
+    (E/S)_{\text{sun}} = f(\phi, \text{DOY}).
+\end{equation}
 
-    To enforce these constraints, two variables were created: $P_{\text{oper}}$ and $S_{\text{solar}}$. 
-    $P_{\text{oper}}$ is defined as the average power required to operate the aircraft. 
-    $S_{\text{solar}}$ is defined as the amount of area on the aircraft covered by solar cells. 
+To operate continually for multiple days the total available solar energy $(E/S)_{\text{sun}}$, must be greater than the required solar energy per unit area to power the aircraft during the day $(E/S)_{\text{day}}$ and the energy required to power the aircraft during the night via batteries $E_{\text{batt}}$,\cite{solartech}
 
-    \begin{align}
-        \label{e:solarpoper}
-        P_{\text{oper}} &\geq P_{\text{shaft}} + P_{\text{avionics}} \\
-        \label{e:solarssolar}
-        S_{\text{solar}} &\leq f_{\text{solar}}S
-    \end{align}
+\begin{align}
+    \label{e:solarreq}
+    (E/S)_{\text{sun}}  &\geq (E/S)_{\text{day}} + \frac{E_{\text{battery}}}{\eta_{\text{charge}}\eta_{\text{solar}} S_{\text{solar}}} \\
+    \label{e:solarbatt}
+    E_{\text{battery}} &\geq \frac{P_{\text{oper}}t_{\text{night}}}{\eta_{\text{discharge}}} + (E/S)_C \eta_{\text{solar}} S_{\text{solar}}
+\end{align}
 
-    For the purposes of this design study, it is assumed that the solar cells are only placed on the wing and that the total solar cell area is limited to some fraction of the wing planform area $f_{\text{solar}}$, to account for control surfaces, leading edge, and other accessories.
+where the charge, discharge and solar cell efficiencies are assumed to be $\eta_{\text{charge}} = \eta_{\text{discharge}} = 0.98$ and $\eta_{\text{solar}}= 0.22$. 
+An additional energy term $(E/S)_C$ is included in Equation~\ref{e:solarbatt} to account for hours of low solar irradiance, during mornings and evenings, when the aircraft must continue to fly on battery power. 
+Equations~\ref{e:solarreq} and~\ref{e:solarbatt} are graphically represented in Figure~\ref{f:lat30}, which represents the solar energy at 30 degrees latitude. 
 
-    Because solar aircraft requirements are typically given in terms of latitude and yearly availability it is useful to express the total available solar energy per unit area per day as a function of latitude, $\phi$, and the day of the year, $DOY$, 
-    
-    \begin{equation}
-        \label{e:solarfunc}
-        (E/S)_{\text{sun}} = f(\phi, DOY).
-    \end{equation}
-
-
-    For simplicity, energy and power will refer to energy and power per unit area throughout the rest of this section (i.e. $(E/S) = E$). 
-    The total available solar energy per day is an integral of the available solar power during the course of the day,
-
-    \begin{equation}
-        \label{e:solares}
-        E_{\text{sun}} = \int_{t_{\text{sun rise}}}^{t_{\text{sun set}}} P_{\text{sun}} dt.
-    \end{equation}
-
-    Figure~\ref{f:lat45} shows a sample distribution of the available solar power during the spring equinox at 45 degrees latitude. 
-    
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width=0.6\textwidth]{lat45.pdf}
-    \caption{ \textbf{ The available solar power per unit area during the spring equinox in the Northern Hemisphere at $\phi=45^{\circ}$.  The area under this curve is the total energy available per unit area for the entire day.} }
-	\label{f:lat45}
+	\includegraphics[width=0.6\textwidth]{lat30.pdf}
+    \caption{\textbf{The available solar power per unit area during the winter solstice in the Northern Hemisphere at $\phi=30^{\circ}$. For a solar-electirc powered aircraft to be operational for more than 24 hours, the area under the red curve must be greater than the areas shown in blue, magenta and green.}}
+	\label{f:lat30}
 	\end{center}
 \end{figure}
 
-The shape of this curve is governed by the angle, $\theta$, between the normal to the flat surface, or aircraft wing, and the sun beam.\cite{solar}
+In order for the aircraft to begin charging batteries there must be a minimum solar irradiance power
+
+\begin{align}
+    (P/S)_{\text{min}} &= \frac{P_{\text{oper}}}{\eta_{\text{solar}} S_{\text{solar}}} \\
+    \eta_{\text{motor}} P_{\text{oper}} &\geq P_{\text{shaft}} + P_{\text{avionics}}. \\
+\end{align}
+
+where $\eta_{\text{motor}} = 0.95$. Thus for a given latitude and day, and therfore total solar energy $(E/S)_{\text{sun}}$, both $(E/S)_{\text{day}}$ and $(E/S)_C$ are functions of $(P/S)_{\text{min}}$.  
+The total solar energy available $(E/S)_{\text{sun}}$, is computed prior to the optimization solve and is used to generate monomial approximations for $(E/S)_{\text{day}}$ and $(E/S)_C$ as functions $(P/S)_{\text{min}}$, one for each latitude between 20 and 60 degrees latitude. 
+Figure~\ref{f:energyapprox} sample monomial approximations at 30 degrees latitude. 
+
+\begin{figure}[H]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[Monomial Approxmiation for $(E/S)_{\text{day}}$\label{f:Benergy}]{\includegraphics{Benergy.pdf}}
+     \subfigure[Monomial Approximation for $(E/S)_C$\label{f:Cenergy}]{\includegraphics{Cenergy.pdf}}
+ \end{subfigmatrix}
+ \caption{\textbf{Monomial approximations for $(E/S)_{\text{day}}$ and $(E/S)_C$ as functions for $(P/S)_{\text{min}}$ at 30 degrees latitude.}}
+ \label{f:energyapprox}
+\end{figure}
+
+    For the purposes of this design study, it is assumed that the solar cells are can be placed on the wings and the horizontal tail but are not placed on the vertical tail.  
+    The fractional solar cell area index $f_{\text{solar}}$ is one when the solar cells completely cover the main wing and greater than one if solar cells are placed on the horizontal tail,
+
+\begin{equation}
+    \label{e:solarssolar}
+    S_{\text{solar}} \leq f_{\text{solar}}S.
+\end{equation}
+
+The total available solar energy per day is an integral of the available solar power during the course of the day,
+
+    \begin{equation}
+        \label{e:solares}
+        (E/S)_{\text{sun}} = \int_{t_{\text{sun rise}}}^{t_{\text{sun set}}} (P/S)_{\text{sun}} dt.
+    \end{equation}
+    
+For simplicity, energy and power will refer to energy and power per unit area throughout the rest of this section (i.e. $(P/S) = P$). 
+The solar irradiated power $P_{\text{sun}}$ a function of $\theta$, the angle between the normal to the flat surface, or aircraft wing, and the sun beam.\cite{solar}
 
 \begin{equation}
     \label{e:solarp}

@@ -128,7 +128,7 @@ if COMP:
 if LATITUDE:
     plt.rcParams.update({'font.size':15})
     fig, ax = plt.subplots()
-    lat = np.arange(20, 60, 1)
+    lat = np.arange(21, 60, 1)
     for a in [80, 90, 95]:
         W = []
         runagain = True
@@ -144,6 +144,10 @@ if LATITUDE:
                 try:
                     sol = M.solve("mosek")
                     # W.append(sol("b_Mission, Aircraft, Wing").magnitude)
+                    mn = [max(M[sv].descr["modelnums"]) for sv in sol("(E/S)_{irr}") if abs(sol["sensitivities"]["constants"][sv]) > 0.01][0]
+                    Poper = [sol(sv) for sv in sol("P_{oper}") if mn in 
+                             M[sv].descr["modelnums"]][0]
+                    print Poper/sol("\\eta_{solar}")/sol("S_Mission, Aircraft, SolarCells")
                     W.append(sol("W_{total}").magnitude)
                 except RuntimeWarning:
                     W.append(np.nan)
