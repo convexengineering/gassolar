@@ -79,6 +79,7 @@ test_reports_nounits/
 *.log
 *.synctex.gz
 *.out
+*.dvi
 
 # md files support files
 *.generated.tex

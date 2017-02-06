@@ -1,0 +1,5 @@
+List to TODO for revision
+
+1. Look at contour plots of (x,y,z)=(span, battery, latitude) and (span, endurance, latitude)
+
+2. Clarify what negative wind speeds means.  Or clarify that directionality is not taken into account. 

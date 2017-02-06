@@ -3,15 +3,25 @@ from gpkit import Model, Variable, Vectorize
 from gpkitmodels.aircraft.GP_submodels.breguet_endurance import BreguetEndurance
 from steady_level_flight import SteadyLevelFlight
 from flight_state import FlightState
+from gassolar.environment.wind_speeds import get_windspeed
 
 class FlightSegment(Model):
     "flight segment"
     def setup(self, aircraft, N=5, altitude=15000, latitude=45, percent=90,
                  day=355):
 
+        if not hasattr(altitude, "__len__"):
+            altitude = [altitude]
+        if all(x == altitude[0] for x in altitude):
+            wind = get_windspeed(latitude, percent, altitude[0], day)
+            Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
+
         self.aircraft = aircraft
         with Vectorize(N):
-            self.fs = FlightState(latitude, percent, altitude, day)
+            if not all(x == altitude[0] for x in altitude):
+                wind = get_windspeed(latitude, percent, altitude, day)
+                Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
+            self.fs = FlightState(Vwind, latitude, percent, altitude, day)
             self.aircraftPerf = self.aircraft.flight_model(self.fs)
             self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                          self.aircraftPerf)

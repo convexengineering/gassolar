@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 import os
-from solar_irradiance import get_Eirr
+from gassolar.environment.solar_irradiance import get_Eirr
 from gpkit import Model, Variable, SignomialsEnabled
 from gpkitmodels.aircraft.GP_submodels.wing import WingAero, Wing
 from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
@@ -10,9 +10,10 @@ from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
 from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
 from gpkitmodels.helpers import summing_vars
 
-path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
+basepath = os.path.abspath(__file__).replace(os.path.basename(__file__), "")
+path = basepath.replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
 DF = pd.read_csv(path + "windaltfitdata.csv")
-DF2 = pd.read_csv("solarirrdata.csv")
+DF2 = pd.read_csv(path + "solarirrdata.csv")
 
 class Aircraft(Model):
     "vehicle"
@@ -33,7 +34,7 @@ class Aircraft(Model):
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
         self.empennage.substitutions["V_h"] = 0.45
-        self.empennage.substitutions["V_v"] = 0.02
+        self.empennage.substitutions["V_v"] = 0.04
         self.empennage.substitutions["m_h"] = 5.514
 
         constraints = [
@@ -129,7 +130,7 @@ class SolarCells(Model):
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         S = Variable("S", "ft**2", "solar cell area")
         W = Variable("W", "lbf", "solar cell weight")
-        etasolar = Variable("\\eta", 0.2, "-", "Solar cell efficiency")
+        etasolar = Variable("\\eta", 0.22, "-", "Solar cell efficiency")
 
         constraints = [W >= rhosolar*S*g]
 
@@ -283,9 +284,11 @@ class Mission(Model):
         for l in range(20, latitude+1, 1):
             mission.append(FlightSegment(self.solar, latitude=l, day=day))
         loading = self.solar.loading(self.solar["W_{cent}"], self.solar["W_{wing}"], mission[-1]["V"], mission[-1]["C_L"])
-        # loading = self.solar.loading(self.solar["W_{cent}"], mission[-1]["\\rho"], mission[-1]["V"], self.solar.wing["S"])
         for vk in loading.varkeys["N_{max}"]:
-            loading.substitutions.update({vk: 1.5})
+            if "ChordSparL" in vk.descr["models"]:
+                loading.substitutions.update({vk: 5})
+            if "GustL" in vk.descr["models"]:
+                loading.substitutions.update({vk: 2})
 
         return self.solar, mission, loading
 
@@ -295,7 +298,7 @@ def test():
     M.solve()
 
 if __name__ == "__main__":
-    M = Mission(latitude=31)
+    M = Mission(latitude=25)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
     mn = [max(M[sv].descr["modelnums"]) for sv in sol("(E/S)_{irr}") if

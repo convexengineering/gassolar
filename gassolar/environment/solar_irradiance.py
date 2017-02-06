@@ -45,12 +45,12 @@ def get_Eirr(latitude, day, N=50.0):
 if __name__ == "__main__":
     ES, td, tn, p = get_Eirr(30, 355, N=1000)
     fig, ax = plt.subplots()
-    ax.fill_between([-12, -td/2], 0, 80, alpha=0.5, facecolor="b",
+    ax.fill_between([-12, -td/2], 0, 80, alpha=0.3, facecolor="b",
                     linewidth=2, color="b")
-    ax.fill_between([td/2, 12], 0, 80, alpha=0.5, facecolor="b", linewidth=2,
+    ax.fill_between([td/2, 12], 0, 80, alpha=0.3, facecolor="b", linewidth=2,
                     color="b")
     ax.fill_between(p[1], p[0], 80, where=p[0] < 80, linewidth=2, color="b",
-                    facecolor="m", alpha=0.5)
+                    facecolor="m", alpha=0.3)
     ax.fill_between(p[1], 0, p[0], hatch="xx", color="r", linewidth=2,
                     facecolor="none")
     newp = []
@@ -60,18 +60,16 @@ if __name__ == "__main__":
         else:
             newp.append(80)
     ax.fill_between(p[1], 0, newp, linewidth=2, color="g", facecolor="g",
-                    alpha=0.5)
+                    alpha=0.3)
     ax.set_xlabel("Time [hr]")
     ax.set_ylabel("Available Solar Power [W/m$^2$]")
     ax.set_xlim([-12, 12])
     ax.text(-1.2, 400, "$(E/S)_{\mathrm{sun}}$", fontsize=15)
-    ax.text(-10, 30, "$E_{\mathrm{batt}}/S_{\mathrm{solar}}$", fontsize=15)
-    ax.text(7, 30, "$E_{\mathrm{batt}}/S_{\mathrm{solar}}$", fontsize=15)
     ax.text(-1.2, 30, "$(E/S)_{\mathrm{day}}$", fontsize=15)
-    ax.annotate("$(E/S)_C$", xy=(-4.9, 70), xytext=(-9, 220),
+    ax.annotate("$(E/S)_{\mathrm{twilight}}$", xy=(-4.9, 70), xytext=(-10.1, 220),
                 arrowprops=dict(facecolor='black', shrink=0.05, width=1.5,
                                 headwidth=10, frac=0.1))
-    ax.annotate("", xy=(5.5, 70), xytext=(-6.8, 205),
+    ax.annotate("", xy=(5.5, 70), xytext=(-6.7, 205),
                 arrowprops=dict(facecolor='black', shrink=0.05, width=1.5,
                                 headwidth=10, frac=0.025))
     ax.grid()
@@ -103,10 +101,10 @@ if __name__ == "__main__":
         cn, rm = fit(x, y, 1, "MA")
         print "RMS error: %.4f" % rm
         yfit = cn.evaluate(x)
-        ax1.plot(P[1:-15], 2*C[:-14], "o", c=col, markerfacecolor="none")
-        ax1.plot(P[1:-15], np.exp(yfit), c=col, label="%dth Latitude" % l)
-        ax1.set_xlabel("Minimum Necessary Power $(P/S)_{\mathrm{min}}$ [W/m$^2$]")
-        ax1.set_ylabel("Extra Required Battery Energy $(E/S)_C}$ [Whr/m$^2$]")
+        ax1.plot(P[1:-15], 2*C[:-14], "o", c=col, markerfacecolor="none", mew=1.5)
+        ax1.plot(P[1:-15], np.exp(yfit), c=col, label="%dth Latitude" % l, lw=2)
+        ax1.set_xlabel("Minimum Necessary Power $(P/S)_{\mathrm{min}}$ [W/m$^2$]", fontsize=19)
+        ax1.set_ylabel("Twilight Energy $(E/S)_{\mathrm{twilight}}}$ [Whr/m$^2$]", fontsize=19)
         ax1.grid()
         params.append(cn[0].right.c)
         params.append(cn[0].right.exp[list(cn[0].varkeys["u_fit_(0,)"])[0]])
@@ -116,11 +114,11 @@ if __name__ == "__main__":
         cn, rm = fit(x, y, 1, "MA")
         print "RMS error: %.4f" % rm
         yfit = cn.evaluate(x)
-        ax2.plot(P[1:-15], 2*B[:-14], "o", c=col, markerfacecolor="none")
-        ax2.plot(P[1:-15], np.exp(yfit), c=col, label="%dth Latitude" % l)
+        ax2.plot(P[1:-15], 2*B[:-14], "o", c=col, markerfacecolor="none", mew=1.5)
+        ax2.plot(P[1:-15], np.exp(yfit), c=col, label="%dth Latitude" % l, lw=2)
         ax2.grid()
-        ax2.set_xlabel("Minimum Necessary Power $(P/S)_{\mathrm{min}}$ [W/m$^2$]")
-        ax2.set_ylabel("Daytime Energry for Solar Cells $(E/S)_{\mathrm{day}}$ [Whr/m$^2$]")
+        ax2.set_xlabel("Minimum Necessary Power $(P/S)_{\mathrm{min}}$ [W/m$^2$]", fontsize=19)
+        ax2.set_ylabel("Daytime Energry $(E/S)_{\mathrm{day}}$ [Whr/m$^2$]", fontsize=19)
         params.append(cn[0].right.c)
         params.append(cn[0].right.exp[list(cn[0].varkeys["u_fit_(0,)"])[0]])
         data["%d" % l] = params

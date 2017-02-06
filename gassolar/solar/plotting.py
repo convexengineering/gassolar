@@ -8,7 +8,7 @@ path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace
 path = "/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/"
 DF = pd.read_csv(path + "windaltfitdata.csv")
 
-def windalt_plot(latitude, sol):
+def windalt_plot(latitude, sol1, sol2):
     plt.rcParams.update({'font.size':15})
     alt = np.linspace(40000, 80000, 20)
     den = density(alt)
@@ -25,16 +25,13 @@ def windalt_plot(latitude, sol):
 
     vwind = (np.exp(softmax_affine(x, params)[0])*100).reshape(6, 20)[3]
     fig, ax = plt.subplots()
-    ax.plot(alt/1000.0, vwind*1.95384)
-    altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
-    vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
-    ax.plot(altsol/1000, vsol, "o", markersize=10, label="operating point")
-    ax.annotate('operating point', xy=(altsol/1000.0, vsol),
-                xytext=(altsol/1000.0-15.0, vsol-15),
-                arrowprops=dict(facecolor='black', shrink=0.05, width=1.5,
-                                headwidth=10))
+    l = ax.plot(alt/1000.0, vwind*1.95384, linewidth=2)
+    for sol in [sol1, sol2]:
+        altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
+        vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
+        ax.plot(altsol/1000, vsol, "o", markersize=10)
     ax.set_xlabel("Altitude [kft]")
-    ax.set_ylabel("Wind Speed [knots]")
+    ax.set_ylabel("90th Percentile Wind Speed [knots]")
     ax.grid()
     ax.set_ylim([0, 200])
     return fig, ax
@@ -116,7 +113,7 @@ def labelLine(line,x,label=None,align=True,**kwargs):
 
     ax.text(x,y,label,rotation=trans_angle,**kwargs)
 
-def labelLines(lines,align=True,xvals=None,**kwargs):
+def labelLines(lines,align=True,xvals=None,zorder=[],**kwargs):
 
     ax = lines[0].get_axes()
     labLines = []
@@ -133,5 +130,5 @@ def labelLines(lines,align=True,xvals=None,**kwargs):
         xmin,xmax = ax.get_xlim()
         xvals = np.linspace(xmin,xmax,len(labLines)+2)[1:-1]
 
-    for line,x,label in zip(labLines,xvals,labels):
-        labelLine(line,x,label,align,**kwargs)
+    for line,x,label,zo in zip(labLines,xvals,labels, zorder):
+        labelLine(line,x,label,align,zorder=zo,**kwargs)

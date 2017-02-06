@@ -1,4 +1,3 @@
 pip install : pandas
 gpkit-models branch : 1682
-skipsolvers : 
-
+skipsolvers : cvxopt

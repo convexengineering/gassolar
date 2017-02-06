@@ -1,8 +1,14 @@
 import pandas as pd
 
 df = pd.read_csv("windaltfitdata.csv")
+PRINT = False
 
-with open("windfitdata.generated.tex", "w") as f:
+if PRINT:
+    filename = "../../gassolarpaper/windfitdata.generated.tex"
+else:
+    filename = "windfitdata.generated.tex"
+
+with open(filename, "w") as f:
     f.write("\\begin{longtable}{lccccccccccccc}\n")
     f.write("\\caption{Wind Fit Data}\\\\\n")
     f.write("\\toprule\n")

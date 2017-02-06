@@ -1,0 +1,2 @@
+all:
+	ipython gassolarlat.py
