@@ -293,7 +293,7 @@ class Mission(Model):
         return self.solar, mission, loading
 
 def test():
-    M = Mission(latitude=31)
+    M = Mission(latitude=25)
     M.cost = M["W_{total}"]
     M.solve()
 
