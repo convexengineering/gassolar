@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from gassolar.gas.gas import Mission
 from gassolar.environment.wind_speeds import get_windspeed
-from gpkit.tools.autosweep import sweep_1d
+from gpkit.tools.autosweep import autosweep_1d
 
 plt.rcParams.update({'font.size':15})
 M = Mission()
@@ -31,10 +31,9 @@ for p in [85, 90, 95]:
 
     del M.substitutions["MTOW"]
     M.cost = M["MTOW"]
-    bst = sweep_1d(M, tol, M["t_Mission, Loiter"], [1, xmin_[-1]],
-                   solver="mosek")
-    ws.append(bst["cost"].__call__(xmin_))
-    del M.substitutions["t_Mission, Loiter"]
+    bst = autosweep_1d(M, tol, M["t_Mission, Loiter"], [1, xmin_[-1]],
+                       solver="mosek")
+    ws.append(bst.sample_at(xmin_)["cost"])
 
 ax.fill_between(xs[0], ws[0],
                 np.append(ws[2], [1000]*(len(xs[0])-len(xs[2]))),

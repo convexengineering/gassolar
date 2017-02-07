@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from solar import Mission
 from plotting import windalt_plot, labelLines
-from gpkit.tools.autosweep import sweep_1d
+from gpkit.tools.autosweep import autosweep_1d
 
 N = 100
 plt.rcParams.update({'font.size':19})
@@ -60,17 +60,17 @@ for av in [80, 85, 90]:
             M.cost = M["h_{batt}"]
             xmin_ = np.linspace(etamin, etamax, 100)
             tol = 0.01
-            bst = sweep_1d(M, tol, M["\\eta_Mission, Aircraft, SolarCells"],
+            bst = autosweep_1d(M, tol, M["\\eta_Mission, Aircraft, SolarCells"],
                            [etamin, etamax], solver="mosek")
 
             if b % 10 == 0:
-                l = ax.plot(xmin_, bst["cost"].__call__(xmin_), "k",
+                l = ax.plot(xmin_, bst.sample_at(xmin_)["cost"], "k",
                             label="%d [ft]" % b, zorder=zo)
                 zo += 2
                 lines.append(l[0])
                 midx.append(np.median(xmin_))
             else:
-                ax.plot(xmin_, bst["cost"].__call__(xmin_), "--", c="0.5",
+                ax.plot(xmin_, bst.sample_at(xmin_)["cost"], "--", c="0.5",
                         zorder=100)
 
         # parato fontier
@@ -82,8 +82,9 @@ for av in [80, 85, 90]:
         notpassing = True
         while notpassing:
             try:
-                bst = sweep_1d(M, tol, M["\\eta_Mission, Aircraft, SolarCells"],
-                               [lower, upper], solver="mosek")
+                bst = autosweep_1d(M, tol,
+                                   M["\\eta_Mission, Aircraft, SolarCells"],
+                                   [lower, upper], solver="mosek")
                 notpassing = False
             except RuntimeWarning:
                 notpassing = True
@@ -93,7 +94,7 @@ for av in [80, 85, 90]:
         ax.set_xlabel("Solar Cell Efficiency")
         ax.set_ylabel("Battery Specific Energy [Whr/kg]")
         labelLines(lines[:-1], align=True, xvals=midx, zorder=[11, 13, 15, 17])
-        ax.fill_between(xmin_, 0, bst["cost"].__call__(xmin_), edgecolor="r",
+        ax.fill_between(xmin_, 0, bst.sample_at(xmin_)["cost"], edgecolor="r",
                         lw=2, hatch="/", facecolor="None", zorder=100)
         ax.text(0.17, 260, "Infeasible", fontsize=19)
         ax.set_xlim([0.15, 0.4])
