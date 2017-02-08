@@ -2,7 +2,6 @@
 import numpy as np
 from numpy import sin, tan, cos, arccos, deg2rad
 import matplotlib.pyplot as plt
-from gpfit.fit import fit
 import pandas as pd
 plt.rcParams.update({'font.size':15})
 
@@ -78,6 +77,31 @@ if __name__ == "__main__":
     ax2.set_yticklabels(["", "$(P/S)_{\mathrm{min}}$", ""])
     fig.savefig("../../gassolarpaper/lat30.pdf", bbox_inches="tight")
 
+    # solar irradiance by year
+    Fig, Ax = plt.subplots()
+    Mos = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
+           "oct", "nov", "dec", "jan"]
+    Dayinmo = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    Moday = [sum(Dayinmo[:i+1]) for i in range(len(Dayinmo))]
+    Mid = [(Moday[i]+Moday[i+1])/2 for i in range(len(Moday)-1)]
+    es = []
+    for d in range(365):
+        E, _, _, _ = get_Eirr(30, d)
+        es.append(E)
+    ind = es.index(min(es))
+    Ax.annotate("winter solstice", xy=(ind, min(es)), xytext=(200, 5500),
+               arrowprops=dict(arrowstyle="->"))
+    Ax.plot(range(365), es)
+    Ax.set_xticks(Moday)
+    Ax.set_xticks(Mid, minor=True)
+    Ax.set_xticklabels(Mos, minor=True)
+    Ax.set_xticklabels([])
+    Ax.set_ylabel("Solar Energy [Whr/m$^2$]")
+    Ax.grid()
+    Ax.set_xlim([0, 365])
+    Fig.savefig("../../gassolarpaper/eirrvsmonth.pdf", bbox_inches="tight")
+
+    from gpfit.fit import fit
     data = {}
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()
