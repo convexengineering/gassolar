@@ -8,7 +8,7 @@ path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace
 path = "/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/"
 DF = pd.read_csv(path + "windaltfitdata.csv")
 
-def windalt_plot(latitude, sol1, sol2):
+def windalt_plot(latitude, sol1=None, sol2=None):
     plt.rcParams.update({'font.size':15})
     alt = np.linspace(40000, 80000, 20)
     den = density(alt)
@@ -26,10 +26,15 @@ def windalt_plot(latitude, sol1, sol2):
     vwind = (np.exp(softmax_affine(x, params)[0])*100).reshape(6, 20)[3]
     fig, ax = plt.subplots()
     l = ax.plot(alt/1000.0, vwind*1.95384, linewidth=2)
-    for sol in [sol1, sol2]:
-        altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
-        vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
-        ax.plot(altsol/1000, vsol, "o", markersize=10)
+    if sol1:
+        if sol2:
+            sols = [sol1, sol2]
+        else:
+            sols = [sol1]
+        for sol in sols:
+            altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
+            vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
+            ax.plot(altsol/1000, vsol, "o", markersize=10, mfc="c")
     ax.set_xlabel("Altitude [kft]")
     ax.set_ylabel("90th Percentile Wind Speed [knots]")
     ax.grid()

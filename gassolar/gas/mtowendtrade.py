@@ -37,10 +37,10 @@ for p in [85, 90, 95]:
 
 ax.fill_between(xs[0], ws[0],
                 np.append(ws[2], [1000]*(len(xs[0])-len(xs[2]))),
-                facecolor="b", edgecolor="None", alpha=0.3)
-ax.plot(xs[0], ws[0], "b")
-ax.plot(xs[1], ws[1], "b", lw=2)
-ax.plot(xs[2], ws[2], "b")
+                facecolor="r", edgecolor="None", alpha=0.3)
+ax.plot(xs[0], ws[0], "r")
+ax.plot(xs[1], ws[1], "r", lw=2)
+ax.plot(xs[2], ws[2], "r")
 for i, p in enumerate(["80%", "90%", "95%"]):
     weight = ws[i].magnitude
     we = 500 + min(abs(weight-500))

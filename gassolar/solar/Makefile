@@ -3,4 +3,6 @@ all:
 	ipython objectivecomp.py
 	ipython print_sens.py
 	ipython solarlat.py
-	ipython wind_struct.py
+	ipython windstruct.py
+	ipython battsolarcon.py
+

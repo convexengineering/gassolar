@@ -28,13 +28,13 @@ print "RMS error = %.4f" % rmserror
 yfit = cstrt.evaluate(x)
 
 fig, ax = plt.subplots()
-ax.plot(u, w*min(df["BSFC"]), "o", mfc="None", ms=7, mew=1.5)
-ax.plot(u, np.exp(yfit)*min(df["BSFC"]), linewidth=2)
+ax.plot(u*100, w*min(df["BSFC"]), "o", mfc="None", ms=7, mew=1.5)
+ax.plot(u*100, np.exp(yfit)*min(df["BSFC"]), linewidth=2)
 ax.set_xlabel("Percent Power")
 ax.set_ylabel("$BSFC$ [kg/kW/hr]")
 ax.legend(["RCV Engine Ltd. Data", "GP approximation"], fontsize=15)
-ax.set_xlim([0, 1])
 ax.set_ylim([0, 1])
+ax.set_xlim([0, 100])
 ax.grid()
 fig.savefig("../../../../gassolarpaper/powertobsfcfit.pdf",
             bbox_inches="tight")

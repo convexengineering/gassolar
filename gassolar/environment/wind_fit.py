@@ -64,15 +64,26 @@ def plot_fits(xdata, ydata, yfit, latitude):
     colors = ["b", "r", "g", "m", "k", "y"]
     assert len(colors) == len(x2)
     fig, ax = plt.subplots()
+    yfits = []
     for p, y, yf, cl in zip(x2, ydata.reshape(len(x2), len(x1)),
                             yfit.reshape(len(x2), len(x1)), colors):
         pp = np.exp(p)
         if pp == 0.75 or pp == 0.85 or pp == 0.95:
-            ax.plot(np.exp(x1), np.exp(y)*WIND_NORM, "o", mec=cl, mfc="none",
+            ax.plot(np.exp(x1), np.exp(y)*WIND_NORM, "o", mec="k", mfc="none",
                     mew=1.5)
-            ax.plot(np.exp(x1), np.exp(yf)*WIND_NORM, c=cl, lw=2,
-                    label="%d Percentile Winds" % np.rint(np.exp(p)*PERCT_NORM))
-    ax.legend(loc=2, fontsize=15)
+            yfits.append(np.exp(yf)*WIND_NORM)
+            if pp == 0.85:
+                wid = 2
+            else:
+                wid = 1
+            ax.plot(np.exp(x1), np.exp(yf)*WIND_NORM, c="#3E31AE", lw=wid)
+                    #label="%d Percentile Winds" % np.rint(np.exp(p)*PERCT_NORM))
+    #ax.legend(loc=2, fontsize=15)
+    ax.fill_between(np.exp(x1), yfits[0], yfits[-1], alpha=0.2,
+                    facecolor="#3E31AE", edgecolor="None")
+    if not GENERATE:
+        for i, p in enumerate(["75\%", "85\%", "95\%"]):
+            ax.text(np.exp(x1)[0]+0.005, yfits[i][0]-1.0, p)
     ax.set_xlabel("Air Density [kg/m$^3$]")
     ax.set_ylabel("Wind Speed [m/s]")
     ax.grid()

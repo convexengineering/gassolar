@@ -2,6 +2,7 @@
 import numpy as np
 from gassolar.gas.gas import Mission
 from gassolar.environment.wind_speeds import get_windspeed
+from gassolar.solar.print_sens import plot_sens
 
 def sens_table(sols, varnames,
                filename="../../gassolarpaper/gassens.generated.tex"):
@@ -41,4 +42,8 @@ if __name__ == "__main__":
         sol = M.solve("mosek")
         sols.append(sol)
 
-    sens_table(sols, ["V_{wind}_Mission, Loiter, FlightSegment", "W_{pay}", "\\eta_{prop}", "BSFC_{min}", "t_Mission, Loiter", "N_{max}_Mission, AircraftLoading, WingLoading, ChordSparL"], filename="sens.generated.tex")
+    varnames = ["V_{wind}_Mission, Loiter, FlightSegment", "W_{pay}", "\\eta_{prop}", "BSFC_{min}", "t_Mission, Loiter", "N_{max}_Mission, AircraftLoading, WingLoading, ChordSparL"]
+    latns = ["$V_{\\mathrm{wind}}$", "$W_{\\mathrm{pay}}$", "$\\eta_{\\mathrm{prop}}$", "$BSFC_{\\mathrm{min}}$", "$t_{\\mathrm{loiter}}$", "$N_{\\mathrm{max}}$"]
+    sens_table(sols, varnames, filename="sens.generated.tex")
+    fig, ax = plot_sens(sols[2], varnames, latns=latns)
+    fig.savefig("../../gassolarpaper/gassensbar.pdf", bbox_inches="tight")

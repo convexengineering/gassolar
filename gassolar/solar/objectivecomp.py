@@ -38,9 +38,9 @@ for obj in ["b_Mission, Aircraft, Wing", "S_Mission, Aircraft, SolarCells"]:
             W.append(np.nan)
             SS.append(np.nan)
     if obj[0] == "b":
-        ty = "b"
+        ty = "#4AA9AF"
     else:
-        ty = "r--"
+        ty = "b--"
     ll = ax.plot(lat, W, "%s" % ty, lw=2)
     ll1 = ax2.plot(lat, SS, '%s' % ty, lw=2)
 

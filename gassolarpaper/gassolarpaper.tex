@@ -44,7 +44,7 @@
 %
 % For further details and support, read the Users Manual, aiaa.pdf.
 
-\documentclass[]{aiaa-tc}% insert '[draft]' option to show overfull boxes
+\documentclass[]{aiaa-tc2}% insert '[draft]' option to show overfull boxes
 
  \usepackage{varioref}%  smart page, figure, table, and equation referencing
  \usepackage{wrapfig}%   wrap figures/tables in text (i.e., Di Vinci style)
@@ -73,7 +73,9 @@
  \usepackage{multirow}
  \usepackage{setspace}
  \usepackage[sort, numbers]{natbib}
- \doublespacing
+ \usepackage{draftwatermark}
+ \SetWatermarkScale{3}
+ % \doublespacing
 
  \title{Solar-Electric and Gas Powered, Long-Endurance UAV Sizing via Geometric Programming}
 
@@ -1624,8 +1626,8 @@ The redesigned airfoil was named \emph{JH01}. We would like to thank Mark Drela 
 
 \begin{figure}[H]
  \begin{subfigmatrix}{2}% number of columns
-     \subfigure[$C_L=0.0$\label{f:cpmin}]{\includegraphics[width=0.35\textwidth,natwidth=612,natheight=792,angle=-90]{cpmin.pdf}}
-     \subfigure[$C_L=1.35$\label{f:cpmax}]{\includegraphics[width=0.35\textwidth,natwidth=612,natheight=792,angle=-90]{cpmax.pdf}}
+     \subfigure[$C_L=0.0$\label{f:cpmin}]{\includegraphics[width=0.35\textwidth,natwidth=612,natheight=792]{cpmin.pdf}}
+     \subfigure[$C_L=1.35$\label{f:cpmax}]{\includegraphics[width=0.35\textwidth,natwidth=612,natheight=792]{cpmax.pdf}}
  \end{subfigmatrix}
  \caption{\textbf{Pressure coefficient plots at the minimum and maximum expected $C_L$ at Reynolds number $Re=\num{3d5}$.}}
  \label{f:jhcps}

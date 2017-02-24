@@ -170,8 +170,8 @@ class AircraftPerf(Model):
                 state["(E/S)_{day}"] + static.battery["E"]
                 / static.battery["\\eta_{charge}"]
                 / static.solarcells["\\eta"]/static.solarcells["S"]),
-            static.battery["E"] >= (
-                Poper*state["t_{night}"]/static.battery["\\eta_{discharge}"]
+            static.battery["E"]*static.battery["\\eta_{discharge}"] >= (
+                Poper*state["t_{night}"]
                 + state["(E/S)_C"]*static.solarcells["\\eta"]
                 * static.solarcells["S"]),
             Poper >= Pacc + Pshaft,

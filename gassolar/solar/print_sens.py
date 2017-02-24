@@ -1,5 +1,7 @@
 "print sensitivities"
 from gassolar.solar.solar import Mission
+import matplotlib.pyplot as plt
+import numpy as np
 
 def sens_table(sols, varnames,
                filename="../../gassolarpaper/solarsens.generated.tex"):
@@ -24,6 +26,40 @@ def sens_table(sols, varnames,
         f.write("\\bottomrule\n")
         f.write("\\end{longtable}")
 
+def plot_sens(sol, varnames, latns=None):
+    fig, ax = plt.subplots()
+    pss = []
+    ngs = []
+    sens = {}
+    for vname, latn in zip(varnames, latns):
+        sen = sol["sensitivities"]["constants"][vname]
+        if hasattr(sen, "__len__"):
+            sen = sol["sensitivities"]["constants"][max(sen)]
+        sens[latn] = sen
+
+    labels = []
+    for s in sorted(np.absolute(sens.values()), reverse=True):
+        vn = [se for se in sens if abs(sens[se]) == s][0]
+        labels.append(vn)
+        if sens[vn] > 0:
+            pss.append(sens[vn])
+            ngs.append(0)
+        else:
+            ngs.append(abs(sens[vn]))
+            pss.append(0)
+
+    ind = np.arange(0.75, len(varnames)*1.5, 1.5)
+    ax.bar(ind, pss, 1.0, color="#4D606E")
+    ax.bar(ind, ngs, 1.0, color="#3FBAC2")
+    ax.set_xlim([0.25, ind[-1]+1.5])
+    if latns:
+        ax.set_xticks(ind+0.75)
+        ax.set_xticklabels(labels, rotation=-45)
+    ax.legend(["Positive", "Negative"])
+    ax.set_ylabel("sensitivities")
+    return fig, ax
+
+
 if __name__ == "__main__":
     sols = []
     for l in [25, 30]:
@@ -35,4 +71,17 @@ if __name__ == "__main__":
             sol = M.solve("mosek")
             sols.append(sol)
 
-    sens_table(sols, ["p_{wind}", "\\eta_Mission, Aircraft, SolarCells", "\\eta_{charge}", "\\eta_{discharge}", "\\rho_{solar}", "t_{night}", "(E/S)_{irr}", "m_{fac}_Mission, Aircraft, Wing", "h_{batt}", "W_{pay}", "\\eta_{prop}"], filename="test.tex")
+    varns =  ["p_{wind}", "\\eta_Mission, Aircraft, SolarCells",
+              "\\eta_{charge}", "\\eta_{discharge}", "\\rho_{solar}",
+              "t_{night}", "(E/S)_{irr}", "h_{batt}", "W_{pay}",
+              "\\eta_{prop}"]
+    latns =  ["$p_{\\mathrm{wind}}$", "$\\eta_{\\mathrm{solar}}$",
+              "$\\eta_{\\mathrm{charge}}$", "$\\eta_{\\mathrm{discharge}}$",
+              "$\\rho_{\\mathrm{solar}}$",
+              "$t_{\\mathrm{night}}$", "$(E/S)_{\\mathrm{irr}}$",
+              "$h_{\\mathrm{batt}}$", "$W_{\\mathrm{pay}}$",
+              "$\\eta_{\\mathrm{prop}}$"]
+    sens_table(sols, varns, filename="test.tex")
+    fig, ax = plot_sens(sols[3], varns, latns=latns)
+    fig.savefig("../../gassolarpaper/solarsensbar.pdf", bbox_inches="tight")
+

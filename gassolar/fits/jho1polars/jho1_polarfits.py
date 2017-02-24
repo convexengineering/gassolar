@@ -57,27 +57,24 @@ def return_fit(cl, re):
 
 def plot_fits(re):
     "plot fit compared to data"
-    colors = ["k", "m", "b", "g", "y"]
+    # colors = ["k", "m", "b", "g", "y"]
+    colors = ["#084081", "#0868ac", "#2b8cbe", "#4eb3d3", "#7bccc4"]
     assert len(re) == len(colors)
     fig, ax = plt.subplots()
-    fig1, ax1 = plt.subplots()
     cls = np.linspace(0.2, 1.3, 20)
     for r, col in zip(re, colors):
         dataf = text_to_df("jho1.ncrit09.Re%dk.pol" % r)
         ax.plot(dataf["CL"], dataf["CD"], "o", mec=col, mfc="none", mew=1.5)
         cd = return_fit(cls, r*1000.)
         ax.plot(cls, cd, c=col, label="Re = %dk" % r, lw=2)
-        ax1.plot(cls, cls**1.5/cd)
     ax.legend(loc=2, fontsize=15)
     ax.set_xlabel("$C_L$")
     ax.set_ylabel("$c_{d_p}$")
     ax.grid()
-    return fig, ax, fig1
+    return fig, ax
 
 if __name__ == "__main__":
     Re = range(200, 750, 50)
     X, Y = fit_setup(Re) # call fit(X, Y, 4, "SMA") to get fit
-    F, A, F1 = plot_fits([300, 350, 400, 450, 500])
-    F.savefig("jho1polarfit1.pdf", bbox_inches="tight")
-    F1.savefig("../../../gassolarpaper/jho1cl32cd.pdf",
-               bbox_inches="tight")
+    F, A = plot_fits([300, 350, 400, 450, 500])
+    F.savefig("../../../gassolarpaper/jho1polarfit1.pdf", bbox_inches="tight")

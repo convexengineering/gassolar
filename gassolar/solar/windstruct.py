@@ -14,6 +14,7 @@ M = Mission(latitude=lat)
 M.cost = M["W_{total}"]
 sol2 = M.solve("mosek")
 fig, ax = windalt_plot(lat, sol1, sol2)
+# fig, ax = windalt_plot(lat, sol1=sol2)
 ax.annotate("structural weight fraction", xy=(66.2, 30), xytext=(46, 10),
             arrowprops=dict(facecolor='black', shrink=0.05, width=1.5,
                             headwidth=10))

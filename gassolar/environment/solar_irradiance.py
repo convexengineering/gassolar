@@ -99,9 +99,9 @@ if __name__ == "__main__":
     Ax.set_ylabel("Solar Energy [Whr/m$^2$]")
     Ax.grid()
     Ax.set_xlim([0, 365])
+    Ax.set_ylim([0, 12000])
     Fig.savefig("../../gassolarpaper/eirrvsmonth.pdf", bbox_inches="tight")
-
-    from gpfit.fit import fit
+    
     data = {}
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()

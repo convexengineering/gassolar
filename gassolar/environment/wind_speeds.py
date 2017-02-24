@@ -83,13 +83,25 @@ def interpolate(xs, ys, x):
 if __name__ == "__main__":
 
     Fig, Ax = plt.subplots()
-    Colors = ["b", "g", "r"]
+    # Colors = ["#253B6E", "#1F5F8B", "#1891AC"]
+    Colors = ["#1C226B", "#3E31AE", "#4AA9AF"]
+    lat = np.arange(70)
     for al, c in zip([15000, 50000, 60000], Colors):
-        Wind85 = [get_windspeed(l, 80, al, 355) for l in np.arange(70)]
-        Wind90 = [get_windspeed(l, 90, al, 355) for l in np.arange(70)]
-        Wind95 = [get_windspeed(l, 95, al, 355) for l in np.arange(70)]
+        Wind85 = [get_windspeed(l, 80, al, 355) for l in lat]
+        Wind90 = [get_windspeed(l, 90, al, 355) for l in lat]
+        Wind95 = [get_windspeed(l, 95, al, 355) for l in lat]
         Ax.fill_betweenx(np.arange(70), Wind85, Wind95, alpha=0.5, facecolor=c)
         Ax.plot(Wind90, np.arange(70), c, label="Altitude=%d" % al, lw=2)
+        if al == 50000:
+            Ax.annotate("80%", xy=(Wind85[np.where(lat==31)[0][0]],31),
+                        xytext=(3,0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
+            Ax.annotate("90%", xy=(Wind90[np.where(lat==31)[0][0]],31),
+                        xytext=(3,0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
+            Ax.annotate("95%", xy=(Wind95[np.where(lat==31)[0][0]],31),
+                        xytext=(3,0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
     Ax.set_ylabel("Latitude [deg]")
     Ax.set_xlabel("Wind speed [m/s]")
     Ax.set_ylim([0, 70])
@@ -100,21 +112,38 @@ if __name__ == "__main__":
 
     Fig, Ax = plt.subplots()
     Alt = range(1000, 80000, 1000)
+    Colors = ["#470031", "#971549", "#CF455C"]
     for l, c in zip([30, 35, 45], Colors):
         Wind85 = get_windspeed(l, 80, Alt, 355)
         Wind90 = get_windspeed(l, 90, Alt, 355)
         Wind95 = get_windspeed(l, 95, Alt, 355)
         Ax.fill_betweenx(Alt, Wind85, Wind95, alpha=0.5, facecolor=c)
         Ax.plot(Wind90, Alt, c, label="Latitude=%d" % l, lw=2)
+        if l == 45:
+            Ax.annotate("80%", xy=(Wind85[Alt.index(63000)], 63000),
+                        xytext=(8,-0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
+            Ax.annotate("90%", xy=(Wind90[Alt.index(63000)], 63000),
+                        xytext=(8,-0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
+            Ax.annotate("95%", xy=(Wind95[Alt.index(63000)], 63000),
+                        xytext=(8,-0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
+
+    # Ax.plot([0, 80], [15000, 15000], "k", lw=2)
+    # Ax.fill_between(np.linspace(0, 80, 10), 12000, 15000, hatch="//", facecolor="None", edgecolor="k", linewidth=0.0)
+    # Ax.text(64, 18000, "$h_{\\mathrm{min}}$", fontsize=15)
     Ax.set_ylabel("Altitude [ft]")
     Ax.set_xlabel("Wind speed [m/s]")
     Ax.set_ylim([0, 80000])
+    Ax.set_xlim([0, 80])
     Ax.grid()
     Ax.legend(loc=1, fontsize=15)
     # Ax.set_title("85%-95% Wind Speeds in Dec")
     Fig.savefig("../../gassolarpaper/altvswind.pdf", bbox_inches="tight")
 
     Fig, Ax = plt.subplots()
+    Colors = ["#1C226B", "#3E31AE", "#4AA9AF"]
     Mos = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
            "oct", "nov", "dec", "jan"]
     Dayinmo = [0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
@@ -127,6 +156,16 @@ if __name__ == "__main__":
         Ax.fill_between(range(13), Wind85 + [Wind85[0]], Wind95 + [Wind95[0]],
                         alpha=0.5, facecolor=c)
         Ax.plot(range(13), Wind90 + [Wind90[0]], c, label="Altitude=%d" % al, lw=2)
+        if al == 50000:
+            Ax.annotate("80%", xy=(1, Wind85[1]),
+                        xytext=(3,0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
+            Ax.annotate("90%", xy=(1, Wind90[1]),
+                        xytext=(3,0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
+            Ax.annotate("95%", xy=(1, Wind95[1]),
+                        xytext=(3,0.1), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-"), fontsize=12)
     Ax.set_xticks(np.arange(12))
     Ax.set_xticks(np.arange(12)+0.5, minor=True)
     Ax.set_xticklabels(Mos, minor=True)
