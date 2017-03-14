@@ -1,5 +1,5 @@
 # gas_solar_trade
-Trade off analysis between solar and gas powered long endurance aircraft
+Trade off analysis between solar and gas powered long endurance aircraft. [Related paper (preprint)](http://hoburg.mit.edu/publications/gassolar.pdf)
 
 [![Build Status](https://acdl.mit.edu/csi/buildStatus/icon?job=gpkit_ResearchModel_gas_solar_trade_Push)](https://acdl.mit.edu/csi/job/gpkit_ResearchModel_gas_solar_trade_Push)
 
