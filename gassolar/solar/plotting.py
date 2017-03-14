@@ -5,7 +5,6 @@ import os
 import pandas as pd
 
 path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
-path = "/Users/mjburton11/MIT/GPKIT/gpkit-projects/gas_solar_trade/gassolar/environment/"
 DF = pd.read_csv(path + "windaltfitdata.csv")
 
 def windalt_plot(latitude, sol1=None, sol2=None):

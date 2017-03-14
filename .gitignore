@@ -80,6 +80,9 @@ test_reports_nounits/
 *.synctex.gz
 *.out
 *.dvi
+*.bbl
+*.blg
+*.glo
 
 # md files support files
 *.generated.tex

@@ -8,7 +8,7 @@ class Loiter(Model):
                  day=355):
         fs = FlightSegment(aircraft, N, altitude, latitude, percent, day)
 
-        t = Variable("t", "days", "loitering time")
+        t = Variable("t", "days", "endurance requirement")
         constraints = [fs.be["t"] >= t/N]
 
         return fs, constraints

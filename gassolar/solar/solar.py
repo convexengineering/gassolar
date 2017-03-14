@@ -4,11 +4,11 @@ import numpy as np
 import os
 from gassolar.environment.solar_irradiance import get_Eirr
 from gpkit import Model, Variable, SignomialsEnabled
-from gpkitmodels.aircraft.GP_submodels.wing import WingAero, Wing
-from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
-from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
-from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
-from gpkitmodels.helpers import summing_vars
+from gpkitmodels.GP.aircraft.wing.wing import WingAero, Wing
+from gpkitmodels.GP.aircraft.tail.empennage import Empennage
+from gpkitmodels.GP.aircraft.tail.tail_boom import TailBoomState
+from gpkitmodels.SP.aircraft.tail.tail_boom_flex import TailBoomFlexibility
+from gpkitmodels.tools.summing_constraintset import summing_vars
 
 basepath = os.path.abspath(__file__).replace(os.path.basename(__file__), "")
 path = basepath.replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
@@ -28,7 +28,7 @@ class Aircraft(Model):
         self.components = [self.solarcells, self.wing, self.battery,
                            self.empennage, self.engine]
 
-        Wpay = Variable("W_{pay}", 10, "lbf", "payload")
+        Wpay = Variable("W_{pay}", 10, "lbf", "payload weight")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Wcent = Variable("W_{cent}", "lbf", "center weight")
@@ -104,12 +104,12 @@ class Battery(Model):
 
         W = Variable("W", "lbf", "battery weight")
         eta_charge = Variable("\\eta_{charge}", 0.98, "-",
-                              "Battery charging efficiency")
+                              "charging efficiency")
         eta_discharge = Variable("\\eta_{discharge}", 0.98, "-",
-                                 "Battery discharging efficiency")
+                                 "discharging efficiency")
         E = Variable("E", "J", "total battery energy")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery energy density")
+        hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery specific energy")
         vbatt = Variable("(E/\\mathcal{V})", 800, "W*hr/l",
                          "volume battery energy density")
         Volbatt = Variable("\\mathcal{V}", "m**3", "battery volume")
@@ -130,7 +130,7 @@ class SolarCells(Model):
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
         S = Variable("S", "ft**2", "solar cell area")
         W = Variable("W", "lbf", "solar cell weight")
-        etasolar = Variable("\\eta", 0.22, "-", "Solar cell efficiency")
+        etasolar = Variable("\\eta", 0.22, "-", "solar cell efficiency")
 
         constraints = [W >= rhosolar*S*g]
 
@@ -206,7 +206,7 @@ class FlightState(Model):
         rho = Variable("\\rho", "kg/m**3", "air density")
         mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity")
         ESirr = Variable("(E/S)_{irr}", esirr, "W*hr/m^2",
-                         "total daytime solar energy")
+                         "solar energy")
         PSmin = Variable("(P/S)_{min}", "W/m^2",
                          "minimum necessary solar power")
         ESday = Variable("(E/S)_{day}", "W*hr/m^2",
@@ -216,7 +216,7 @@ class FlightState(Model):
         ESvar = Variable("(E/S)_{var}", 1, "W*hr/m^2", "energy units variable")
         PSvar = Variable("(P/S)_{var}", 1, "W/m^2", "power units variable")
         tday = Variable("t_{day}", td, "hr", "Daylight span")
-        tnight = Variable("t_{night}", tn, "hr", "Night span")
+        tnight = Variable("t_{night}", tn, "hr", "night duration")
         pct = Variable("p_{wind}", 0.9, "-", "percentile wind speeds")
         Vwindref = Variable("V_{wind-ref}", 100.0, "m/s",
                             "reference wind speed")

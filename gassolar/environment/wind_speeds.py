@@ -2,6 +2,7 @@
 import pandas as pd
 import numpy as np
 import os
+import sys
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size':15})
 
@@ -81,6 +82,10 @@ def interpolate(xs, ys, x):
     return y
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+    else:
+        path = ""
 
     Fig, Ax = plt.subplots()
     # Colors = ["#253B6E", "#1F5F8B", "#1891AC"]
@@ -108,7 +113,7 @@ if __name__ == "__main__":
     Ax.grid()
     Ax.legend(loc=2, fontsize=15)
     # Ax.set_title("85%-95% Wind Speeds in Dec")
-    Fig.savefig("../../gassolarpaper/latvswind.pdf", bbox_inches="tight")
+    Fig.savefig(path + "latvswind.pdf", bbox_inches="tight")
 
     Fig, Ax = plt.subplots()
     Alt = range(1000, 80000, 1000)
@@ -140,7 +145,7 @@ if __name__ == "__main__":
     Ax.grid()
     Ax.legend(loc=1, fontsize=15)
     # Ax.set_title("85%-95% Wind Speeds in Dec")
-    Fig.savefig("../../gassolarpaper/altvswind.pdf", bbox_inches="tight")
+    Fig.savefig(path + "altvswind.pdf", bbox_inches="tight")
 
     Fig, Ax = plt.subplots()
     Colors = ["#1C226B", "#3E31AE", "#4AA9AF"]
@@ -175,4 +180,4 @@ if __name__ == "__main__":
     Ax.grid()
     Ax.legend(loc=1, fontsize=15)
     # Ax.set_title("85%-95% Wind Speeds at 45 deg Lat")
-    Fig.savefig("../../gassolarpaper/windvsmonth.pdf", bbox_inches="tight")
+    Fig.savefig(path + "windvsmonth.pdf", bbox_inches="tight")

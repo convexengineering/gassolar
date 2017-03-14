@@ -1,3 +1,4 @@
 all:
-	ipython powerlaw/engine_law.py
-	ipython DF70/fitDF70.py
+	ipython powerlaw/engine_law.py ../../../docs/figs/
+	ipython DF70/fitDF70.py ../../../docs/figs/
+

@@ -1,5 +1,6 @@
 "print sensitivities"
 import numpy as np
+import sys
 from gassolar.gas.gas import Mission
 from gassolar.environment.wind_speeds import get_windspeed
 from gassolar.solar.print_sens import plot_sens
@@ -42,8 +43,16 @@ if __name__ == "__main__":
         sol = M.solve("mosek")
         sols.append(sol)
 
-    varnames = ["V_{wind}_Mission, Loiter, FlightSegment", "W_{pay}", "\\eta_{prop}", "BSFC_{min}", "t_Mission, Loiter", "N_{max}_Mission, AircraftLoading, WingLoading, ChordSparL"]
+    varnames = ["V_{wind}_Mission, Loiter, FlightSegment", "W_{pay}", "\\eta_{prop}", "BSFC_{min}", "t_Mission, Loiter", "N_{max}_Mission, AircraftLoading, WingLoading, GustL"]
     latns = ["$V_{\\mathrm{wind}}$", "$W_{\\mathrm{pay}}$", "$\\eta_{\\mathrm{prop}}$", "$BSFC_{\\mathrm{min}}$", "$t_{\\mathrm{loiter}}$", "$N_{\\mathrm{max}}$"]
     sens_table(sols, varnames, filename="sens.generated.tex")
-    fig, ax = plot_sens(sols[2], varnames, latns=latns)
-    fig.savefig("../../gassolarpaper/gassensbar.pdf", bbox_inches="tight")
+    fig, ax = plot_sens(M, sols[2], varnames, latns=latns)
+
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+        fig.savefig(path + "gassensbar.pdf", bbox_inches="tight")
+        print path
+        print sys.argv
+    else:
+        fig.savefig("gassensbar.pdf", bbox_inches="tight")
+

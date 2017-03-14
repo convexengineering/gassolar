@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import sys
 plt.rcParams.update({'font.size':15})
 
 def text_to_df(filename):
@@ -77,4 +78,8 @@ if __name__ == "__main__":
     Re = range(200, 750, 50)
     X, Y = fit_setup(Re) # call fit(X, Y, 4, "SMA") to get fit
     F, A = plot_fits([300, 350, 400, 450, 500])
-    F.savefig("../../../gassolarpaper/jho1polarfit1.pdf", bbox_inches="tight")
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+        F.savefig(path + "jho1polarfit1.pdf", bbox_inches="tight")
+    else:
+        F.savefig(path + "jho1polarfit1.pdf", bbox_inches="tight")

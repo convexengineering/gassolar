@@ -2,8 +2,11 @@
 import numpy as np
 from numpy import sin, tan, cos, arccos, deg2rad
 import matplotlib.pyplot as plt
+from gpfit.fit import fit
+import sys
 import pandas as pd
 plt.rcParams.update({'font.size':15})
+GENERATE = False
 
 def get_Eirr(latitude, day, N=50.0):
     """
@@ -42,6 +45,11 @@ def get_Eirr(latitude, day, N=50.0):
     return E, tday, tnight, plot
 
 if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+    else:
+        path = ""
+
     ES, td, tn, p = get_Eirr(30, 355, N=1000)
     fig, ax = plt.subplots()
     ax.fill_between([-12, -td/2], 0, 80, alpha=0.3, facecolor="b",
@@ -75,7 +83,7 @@ if __name__ == "__main__":
     ax2 = ax.twinx()
     ax2.set_yticks([0, 80, 900])
     ax2.set_yticklabels(["", "$(P/S)_{\mathrm{min}}$", ""])
-    fig.savefig("../../gassolarpaper/lat30.pdf", bbox_inches="tight")
+    fig.savefig(path + "lat30.pdf", bbox_inches="tight")
 
     # solar irradiance by year
     Fig, Ax = plt.subplots()
@@ -100,13 +108,17 @@ if __name__ == "__main__":
     Ax.grid()
     Ax.set_xlim([0, 365])
     Ax.set_ylim([0, 12000])
-    Fig.savefig("../../gassolarpaper/eirrvsmonth.pdf", bbox_inches="tight")
-    
+    Fig.savefig(path + "eirrvsmonth.pdf", bbox_inches="tight")
+
     data = {}
     fig1, ax1 = plt.subplots()
     fig2, ax2 = plt.subplots()
-    # for l in range(20, 61):
-    for l, col in zip([30], ["g"]):
+
+    if GENERATE:
+        lat = range(20, 61)
+    else:
+        lat = [30]
+    for l in lat:
 
         ES, td, tn, p = get_Eirr(l, 355)
         params = [l]
@@ -125,8 +137,8 @@ if __name__ == "__main__":
         cn, rm = fit(x, y, 1, "MA")
         print "RMS error: %.4f" % rm
         yfit = cn.evaluate(x)
-        ax1.plot(P[1:-15], 2*C[:-14], "o", c=col, markerfacecolor="none", mew=1.5)
-        ax1.plot(P[1:-15], np.exp(yfit), c=col, label="%dth Latitude" % l, lw=2)
+        ax1.plot(P[1:-15], 2*C[:-14], "o", c="g", markerfacecolor="none", mew=1.5)
+        ax1.plot(P[1:-15], np.exp(yfit), c="g", label="%dth Latitude" % l, lw=2)
         ax1.set_xlabel("Minimum Necessary Power $(P/S)_{\mathrm{min}}$ [W/m$^2$]", fontsize=19)
         ax1.set_ylabel("Twilight Energy $(E/S)_{\mathrm{twilight}}}$ [Whr/m$^2$]", fontsize=19)
         ax1.grid()
@@ -138,8 +150,8 @@ if __name__ == "__main__":
         cn, rm = fit(x, y, 1, "MA")
         print "RMS error: %.4f" % rm
         yfit = cn.evaluate(x)
-        ax2.plot(P[1:-15], 2*B[:-14], "o", c=col, markerfacecolor="none", mew=1.5)
-        ax2.plot(P[1:-15], np.exp(yfit), c=col, label="%dth Latitude" % l, lw=2)
+        ax2.plot(P[1:-15], 2*B[:-14], "o", c="g", markerfacecolor="none", mew=1.5)
+        ax2.plot(P[1:-15], np.exp(yfit), c="g", label="%dth Latitude" % l, lw=2)
         ax2.grid()
         ax2.set_xlabel("Minimum Necessary Power $(P/S)_{\mathrm{min}}$ [W/m$^2$]", fontsize=19)
         ax2.set_ylabel("Daytime Energry $(E/S)_{\mathrm{day}}$ [Whr/m$^2$]", fontsize=19)
@@ -147,9 +159,11 @@ if __name__ == "__main__":
         params.append(cn[0].right.exp[list(cn[0].varkeys["u_fit_(0,)"])[0]])
         data["%d" % l] = params
 
-    fig1.savefig("../../gassolarpaper/Cenergy.pdf")
-    fig2.savefig("../../gassolarpaper/Benergy.pdf")
-    # df = pd.DataFrame(data).transpose()
-    # colnames = ["latitude", "Cc", "Ce", "Bc", "Be"]
-    # df.columns = colnames
-    # df.to_csv("solarirrdata.csv")
+    if GENERATE:
+        df = pd.DataFrame(data).transpose()
+        colnames = ["latitude", "Cc", "Ce", "Bc", "Be"]
+        df.columns = colnames
+        df.to_csv("solarirrdata.csv")
+    else:
+        fig1.savefig(path + "Cenergy.pdf")
+        fig2.savefig(path + "Benergy.pdf")

@@ -1,12 +1,12 @@
 """Jungle Hawk Owl"""
 import numpy as np
-from gpkitmodels.aircraft.GP_submodels.gas_engine import Engine
-from gpkitmodels.aircraft.GP_submodels.wing import Wing
-from gpkitmodels.aircraft.GP_submodels.elliptical_fuselage import Fuselage
-from gpkitmodels.aircraft.GP_submodels.empennage import Empennage
-from gpkitmodels.aircraft.GP_submodels.tail_boom import TailBoomState
-from gpkitmodels.aircraft.GP_submodels.tail_boom_flex import TailBoomFlexibility
-from gpkitmodels.helpers import summing_vars
+from gpkitmodels.GP.aircraft.engine.gas_engine import Engine
+from gpkitmodels.GP.aircraft.wing.wing import Wing
+from gpkitmodels.GP.aircraft.fuselage.elliptical_fuselage import Fuselage
+from gpkitmodels.GP.aircraft.tail.empennage import Empennage
+from gpkitmodels.GP.aircraft.tail.tail_boom import TailBoomState
+from gpkitmodels.SP.aircraft.tail.tail_boom_flex import TailBoomFlexibility
+from gpkitmodels.tools.summing_constraintset import summing_vars
 from gpkit import Model, Variable, Vectorize, units
 from flight_segment import FlightSegment
 from loiter import Loiter

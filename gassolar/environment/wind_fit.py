@@ -2,6 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+import sys
 from gassolar.environment.wind_speeds import get_windspeed, interpolate
 from gpfit.fit import fit
 plt.rc("text", usetex=True)
@@ -91,6 +92,11 @@ def plot_fits(xdata, ydata, yfit, latitude):
 
 if __name__ == "__main__":
 
+    if len(sys.argv) > 1:
+        path = sys.argv[1]
+    else:
+        path = ""
+
     if GENERATE:
         latitude = range(20, 61, 1)
     else:
@@ -151,8 +157,7 @@ if __name__ == "__main__":
                 print "RMS Error: %.3f, Alt iter=%d" % (rm, j)
         fig, ax = plot_fits(X, Y, yfit, l)
         if not GENERATE:
-            fig.savefig("../../gassolarpaper/windfitl%d.pdf" % l,
-                        bbox_inches="tight")
+            fig.savefig(path + "windfitl%d.pdf" % l, bbox_inches="tight")
         plt.close()
 
     if GENERATE:

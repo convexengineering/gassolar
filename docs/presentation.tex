@@ -9,15 +9,21 @@
  \usepackage[sort, numbers]{natbib}
  \usepackage{siunitx}
 \newcommand{\tikzmark}[1]{\tikz[remember picture] \node[coordinate] (#1) {#1};}
+\setbeamertemplate{footline}
+{\begin{beamercolorbox}[sep=1ex]{author in head/foot}
+     \rlap{}\hfill\llap{\insertframenumber}%
+     \end{beamercolorbox}%
+     }
    
 %Information to be included in the title page:
 \title{Solar-Electric and Gas Powered, Long-Endurance UAV Sizing via Geometric Programming}
 \author{Michael Burton and Warren Hoburg}
 \institute{Massachusetts Institute of Technology}
-\date{Feb 24, 2017}
+\date{March 20, 2017}
  
 \begin{document}
  
+\graphicspath{{./figs/}}
 \frame{\titlepage}
  
 \begin{frame}
@@ -71,7 +77,7 @@
 
     $ V_{\text{wind}} = f(\text{Lat}, \text{ Alt},  \text{ Day}, \text{ Percentile Wind Speed}) $
 
-    Demonstrated \pause
+    \pause
     \begin{itemize}
         \item 90th Percentile Wind $\rightarrow V \geq V_{\text{wind}}$ 90\% of the time
         \end{itemize}
@@ -489,7 +495,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Aerodynamics}
+    \frametitle{Estimating Drag}
 
     \pause
     \[ C_D \geq C_{d_0} + c_{d_p} + \frac{C_L^2}{\pi e A} \]
@@ -685,7 +691,7 @@
 
 
     \begin{center}
-    \includegraphics[width=0.7\textwidth]{windaltoper.pdf} \\
+    \includegraphics[width=0.7\textwidth]{windaltoper2.pdf} \\
     \end{center}
     
     \[ W_{\text{structural}} \geq \text{MTOW} f_{\text{structural}} \]
@@ -714,7 +720,7 @@
     \frametitle{With and Without Wind Speed Constraint}
 
     \begin{center}
-    \includegraphics[width=1.0\textwidth]{polarmission.pdf} \\
+    \includegraphics[width=1.0\textwidth]{polarmission2.pdf} \\
     \end{center}
 
 \end{frame}
@@ -724,6 +730,7 @@
 
     \pause
     Sensitivity of variable $x$ is $a$ \\
+    \pause
     1\% increase in $x \rightarrow$ $a\%$ increase in objective 
     \pause
     \begin{center}
@@ -731,9 +738,6 @@
         90th percentile winds, 30 degrees latitude
     \includegraphics[width=0.6\textwidth]{solarsensbar.pdf} 
     \end{center}
-
-    \pause
-    Break-even point = ratio of sensitivities
 
 \end{frame}
 

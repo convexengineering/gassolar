@@ -1,2 +1,2 @@
 all:
-	ipython arctan/arctan_fits.py
+	ipython arctan/arctan_fit.py ../../../docs/figs/

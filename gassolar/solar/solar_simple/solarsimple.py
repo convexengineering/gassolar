@@ -1,7 +1,7 @@
 " Simple Solar-Electric Powered Aircraft Model "
 from gassolar.environment.solar_irradiance import get_Eirr
 from gpkit import Model, Variable
-from gpkitmodels.aircraft.GP_submodels.wing import WingAero
+from gpkitmodels.GP.aircraft.wing.wing import WingAero
 from gassolar.solar.solar import FlightState
 
 class Aircraft(Model):

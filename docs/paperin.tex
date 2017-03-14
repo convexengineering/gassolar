@@ -1,83 +1,4 @@
-% `advanced_example.tex', an advanced example employing the AIAA class
-% plus other third-party LaTeX packages.
-%
-% For a bare-bones usage, see `template.tex'.
-%
-% Typical processing for PostScript (PS) output:
-%
-%  latex advanced_example
-%  bibtex advanced_example  (bibliography)
-%  makeindex -s nomencl.ist -o advanced_example.gls advanced_example.glo
-%                            (nomenclature)
-%  latex advanced_example   (repeat as needed to resolve references)
-%
-%  xdvi advanced_example    (onscreen draft display)
-%  dvips advanced_example   (postscript)
-%  gv advanced_example.ps   (onscreen display)
-%  lpr advanced_example.ps  (hardcopy)
-%
-% With the above, only Encapsulated PostScript (EPS) images can be used.
-%
-%
-%  pdflatex advanced_example
-%  bibtex advanced_example    (bibliography)
-%  makeindex -s nomencl.ist -o advanced_example.gls advanced_example.glo
-%                              (nomenclature)
-%  pdflatex advanced_example  (repeat as needed to resolve references)
-%
-%  acroread advanced_example.pdf  (onscreen display)
-%
-% If you have EPS figures, you will need to use the epstopdf script
-% to convert them to PDF because PDF is a limmited subset of EPS.
-% pdflatex accepts a variety of other image formats such as JPG, TIFF,
-% PNG, and so forth -- check the documentation for your version.
-%
-% If you do *not* specify suffixes when using the graphicx package's
-% \includegraphics command, latex and pdflatex will automatically select
-% the appropriate figure format from those available.  This allows you
-% to produce PS and PDF output from the same LaTeX source file.
-%
-% To generate a large format (e.g., 11"x17") PostScript copy for editing
-% purposes, use
-%
-%  dvips -x 1467 -O -0.65in,0.85in -t tabloid advanced_example
-%
-% For further details and support, read the Users Manual, aiaa.pdf.
-
-\documentclass[]{aiaa-tc2}% insert '[draft]' option to show overfull boxes
-
- \usepackage{varioref}%  smart page, figure, table, and equation referencing
- \usepackage{wrapfig}%   wrap figures/tables in text (i.e., Di Vinci style)
- \usepackage{threeparttable}% tables with footnotes
- \usepackage{dcolumn}%   decimal-aligned tabular math columns
-  \newcolumntype{d}{D{.}{.}{-1}}
- \usepackage{nomencl}%   nomenclature generation via makeindex
-  \makeglossary
- \usepackage{amssymb,amsmath}
- \usepackage{subfigure}% subcaptions for subfigures
- \usepackage{subfigmat}% matrices of similar subfigures, aka small mulitples
- \usepackage{fancyvrb}%  extended verbatim environments
- \fvset{fontsize=\footnotesize,xleftmargin=2em}
- \usepackage{lettrine}%  dropped capital letter at beginning of paragraph
-%  \usepackage[dvips]{dropping}% alternative dropped capital package
- \usepackage[colorlinks]{hyperref}%  hyperlinks [must be loaded after dropping]
- \usepackage{float}
- \usepackage{longtable,booktabs,tabularx}
- \restylefloat{table}
- \usepackage{graphicx}
- \usepackage{caption}
- \usepackage{siunitx}
- \usepackage{multicol}
- \usepackage{indentfirst}
- \usepackage[labelfont=bf]{caption}
- \usepackage{multirow}
- \usepackage{setspace}
- \usepackage[sort, numbers]{natbib}
- \usepackage{draftwatermark}
- \SetWatermarkScale{3}
- % \doublespacing
-
- \title{Solar-Electric and Gas Powered, Long-Endurance UAV Sizing via Geometric Programming}
+\title{Solar-Electric and Gas Powered, Long-Endurance UAV Sizing via Geometric Programming}
 
  \author{
   Michael Burton \thanks{Master's Candidate, Aeronautics and Astronautics Engineering, 77 Mass Ave, Cambridge MA, 02139, AIAA Student.}
@@ -102,6 +23,7 @@
 
 \begin{document}
 
+\graphicspath{{./figs/}} 
 \maketitle
 
 \begin{abstract}
@@ -753,7 +675,7 @@ The non-wing drag coefficient $C_{d_0}$, is estimated as a drag build up from th
 
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width=0.6\textwidth,natwidth=536,natheight=405]{JH01polar.pdf}
+	\includegraphics[width=0.6\textwidth,natwidth=536,natheight=405]{jho1polarfit1.pdf}
     \caption{\textbf{Posynomial fit (solid lines) to XFOIL data (circles).  (Log-space RMS error~=~0.00489.)}}
 	\label{f:JH01polar}
 	\end{center}
@@ -1473,7 +1395,7 @@ Therefore, by adding a structural model the optimization seeks a smaller wing to
 
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width=0.6\textwidth,natwidth=519,natheight=405]{windaltoper.pdf}
+	\includegraphics[width=0.6\textwidth,natwidth=519,natheight=405]{windaltoper2.pdf}
  \caption{\textbf{Comparison of simplified and detailed structural models highlights trade between wing weight and air density.}}
  \label{f:altoper}
 	\end{center}
@@ -1487,7 +1409,7 @@ If it is assumed that wind speeds are negligible or that station-keeping is not 
 
 \begin{figure}[H]
 	\begin{center}
-	\includegraphics[width=0.6\textwidth,natwidth=555,natheight=415]{polarmission.pdf}
+	\includegraphics[width=0.6\textwidth,natwidth=555,natheight=415]{polarmission2.pdf}
     \caption{\textbf{Wind speed constraint moves lift to drag ratio off maximum $(C_L^{1.5}/C_D)$ point (plus signs). Solid lines are drag polars.}}
  \label{f:polarmission}
 	\end{center}
