@@ -15,6 +15,7 @@ The gas and solar models respectively live in:
 In order to run these models this repository must be installed as well as 2 additional repositories:
 
 [Gpkit](https://github.com/hoburg/gpkit)
+
 [gpkit-models](https://github.com/hoburg/gpkit-models)
 
 More documentation is available on these repos, but essentially [Gpkit](https://github.com/hoburg/gpkit) is a python based program that facilitates the use of geometric programming as an optimization routine.  [gpkit-models](https://github.com/hoburg/gpkit-models) is a repository with existing geometric and signomial models some of which are shared by the gas and solar powered aircraft. Both repositories can be installed using
@@ -27,11 +28,13 @@ pip install -e
 This project has inspired a paper, "Solar-Electric and Gas Powered, Long-Endurance UAV Sizing via Geometric Programming," which can be generated here using the following commands:
 
 `cd ./gassolar/` 
+
 `make` generates all figures in document (will take about 45-60 min)
 
 All figures are saved in `./docs/figs/`
 
 `cd ./docs/`
+
 `make` to generate latex documents, including a presentation
 
 The fitted function data for wind speed and solar irradiance by latitude is included in this repository:
