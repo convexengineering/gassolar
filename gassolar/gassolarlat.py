@@ -69,6 +69,7 @@ def plot_lats():
     b = psolar[0][indl]-a*lat[indl]
     c = a*lat[indh+1:indl+1] + b
     ax.fill_between(lat[0:indl+1], psolar[0][0:indl+1], np.append(np.array(psolar[-1][0:indh+1]), c), alpha=0.3, facecolor="b", edgecolor="None")
+    psolar[1][np.where(lat == 31)[0][0]] = np.nan
     ax.plot(lat, psolar[1], "b", lw=2)
     ax.plot(lat, pgas[1], "r", lw=2)
     ax.plot(lat, psolar[0], "b")

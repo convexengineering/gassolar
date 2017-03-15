@@ -51,8 +51,6 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         path = sys.argv[1]
         fig.savefig(path + "gassensbar.pdf", bbox_inches="tight")
-        print path
-        print sys.argv
     else:
         fig.savefig("gassensbar.pdf", bbox_inches="tight")
 

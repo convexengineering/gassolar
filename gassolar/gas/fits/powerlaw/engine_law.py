@@ -27,7 +27,7 @@ def plot_powerlaw(csv):
     ax.plot(u*WEIGHT, w*POWER, "o", mfc="None", mew=1.5)
     ax.plot(weight, np.exp(yfit)*POWER, lw=2)
     ax.set_xlabel("Engine Weight [lbs]")
-    ax.set_ylabel("Maximum Shaft Power [hp]")
+    ax.set_ylabel("Maximum SL Shaft Power [hp]")
     ax.legend(["UND Engine Data", "Power Law Fit"], loc=2)
     ax.grid()
     return fig, ax

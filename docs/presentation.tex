@@ -21,10 +21,14 @@
 \institute{Massachusetts Institute of Technology}
 \date{March 20, 2017}
  
+\titlegraphic{\includegraphics[width=\textwidth,height=.5\textheight]{jho.jpeg}}
 \begin{document}
  
 \graphicspath{{./figs/}}
-\frame{\titlepage}
+
+\begin{frame}
+    \titlepage
+\end{frame}
  
 \begin{frame}
 
@@ -58,7 +62,7 @@
                 \pause
                 \item Gas: time requirment (i.e. 5 days)
                 \pause
-                \item Solar: 24 hr availability $\rightarrow$ solar flux
+                \item Solar: complete one 24 hr cycle (continuous endurance)
                 \end{itemize}
         \pause
         \item Station keeping ($V \geq V_{\text{wind}}$)
@@ -91,7 +95,7 @@
 
     \pause
     \begin{itemize}
-        \item Gas: fuel 
+        \item Gas: fuel capacity
             \pause
         \item Solar-electric: winter solstice \\~\\
     \end{itemize}
@@ -147,7 +151,7 @@
     \pause
     \begin{columns}
         \column{0.55\textwidth}
-        \includegraphics[width=1.0\textwidth]{altvswind.pdf}
+        \includegraphics[width=1.0\textwidth]{altvswindhmin.pdf}
 
         \pause
         
@@ -365,6 +369,14 @@
 \end{frame}
 
 \begin{frame}
+
+    \begin{center}
+    \includegraphics[width=1.0\textwidth]{simpleaircraft.pdf}
+    \end{center}
+
+\end{frame}
+
+\begin{frame}
     \frametitle{Weight Breakdown}
 
     \pause
@@ -383,14 +395,6 @@
         W_{\text{batt}} &\geq \frac{E_{\text{batt}}}{h_{\text{batt}}} g \\
         E_{\text{batt}} &= 350 \text{ [Whr/kg]}
     \end{align*}
-
-\end{frame}
-
-\begin{frame}
-
-    \begin{center}
-    \includegraphics[width=1.0\textwidth]{simpleaircraft.pdf}
-    \end{center}
 
 \end{frame}
 
@@ -453,10 +457,8 @@
         \end{align*}
     \end{itemize}
         
-    \pause
     \column{0.5\textwidth}
         \includegraphics[width=1.0\textwidth]{latvswind.pdf} \\~\\
-        \pause
         \includegraphics[width=1.0\textwidth]{solaranglepic.pdf}
 
 \end{columns}
@@ -464,7 +466,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Lower Power Affects BSFC and Endurance}
+    \frametitle{Throttled Operation Affects BSFC and Endurance}
 
     \pause
     \[ \text{Breguet Endurance}: t = \frac{W_{\text{ave}}}{P_{\text{shaft}}\text{BSFC}g} \ln{\left( \frac{W_{\text{initial}}}{W_{\text{final}}}\right)} \]
@@ -495,7 +497,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Estimating Drag}
+    \frametitle{Drag Model}
 
     \pause
     \[ C_D \geq C_{d_0} + c_{d_p} + \frac{C_L^2}{\pi e A} \]
@@ -524,8 +526,6 @@
         Gust Loading ($N_{\text{max}}$ = 2) \\~\\
         \end{center}
     \end{columns}
-
-    \pause
 
     \begin{columns}
         \column{0.5\textwidth}
@@ -588,11 +588,11 @@
     \begin{columns}
         \column{0.5\textwidth}
         \begin{center}
-        Dimensional Constraints
+        Sizing Constraints
         \end{center}
         \column{0.5\textwidth}
         \begin{center}
-        Moment and Deflection Constraints
+        Stress and Deflection Constraints
         \end{center}
     \end{columns}
     
@@ -614,6 +614,20 @@
 
 \end{frame}
 
+\begin{frame}
+\frametitle{Generating Results}
+
+\begin{itemize}
+        \pause
+    \item Solve bag of constraints
+        \pause
+    \item Optimizing new aircraft each solve
+        \pause
+    \item Solve time $\sim$ 0.1-0.5 sec
+        \pause
+    \item Parameter sweeps
+    \end{itemize}
+\end{frame}
 
 
 \begin{frame}
@@ -633,7 +647,7 @@
     \pause
     \begin{center}
     \includegraphics[width=0.7\textwidth]{battsolarcontour.pdf} \\
-    Minimizing battery specific energy for solar cell efficiency sweeps, 90th percentile wind speeds
+    Minimizing battery specific energy for solar cell efficiency, 90th percentile wind speeds
     \end{center}
 
 \end{frame}
@@ -650,22 +664,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Changing Objectives on Solar Aircraft}
-
-    \pause
-    \begin{columns}
-        \column{0.5\textwidth}
-        \includegraphics[width=1.0\textwidth]{solarobjcomp.pdf}
-        
-        \column{0.5\textwidth}
-        \includegraphics[width=1.0\textwidth]{solarobjcomp2.pdf}
-    \end{columns}
-
-\end{frame}
-
-\begin{frame}
-    \frametitle{Changing Structural Models on Solar Aircraft}
-
+    \frametitle{Wind-Altitude Trade Off}
 
     \begin{center}
     \includegraphics[width=0.7\textwidth]{windaltoper0.pdf} \\
@@ -675,8 +674,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Changing Structural Models on Solar Aircraft}
-
+    \frametitle{Wind-Altitude Trade Off}
 
     \begin{center}
     \includegraphics[width=0.7\textwidth]{windaltoper1.pdf} \\
@@ -687,8 +685,7 @@
 \end{frame}
 
 \begin{frame}
-    \frametitle{Changing Structural Models on Solar Aircraft}
-
+    \frametitle{Wind-Altitude Trade Off}
 
     \begin{center}
     \includegraphics[width=0.7\textwidth]{windaltoper2.pdf} \\

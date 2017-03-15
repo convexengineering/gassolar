@@ -15,13 +15,15 @@ class FlightSegment(Model):
             altitude = [altitude]
         if all(x == altitude[0] for x in altitude):
             wind = get_windspeed(latitude, percent, altitude[0], day)
-            Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
+            Vwind = Variable("V_{wind}", wind, "m/s",
+                             "wind velocity at $h_{\\mathrm{min}}$")
 
         self.aircraft = aircraft
         with Vectorize(N):
             if not all(x == altitude[0] for x in altitude):
                 wind = get_windspeed(latitude, percent, altitude, day)
-                Vwind = Variable("V_{wind}", wind, "m/s", "wind velocity")
+                Vwind = Variable("V_{wind}", wind, "m/s",
+                                 "wind velocity at $h_{\\mathrm{min}}$")
             self.fs = FlightState(Vwind, latitude, percent, altitude, day)
             self.aircraftPerf = self.aircraft.flight_model(self.fs)
             self.slf = SteadyLevelFlight(self.fs, self.aircraft,
