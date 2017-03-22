@@ -264,7 +264,7 @@ class SteadyLevelFlight(Model):
     def setup(self, state, aircraft, perf, etap):
 
         T = Variable("T", "N", "thrust")
-        etaprop = Variable("\\eta_{prop}", etap, "-", "propulsive efficiency")
+        etaprop = Variable("\\eta_{prop}", etap, "-", "propeller efficiency")
 
         constraints = [
             aircraft["W_{total}"] <= (

@@ -35,7 +35,8 @@ def plot_sens(model, sol, varnames):
     for vname in varnames:
         sen = sol["sensitivities"]["constants"][vname]
         if hasattr(sen, "__len__"):
-            vk = max(sen)
+            val = max(np.abs(sen.values()))
+            vk = [svk for svk in sen if abs(sen[svk])==val][0]
             sen = sol["sensitivities"]["constants"][vk]
         else:
             vk = model[vname]
@@ -88,7 +89,7 @@ if __name__ == "__main__":
               "$\\eta_{\\mathrm{prop}}$"]
     sens_table(sols, varns, filename="test.tex")
     fig, ax = plot_sens(M, sols[3], varns)
-    varnsw = ["e", "t_{min}_Mission, Aircraft, Wing, WingSkin", "\\rho_{CFRP}_Mission, Aircraft, Wing, WingSkin", "\\eta_{discharge}", "\\eta_{charge}", "h_{batt}", "\\eta_Mission, Aircraft, SolarCells", "\\rho_{solar}", "\\eta_{prop}"]
+    varnsw = ["e", "t_{min}_Mission, Aircraft, Wing, WingSkin", "\\rho_{CFRP}", "\\eta_{discharge}", "\\eta_{charge}", "h_{batt}", "\\eta_Mission, Aircraft, SolarCells", "\\rho_{solar}", "\\eta_{prop}", "\\sigma_{CFRP}"]
     figw, axw = plot_sens(Ms[2], sols[2], varnsw)
     if len(sys.argv) > 1:
         path = sys.argv[1]
