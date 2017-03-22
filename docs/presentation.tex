@@ -1,4 +1,5 @@
 \documentclass{beamer}
+% \documentclass[aspectratio=169]{beamer}
  
 \usepackage{multirow}
 \usepackage{longtable,booktabs,tabularx}
@@ -8,6 +9,7 @@
 \usetikzlibrary{arrows,shapes}
  \usepackage[sort, numbers]{natbib}
  \usepackage{siunitx}
+ \usepackage[framemethod=default]{mdframed}
 \newcommand{\tikzmark}[1]{\tikz[remember picture] \node[coordinate] (#1) {#1};}
 \setbeamertemplate{footline}
 {\begin{beamercolorbox}[sep=1ex]{author in head/foot}
@@ -28,6 +30,51 @@
 
 \begin{frame}
     \titlepage
+\end{frame}
+
+\begin{frame}{Hoburg research group overview}
+Mission: make conceptual design reliable and efficient\\
+\begin{tabularx}{\textwidth}{XXX}
+\includegraphics[width=0.31\textwidth]{nlp_example6.pdf} &
+\includegraphics[width=0.31\textwidth]{gpkit-code.png} &
+\includegraphics[width=0.31\textwidth]{D8-day.jpg} \\ [-3.0ex]
+\begin{mdframed}[roundcorner=0pt]
+\parbox[t][0.85cm][t]{\linewidth}{\centering
+\vfill
+Optimization mathematics
+\vfill
+}
+\end{mdframed} &
+\begin{mdframed}[roundcorner=0pt]
+\parbox[t][0.85cm][t]{\linewidth}{\centering
+\vfill
+Design tools
+\vfill
+}
+\end{mdframed} &
+\begin{mdframed}[roundcorner=0pt]
+\parbox[t][0.85cm][t]{\linewidth}{\centering
+\vfill
+Aerospace applications
+\vfill
+}
+\end{mdframed} \\ [-3.5ex]
+\begin{itemize}
+\item Signomial programming
+\item Robust GP
+\item Black-box interfaces
+\end{itemize} &
+\begin{itemize}
+\item GPkit
+\item TRADES
+\end{itemize} &
+\begin{itemize}
+\item D8
+\item Jungle Hawk Owl
+\item Solar-electric
+\item 787 comp fab
+\end{itemize}
+\end{tabularx}
 \end{frame}
  
 \begin{frame}

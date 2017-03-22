@@ -23,10 +23,10 @@ class Aircraft(Model):
         self.wing = Wing(hollow=True)
         self.battery = Battery()
         self.empennage = Empennage()
-        self.engine = Engine()
+        self.motor = Motor()
 
         self.components = [self.solarcells, self.wing, self.battery,
-                           self.empennage, self.engine]
+                           self.empennage, self.motor]
 
         Wpay = Variable("W_{pay}", 10, "lbf", "payload weight")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
@@ -41,7 +41,7 @@ class Aircraft(Model):
             Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
             Wwing >= (sum(summing_vars([self.wing, self.battery,
                                         self.solarcells], "W"))),
-            Wcent >= Wpay + sum(summing_vars([self.empennage, self.engine],
+            Wcent >= Wpay + sum(summing_vars([self.empennage, self.motor],
                                              "W")),
             self.solarcells["S"] <= self.wing["S"],
             self.wing["c_{MAC}"]**2*0.5*self.wing["\\tau"]*self.wing["b"] >= (
@@ -69,15 +69,16 @@ class Aircraft(Model):
     def loading(self, Wcent, Wwing, V, CL):
         return AircraftLoading(self, Wcent, Wwing, V, CL)
 
-class Engine(Model):
+class Motor(Model):
     "the thing that provides power"
     def setup(self):
 
-        W = Variable("W", "lbf", "engine weight")
+        W = Variable("W", "lbf", "motor weight")
         Pmax = Variable("P_{max}", "W", "max power")
         Bpm = Variable("B_{PM}", 4140.8, "W/kg", "power mass ratio")
-        m = Variable("m", "kg", "engine mass")
+        m = Variable("m", "kg", "motor mass")
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
+        eta = Variable("\\eta", 0.95, "-", "motor efficiency")
 
         constraints = [Pmax == Bpm*m,
                        W >= m*g]
@@ -174,12 +175,12 @@ class AircraftPerf(Model):
                 Poper*state["t_{night}"]
                 + state["(E/S)_C"]*static.solarcells["\\eta"]
                 * static.solarcells["S"]),
-            Poper >= Pacc + Pshaft,
+            Poper >= Pacc + Pshaft/static.motor["\\eta"],
             Poper == (state["(P/S)_{min}"]*static.solarcells["S"]
                       * static.solarcells["\\eta"]),
             cda >= sum(dvars),
             CD >= cda + self.wing["C_d"],
-            Poper <= static.engine["P_{max}"]
+            Poper <= static.motor["P_{max}"]
             ]
 
         return self.flight_models, constraints

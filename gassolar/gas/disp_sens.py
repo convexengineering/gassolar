@@ -43,7 +43,7 @@ if __name__ == "__main__":
         sol = M.solve("mosek")
         sols.append(sol)
 
-    varnames = ["V_{wind}_Mission, Loiter, FlightSegment", "W_{pay}", "\\eta_{prop}", "BSFC_{min}", "t_Mission, Loiter", "N_{max}_Mission, AircraftLoading, WingLoading, GustL"]
+    varnames = ["V_{wind}_Mission, Loiter, FlightSegment", "W_{pay}", "\\eta_{prop}", "BSFC_{min}", "t_Mission, Loiter", "N_{max}_Mission, AircraftLoading, WingLoading, ChordSparL"]
     latns = ["$V_{\\mathrm{wind}}$", "$W_{\\mathrm{pay}}$", "$\\eta_{\\mathrm{prop}}$", "$BSFC_{\\mathrm{min}}$", "$t_{\\mathrm{loiter}}$", "$N_{\\mathrm{max}}$"]
     sens_table(sols, varnames, filename="sens.generated.tex")
     fig, ax = plot_sens(M, sols[2], varnames, latns=latns)

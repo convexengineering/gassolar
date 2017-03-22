@@ -27,12 +27,12 @@ def sens_table(sols, varnames,
         f.write("\\bottomrule\n")
         f.write("\\end{longtable}")
 
-def plot_sens(model, sol, varnames, latns=None):
+def plot_sens(model, sol, varnames):
     fig, ax = plt.subplots()
     pss = []
     ngs = []
     sens = {}
-    for vname, latn in zip(varnames, latns):
+    for vname in varnames:
         sen = sol["sensitivities"]["constants"][vname]
         if hasattr(sen, "__len__"):
             vk = max(sen)
@@ -65,10 +65,12 @@ def plot_sens(model, sol, varnames, latns=None):
 
 if __name__ == "__main__":
     sols = []
-    for l in [25, 30]:
+    Ms = []
+    for l in [25, 29]:
         for p in [85, 90]:
             M = Mission(latitude=l)
             M.cost = M["W_{total}"]
+            Ms.append(M)
             for vk in M.varkeys["p_{wind}"]:
                 M.substitutions.update({vk: p/100.0})
             sol = M.solve("mosek")
@@ -85,10 +87,14 @@ if __name__ == "__main__":
               "$h_{\\mathrm{batt}}$", "$W_{\\mathrm{pay}}$",
               "$\\eta_{\\mathrm{prop}}$"]
     sens_table(sols, varns, filename="test.tex")
-    fig, ax = plot_sens(M, sols[3], varns, latns=latns)
+    fig, ax = plot_sens(M, sols[3], varns)
+    varnsw = ["e", "t_{min}_Mission, Aircraft, Wing, WingSkin", "\\rho_{CFRP}_Mission, Aircraft, Wing, WingSkin", "\\eta_{discharge}", "\\eta_{charge}", "h_{batt}", "\\eta_Mission, Aircraft, SolarCells", "\\rho_{solar}", "\\eta_{prop}"]
+    figw, axw = plot_sens(Ms[2], sols[2], varnsw)
     if len(sys.argv) > 1:
         path = sys.argv[1]
         fig.savefig(path + "solarsensbar.pdf", bbox_inches="tight")
+        figw.savefig(path + "solarsensbarw.pdf", bbox_inches="tight")
     else:
         fig.savefig("solarsensbar.pdf", bbox_inches="tight")
+        figw.savefig("solarsensbarw.pdf", bbox_inches="tight")
 
