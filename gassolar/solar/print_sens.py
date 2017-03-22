@@ -37,7 +37,8 @@ def plot_sens(model, sol, varnames):
         if hasattr(sen, "__len__"):
             val = max(np.abs(sen.values()))
             vk = [svk for svk in sen if abs(sen[svk])==val][0]
-            sen = sol["sensitivities"]["constants"][vk]
+            # sen = sol["sensitivities"]["constants"][vk]
+            sen = sum(sen.values())
         else:
             vk = model[vname]
         sens[vk] = sen
