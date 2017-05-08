@@ -23,7 +23,7 @@ for lat in range(20, 31, 2):
     M.cost = M["h_{batt}"]
     sol = M.solve("mosek")
     hmin = sol["cost"].magnitude + 1e-3
-    M.cost = M["b_Mission, Aircraft, Wing"]
+    M.cost = M["b_Mission/Aircraft/Wing"]
     xmin_ = np.linspace(hmin, hmax, 100)
     tol = 0.01
     bst = autosweep_1d(M, tol, M["h_{batt}"], [hmin, hmax], solver="mosek")

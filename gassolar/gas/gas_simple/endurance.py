@@ -29,7 +29,7 @@ for p in [85, 90, 95]:
             else:
                 M.substitutions.update({vk: wind})
         try:
-            bst = sweep_1d(M, tol, M["t_Mission, Loiter"], [lower, upper],
+            bst = sweep_1d(M, tol, M["t_Mission/Loiter"], [lower, upper],
                            solver="mosek")
             notpassing = False
         except RuntimeWarning:

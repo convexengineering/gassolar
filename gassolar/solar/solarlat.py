@@ -17,11 +17,11 @@ def plot_solarlat():
                 M = Mission(latitude=l)
                 for vk in M.varkeys["p_{wind}"]:
                     M.substitutions.update({vk: a/100.0})
-                # M.cost = M["b_Mission, Aircraft, Wing"]
+                # M.cost = M["b_Mission/Aircraft/Wing"]
                 M.cost = M["W_{total}"]
                 try:
                     sol = M.solve("mosek")
-                    # W.append(sol("b_Mission, Aircraft, Wing").magnitude)
+                    # W.append(sol("b_Mission/Aircraft/Wing").magnitude)
                     W.append(sol("W_{total}").magnitude)
                 except RuntimeWarning:
                     W.append(np.nan)

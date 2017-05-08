@@ -12,7 +12,7 @@ def return_cd(cl, re):
     return cd
 
 def ld_plot(model, num):
-    model.cost = 1/model["t_Mission, Loiter"]
+    model.cost = 1/model["t_Mission/Loiter"]
     for e in model.varkeys["\\eta_{prop}"]:
         model.substitutions.update({e: 0.75})
 
@@ -26,11 +26,11 @@ def ld_plot(model, num):
             model.substitutions.update({vk: wind})
     model.substitutions.update({"MTOW": 200})
     sol = model.solve("mosek")
-    re = sol("Re_Mission, Loiter, FlightSegment, AircraftPerf, WingAero")[-1]
+    re = sol("Re_Mission/Loiter/FlightSegment/AircraftPerf/WingAero")[-1]
 
     if num == 1 or num == 2:
-        clm = sol("C_L_Mission, Loiter, FlightSegment, AircraftPerf, WingAero")
-        cdm = sol("c_{dp}_Mission, Loiter, FlightSegment, AircraftPerf, WingAero")
+        clm = sol("C_L_Mission/Loiter/FlightSegment/AircraftPerf/WingAero")
+        cdm = sol("c_{dp}_Mission/Loiter/FlightSegment/AircraftPerf/WingAero")
         l = ax.plot(clm, cdm, "o", mfc="None", ms=7, mew=1.5,
                     label="With Wind Constraint")
         ax.annotate("mission start", xy=(clm[0], cdm[0]), xytext=(0.87, 0.0062),
@@ -48,8 +48,8 @@ def ld_plot(model, num):
         if "Loiter" in vk.descr["models"] and "FlightState" in vk.descr["models"]:
             model.substitutions.update({vk:0.01})
     sol = model.solve("mosek")
-    clw = sol("C_L_Mission, Loiter, FlightSegment, AircraftPerf, WingAero")
-    cdw = sol("c_{dp}_Mission, Loiter, FlightSegment, AircraftPerf, WingAero")
+    clw = sol("C_L_Mission/Loiter/FlightSegment/AircraftPerf/WingAero")
+    cdw = sol("c_{dp}_Mission/Loiter/FlightSegment/AircraftPerf/WingAero")
     if num == 2:
         l = ax.plot(clw, cdw, "s", mfc="None", ms=7, mew=1.5,
                     label="Without Wind Constraint")
@@ -62,7 +62,7 @@ def ld_plot(model, num):
     l = ax.plot(cl, cd, linewidth=2, label="Re=%3.fk" % (re/1000.),
                 c="#084081", zorder=1)
     lines = [l[0]]
-    re = sol("Re_Mission, Loiter, FlightSegment, AircraftPerf, WingAero")
+    re = sol("Re_Mission/Loiter/FlightSegment/AircraftPerf/WingAero")
     for i, r, col in zip(range(5), re, ["#0868ac","#0868ac","#0868ac", "#2b8cbe", "#2b8cbe"]):
         cd = return_cd(cl, r)
         cl15 = cl**1.5/cd
@@ -105,4 +105,3 @@ if __name__ == "__main__":
             M = Mission()
             fig, ax = ld_plot(M, num)
             fig.savefig("polarmission%d.pdf" % num)
-

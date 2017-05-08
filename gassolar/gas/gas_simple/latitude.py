@@ -12,7 +12,7 @@ for e in M.varkeys["\\eta_{prop}"]:
     M.substitutions.update({e: 0.75})
 for cd in M.varkeys["CDA_0"]:
     M.substitutions.update({cd: 0.01})
-M.substitutions.update({"t_Mission, Loiter": 7})
+M.substitutions.update({"t_Mission/Loiter": 7})
 M.cost = M["MTOW"]
 for a in [80, 90, 95]:
     mtow = []

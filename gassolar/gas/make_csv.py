@@ -38,21 +38,21 @@ def sketch_params(M, sol, varnames, othervars=None, pointmasses=None):
 
 if __name__ == "__main__":
     M = Mission()
-    M.cost = 1/M["t_Mission, Loiter"]
+    M.cost = 1/M["t_Mission/Loiter"]
     sol = M.solve("mosek")
 
     sketchvars = [
-        "R_Mission, Aircraft, Fuselage",
-        "S_Mission, Aircraft, Wing", "b_Mission, Aircraft, Wing",
-        "l_Mission, Aircraft, Empennage, TailBoom", "d_0",
-        "b_Mission, Aircraft, Empennage, HorizontalTail",
-        "S_Mission, Aircraft, Empennage, HorizontalTail",
-        "b_Mission, Aircraft, Empennage, VerticalTail",
-        "S_Mission, Aircraft, Empennage, VerticalTail",
-        "\\tau_Mission, Aircraft, Wing", "k_{nose}", "k_{body}", "k_{bulk}",
-        "\\lambda_Mission, Aircraft, Wing",
-        "\\lambda_Mission, Aircraft, Empennage, HorizontalTail",
-        "\\lambda_Mission, Aircraft, Empennage, VerticalTail"]
+        "R_Mission/Aircraft/Fuselage",
+        "S_Mission/Aircraft/Wing", "b_Mission/Aircraft/Wing",
+        "l_Mission/Aircraft/Empennage/TailBoom", "d_0",
+        "b_Mission/Aircraft/Empennage/HorizontalTail",
+        "S_Mission/Aircraft/Empennage/HorizontalTail",
+        "b_Mission/Aircraft/Empennage/VerticalTail",
+        "S_Mission/Aircraft/Empennage/VerticalTail",
+        "\\tau_Mission/Aircraft/Wing", "k_{nose}", "k_{body}", "k_{bulk}",
+        "\\lambda_Mission/Aircraft/Wing",
+        "\\lambda_Mission/Aircraft/Empennage/HorizontalTail",
+        "\\lambda_Mission/Aircraft/Empennage/VerticalTail"]
     df = sketch_params(M, sol, sketchvars)
 
     df.to_csv("sketcher/16_82viewer/sketch_params.csv")

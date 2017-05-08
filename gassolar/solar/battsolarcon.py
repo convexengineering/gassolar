@@ -26,12 +26,12 @@ def plot_battsolarcon():
             for vk in M.varkeys["p_{wind}"]:
                 M.substitutions.update({vk: 90/100.0})
             del M.substitutions["h_{batt}"]
-            M.substitutions.update({"\\eta_Mission, Aircraft, SolarCells": 0.4})
+            M.substitutions.update({"\\eta_Mission/Aircraft/SolarCells": 0.4})
             M.cost = M["h_{batt}"]
             sol = M.solve("mosek")
             hmin = sol["cost"].magnitude + 1e-3
-            del M.substitutions["\\eta_Mission, Aircraft, SolarCells"]
-            M.cost = M["\\eta_Mission, Aircraft, SolarCells"]
+            del M.substitutions["\\eta_Mission/Aircraft/SolarCells"]
+            M.cost = M["\\eta_Mission/Aircraft/SolarCells"]
             xmin_ = np.linspace(hmin, hmax, 100)
             tol = 0.01
             notpassing = True

@@ -37,7 +37,7 @@ def gas_lat(model, cost, subs=None):
 if __name__ == "__main__":
     M = Mission()
     cost = "MTOW"
-    subs = {"W_{pay}": 10, "t_Mission, Loiter": 7}
+    subs = {"W_{pay}": 10, "t_Mission/Loiter": 7}
     fig, ax = gas_lat(M, cost, subs=subs)
 
     ax.set_ylim([0, 500])
@@ -50,5 +50,3 @@ if __name__ == "__main__":
         fig.savefig(path + "mtowvslatgas.pdf", bbox_inches="tight")
     else:
         fig.savefig("mtowvslatgas.pdf", bbox_inches="tight")
-
-

@@ -11,7 +11,7 @@ def plot_objectivecomp(path=None):
     lat = np.arange(20, 40, 1)
     l1 = []
     l2 = []
-    for obj in ["b_Mission, Aircraft, Wing", "S_Mission, Aircraft, SolarCells"]:
+    for obj in ["b_Mission/Aircraft/Wing", "S_Mission/Aircraft/SolarCells"]:
         W = []
         SS = []
         runagain = True
@@ -24,8 +24,8 @@ def plot_objectivecomp(path=None):
                 M.cost = M[obj]
                 try:
                     sol = M.solve("mosek")
-                    W.append(sol("b_Mission, Aircraft, Wing").magnitude)
-                    SS.append(sol("S_Mission, Aircraft, SolarCells").magnitude)
+                    W.append(sol("b_Mission/Aircraft/Wing").magnitude)
+                    SS.append(sol("S_Mission/Aircraft/SolarCells").magnitude)
                 except RuntimeWarning:
                     W.append(np.nan)
                     SS.append(np.nan)

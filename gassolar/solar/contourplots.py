@@ -33,36 +33,36 @@ def plot_contours(path=None):
                 M.substitutions.update({vk: 0.75})
             for vk in M.varkeys["p_{wind}"]:
                 M.substitutions.update({vk: av/100.0})
-            del M.substitutions["\\eta_Mission, Aircraft, SolarCells"]
+            del M.substitutions["\\eta_Mission/Aircraft/SolarCells"]
             del M.substitutions["h_{batt}"]
             M.cost = M["h_{batt}"]
             lines = []
             midx = []
             for b in bs:
-                M.substitutions.update({"b_Mission, Aircraft, Wing": b})
-                M.substitutions.update({"\\eta_Mission, Aircraft, SolarCells":
+                M.substitutions.update({"b_Mission/Aircraft/Wing": b})
+                M.substitutions.update({"\\eta_Mission/Aircraft/SolarCells":
                                         etamax})
                 sol = M.solve("mosek")
                 if sol("h_{batt}").magnitude < hmin:
                     M.substitutions.update({"h_{batt}": hmin})
-                    del M.substitutions["\\eta_Mission, Aircraft, SolarCells"]
-                    M.cost = M["\\eta_Mission, Aircraft, SolarCells"]
+                    del M.substitutions["\\eta_Mission/Aircraft/SolarCells"]
+                    M.cost = M["\\eta_Mission/Aircraft/SolarCells"]
                     sol = M.solve("mosek")
-                    etamax = sol("\\eta_Mission, Aircraft, SolarCells")
+                    etamax = sol("\\eta_Mission/Aircraft/SolarCells")
                 else:
                     etammax = 0.5
-                    del M.substitutions["\\eta_Mission, Aircraft, SolarCells"]
+                    del M.substitutions["\\eta_Mission/Aircraft/SolarCells"]
 
                 M.substitutions.update({"h_{batt}": hmax})
-                M.cost = M["\\eta_Mission, Aircraft, SolarCells"]
+                M.cost = M["\\eta_Mission/Aircraft/SolarCells"]
                 sol = M.solve("mosek")
-                etamin = sol("\\eta_Mission, Aircraft, SolarCells")
+                etamin = sol("\\eta_Mission/Aircraft/SolarCells")
 
                 del M.substitutions["h_{batt}"]
                 M.cost = M["h_{batt}"]
                 xmin_ = np.linspace(etamin, etamax, 100)
                 tol = 0.01
-                bst = autosweep_1d(M, tol, M["\\eta_Mission, Aircraft, SolarCells"],
+                bst = autosweep_1d(M, tol, M["\\eta_Mission/Aircraft/SolarCells"],
                                [etamin, etamax], solver="mosek")
 
                 if b % 10 == 0:
@@ -76,7 +76,7 @@ def plot_contours(path=None):
                             zorder=100)
 
             # parato fontier
-            del M.substitutions["b_Mission, Aircraft, Wing"]
+            del M.substitutions["b_Mission/Aircraft/Wing"]
             lower = 0.15
             upper = 0.4
             xmin_ = np.linspace(lower, upper, 100)
@@ -85,7 +85,7 @@ def plot_contours(path=None):
             while notpassing:
                 try:
                     bst = autosweep_1d(M, tol,
-                                       M["\\eta_Mission, Aircraft, SolarCells"],
+                                       M["\\eta_Mission/Aircraft/SolarCells"],
                                        [lower, upper], solver="mosek")
                     notpassing = False
                 except RuntimeWarning:
