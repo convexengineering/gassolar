@@ -78,7 +78,7 @@ if __name__ == "__main__":
             sol = M.solve("mosek")
             sols.append(sol)
 
-    varns =  ["p_{wind}", "\\eta_Mission, Aircraft, SolarCells",
+    varns =  ["p_{wind}", "\\eta_Mission/Aircraft, SolarCells",
               "\\eta_{charge}", "\\eta_{discharge}", "\\rho_{solar}",
               "t_{night}", "(E/S)_{irr}", "h_{batt}", "W_{pay}",
               "\\eta_{prop}"]
@@ -90,7 +90,7 @@ if __name__ == "__main__":
               "$\\eta_{\\mathrm{prop}}$"]
     sens_table(sols, varns, filename="test.tex")
     fig, ax = plot_sens(M, sols[3], varns)
-    varnsw = ["e", "t_{min}_Mission, Aircraft, Wing, WingSkin", "\\rho_{CFRP}", "\\eta_{discharge}", "\\eta_{charge}", "h_{batt}", "\\eta_Mission, Aircraft, SolarCells", "\\rho_{solar}", "\\eta_{prop}", "\\sigma_{CFRP}"]
+    varnsw = ["e", "t_{min}_Mission/Aircraft/Wing/WingSkin", "\\rho_{CFRP}", "\\eta_{discharge}", "\\eta_{charge}", "h_{batt}", "\\eta_Mission/Aircraft/SolarCells", "\\rho_{solar}", "\\eta_{prop}", "\\sigma_{CFRP}"]
     figw, axw = plot_sens(Ms[2], sols[2], varnsw)
     if len(sys.argv) > 1:
         path = sys.argv[1]
@@ -99,4 +99,3 @@ if __name__ == "__main__":
     else:
         fig.savefig("solarsensbar.pdf", bbox_inches="tight")
         figw.savefig("solarsensbarw.pdf", bbox_inches="tight")
-

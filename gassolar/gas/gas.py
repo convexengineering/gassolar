@@ -188,11 +188,11 @@ class Mission(Model):
 
 def test():
     M = Mission()
-    M.cost = 1/M["t_Mission, Loiter"]
+    M.cost = 1/M["t_Mission/Loiter"]
     M.solve()
 
 if __name__ == "__main__":
     M = Mission()
-    M.cost = 1/M["t_Mission, Loiter"]
+    M.cost = 1/M["t_Mission/Loiter"]
     sol = M.solve("mosek")
     print sol.table()

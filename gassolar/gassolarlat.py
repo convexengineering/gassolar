@@ -17,7 +17,7 @@ def plot_lats():
     lat = np.arange(20, 41, 1)
     Mg = Mgas()
     Mg.substitutions.update({"W_{pay}": 10})
-    Mg.substitutions.update({"t_Mission, Loiter": 7})
+    Mg.substitutions.update({"t_Mission/Loiter": 7})
     Mg.cost = Mg["MTOW"]
     psolar = []
     pgas = []
