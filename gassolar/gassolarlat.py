@@ -2,6 +2,7 @@
 from gassolar.solar.solar import Mission as Msolar
 from gassolar.gas.gas import Mission as Mgas
 from gassolar.environment.wind_speeds import get_windspeed
+from gassolar.solar.battsolarcon import find_sols
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -22,6 +23,10 @@ def plot_lats():
     psolar = []
     pgas = []
     faillat = []
+    gtime = 0.0
+    gnsols = 0
+    stime = 0.0
+    snsols = 0.0
     for a in [80, 90, 95]:
         wg = []
         ws = []
@@ -36,6 +41,8 @@ def plot_lats():
                 Ms.cost = Ms["W_{total}"]
                 try:
                     sol = Ms.solve("mosek")
+                    stime += sol["soltime"]
+                    snsols += 1
                     ws.append(sol("W_{total}").magnitude)
                 except RuntimeWarning:
                     ws.append(np.nan)
@@ -55,6 +62,8 @@ def plot_lats():
                         Mg.substitutions.update({vk: wind})
             try:
                 sol = Mg.solve("mosek")
+                gtime += sol["soltime"]
+                gnsols += 1
                 wg.append(sol("MTOW").magnitude)
             except RuntimeWarning:
                 wg.append(np.nan)
@@ -62,6 +71,10 @@ def plot_lats():
 
         pgas.append(wg)
         psolar.append(ws)
+
+
+    print "Solar: %d solves in %.4f seconds" % (snsols, stime)
+    print "Gas: %d solves in %.4f seconds" % (gnsols, gtime)
 
     indl = psolar[0].index(max(psolar[0]))
     indh = psolar[2].index(max(psolar[2]))
@@ -81,11 +94,11 @@ def plot_lats():
     for i, p in enumerate(["80%", "90%", "95%"]):
         ax.annotate(p, xy=(36,pgas[i][np.where(lat==36)[0][0]]), xytext=(0.1,-20), textcoords="offset points", arrowprops=dict(arrowstyle="-"), fontsize=12)
 
-    ax.annotate("80%", xy=(25,psolar[0][np.where(lat==25)[0][0]]), xytext=(0.1,-20), textcoords="offset points", arrowprops=dict(arrowstyle="-"), fontsize=12)
-    ax.annotate("90%", xy=(23,psolar[1][np.where(lat==23)[0][0]]), xytext=(0.1,-30), textcoords="offset points", arrowprops=dict(arrowstyle="-"), fontsize=12)
-    ax.annotate("95%", xy=(21,psolar[2][np.where(lat==21)[0][0]]), xytext=(0.1,-30), textcoords="offset points", arrowprops=dict(arrowstyle="-"), fontsize=12)
+    ax.annotate("80%", xy=(30,psolar[0][np.where(lat==30)[0][0]]), xytext=(15,15), textcoords="offset points", arrowprops=dict(arrowstyle="-"), fontsize=12)
+    ax.annotate("90%", xy=(28, psolar[1][np.where(lat==28)[0][0]]), xytext=(15,15), textcoords="offset points", arrowprops=dict(arrowstyle="-"), fontsize=12)
+    ax.annotate("95%", xy=(27,psolar[2][np.where(lat==27)[0][0]]), xytext=(-30,15), textcoords="offset points", arrowprops=dict(arrowstyle="-"), fontsize=12)
 
-    ax.set_ylim([0, 400])
+    ax.set_ylim([0, 350])
     ax.set_xlim([20, 40])
     ax.grid()
     ax.set_xlabel("Latitude Requirement [deg]")
@@ -93,7 +106,7 @@ def plot_lats():
     labels = ["$\\pm$" + item.get_text() for item in ax.get_xticklabels()]
     labels = ["$\\pm$%d" % l for l in np.linspace(20, 40, len(labels))]
     ax.set_xticklabels(labels)
-    ax.legend(["Solar-electric Powered", "Gas Powered (7-day endurance)"], fontsize=15, loc=2)
+    ax.legend(["Solar-electric Powered", "Gas Powered"], fontsize=15, loc=2)
     return fig, ax
 
 if __name__ == "__main__":

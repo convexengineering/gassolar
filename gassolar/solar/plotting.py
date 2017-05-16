@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from gpfit.softmax_affine import softmax_affine
+from gpfit.max_affine import max_affine
 import os
 import pandas as pd
 
@@ -15,14 +16,18 @@ def windalt_plot(latitude, sol1=None, sol2=None):
                 np.hstack([[p/100.0]*len(den)
                            for p in range(75, 100, 5) + [99]])]).T
 
-    df = DF[DF["latitude"] == latitude]
-    params = np.append(np.hstack([[
-        np.log((df["c%d" % i]**(1/df["alpha"])).iloc[0]),
-        (df["e%d1" % i]/df["alpha"]).iloc[0],
-        (df["e%d2" % i]/df["alpha"]).iloc[0]] for i in range(1, 5)]),
-                       1/df["alpha"].iloc[0])
+    # df = DF[DF["latitude"] == latitude]
+    df = pd.read_csv(path + "windfitsdec/windaltfit_lat%d.csv" % latitude)
+    ftype = df["ftype"].iloc[0]
+    K = df["K"].iloc[0]
+    if ftype == "SMA":
+        params = np.append(np.hstack([[
+            np.log((df["c%d" % i]**(1/df["a1"])).iloc[0]),
+            (df["e%d1" % i]/df["a1"]).iloc[0],
+            (df["e%d2" % i]/df["a1"]).iloc[0]] for i in range(1, K)]),
+                           1/df["a1"].iloc[0])
 
-    vwind = (np.exp(softmax_affine(x, params)[0])*100).reshape(6, 20)[3]
+        vwind = (np.exp(softmax_affine(x, params)[0])*100).reshape(6, 20)[3]
     fig, ax = plt.subplots()
     l = ax.plot(alt/1000.0, vwind*1.95384, linewidth=2)
     if sol1:

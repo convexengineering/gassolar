@@ -10,6 +10,7 @@ xfoil << EOF
 naca $1
 oper
 v $2e3
+cl 0.1
 pacc 
 $POLARFILE
 

@@ -13,7 +13,7 @@ PERCT_NORM = 100.0
 WIND_NORM = 100.0
 RHO_NORM = 1.0
 
-def fit_setup(altitude=(40000, 80000), latitude=45):
+def fit_setup(altitude=(40000, 80000), latitude=45, day=355):
     """
     Function that sets up the fit for altitude versus density. Density in
     10^-1 kg/m^3
@@ -39,7 +39,7 @@ def fit_setup(altitude=(40000, 80000), latitude=45):
     wind = []
     ps = []
     for p in percentiles:
-        wind.append(np.array(get_windspeed(latitude, p, altitude, 355))
+        wind.append(np.array(get_windspeed(latitude, p, altitude, day))
                     / WIND_NORM)
         ps.append([p/PERCT_NORM]*len(altitude))
 
@@ -78,8 +78,7 @@ def plot_fits(xdata, ydata, yfit, latitude):
             else:
                 wid = 1
             ax.plot(np.exp(x1), np.exp(yf)*WIND_NORM, c="#3E31AE", lw=wid)
-                    #label="%d Percentile Winds" % np.rint(np.exp(p)*PERCT_NORM))
-    #ax.legend(loc=2, fontsize=15)
+
     ax.fill_between(np.exp(x1), yfits[0], yfits[-1], alpha=0.2,
                     facecolor="#3E31AE", edgecolor="None")
     if not GENERATE:
@@ -87,8 +86,57 @@ def plot_fits(xdata, ydata, yfit, latitude):
             ax.text(np.exp(x1)[0]+0.005, yfits[i][0]-1.0, p)
     ax.set_xlabel("Air Density [kg/m$^3$]")
     ax.set_ylabel("Wind Speed [m/s]")
+    ax.legend(["ECF Wind Data", "GP approximation"], loc=2)
     ax.grid()
     return fig, ax
+
+def make_fits(day, latrange, month, gen=False, path=""):
+
+    for l in latrange:
+        print "Fitting for %d latitude" % l
+        altitudestart = range(40000, 50500, 500)
+        for j, a in enumerate(altitudestart):
+            print "Trying Altitude Range: %d-80000" % a
+            X, Y = fit_setup(altitude=(a, 80000), latitude=l, day=day)
+            rms_best = 1
+            cn_best = None
+            df_best = None
+            yfit = None
+            for K in range(2, 6):
+                for ftype in ["MA", "SMA"]:
+                    try:
+                        cns, err = fit(X, Y, K, ftype)
+                        print "Lat %d; K = %d; ftype = %s; RMS = %.4f" % (
+                            l, K, ftype, err[0])
+                    except ValueError:
+                        print "Fit failed: Lat %d; K = %d; ftype = %s;" % (
+                            l, K, ftype)
+                        err = [0.9, 0.9]
+                    if err[0] < rms_best:
+                        df = cns.get_dataframe(X)
+                        if "0.0" in df.values or "inf" in df.values:
+                            continue
+                        rms_best = err[0]
+                        cn_best, df_best = cns, df
+
+            if rms_best == 1:
+                print "Nothing worked... trying new altitude range"
+                continue
+            elif rms_best < 0.05:
+                print "success"
+                if gen:
+                    df_best.to_csv("windfits" + month
+                                   + "/windaltfit_lat%d.csv" % l)
+                else:
+                    yfit = cn_best.evaluate(X)
+                break
+            else:
+                print "Lowest RMS: %.3f, trying new altitude range" % rms_best
+        if not gen:
+            if not yfit is None:
+                fig, ax = plot_fits(X, Y, yfit, l)
+                fig.savefig(path + "windfitl%d.pdf" % l, bbox_inches="tight")
+                plt.close()
 
 if __name__ == "__main__":
 
@@ -97,74 +145,15 @@ if __name__ == "__main__":
     else:
         path = ""
 
+    np.random.seed(0)
+
+    mos = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
+           "oct", "nov", "dec"]
     if GENERATE:
         latitude = range(20, 61, 1)
+        for m in mos:
+            make_fits(21, latitude, month=m, gen=GENERATE, path=path)
     else:
-        latitude = [35]
+        latitude = [30]
+        make_fits(355, latitude, month="dec", path=path)
 
-    constraintlist = []
-    data = {}
-
-    for l in latitude:
-        print "Fitting for %d latitude" % l
-        altitudestart = range(40000, 50500, 500)
-        for j, a in enumerate(altitudestart):
-            X, Y = fit_setup(altitude=(a, 80000), latitude=l)
-            tol = True
-            i = 0
-            rms = []
-            while tol:
-                if i > 100:
-                    tol = False
-                    continue
-                else:
-                    print "rms iter=%d" % i
-                np.random.seed(i)
-                cns, rm = fit(X, Y, 4, "SMA")
-                rms.append(rm)
-                if rm > 0.05:
-                    i += 1
-                    print "Latitude: %d     RMS Error: %.3f" % (l, rm)
-                    if rm > 0.06:
-                        print "RMS too big... try new altitude range"
-                        tol = False
-                    if i > 10 and np.all(np.round(rms, 3), round(rm, 3)):
-                        print "RPM not changing... try new altitude range"
-                        tol = False
-                    continue
-                yfit = cns.evaluate(X)
-                if not hasattr(yfit, "__len__"):
-                    i += 1
-                    print "Params out of range"
-                    continue
-                else:
-                    tol = False
-            if rm < 0.05:
-                print "RMS Error: %.3f after iter=%d, Altitude %d" % (rm, j, a)
-                wvk = [vk for vk in cns.varkeys if vk.name == "w"][0]
-                alpha = [ex[wvk] for ex in cns.left.exps][0]
-                vkn = range(len(cns.right.varkeys))
-                expos = np.array(
-                    [e[list(cns.varkeys["u_fit_(%d,)" % n])[0]] for e in
-                     cns.right.exps for n in vkn]).reshape(
-                         len(cns.right.cs), len(vkn))
-                params = np.hstack([l] + [np.hstack([c] + [ex]) for c, ex in
-                                          zip(cns.right.cs, expos)])
-                params = np.append(params, alpha)
-                data["%d" % l] = params
-                break
-            else:
-                print "RMS Error: %.3f, Alt iter=%d" % (rm, j)
-        fig, ax = plot_fits(X, Y, yfit, l)
-        if not GENERATE:
-            fig.savefig(path + "windfitl%d.pdf" % l, bbox_inches="tight")
-        plt.close()
-
-    if GENERATE:
-        df = pd.DataFrame(data).transpose()
-        colnames = np.hstack([["c%d" % d, "e%d1" % d, "e%d2" % d] for d in
-                              range(1, 5, 1)])
-        colnames = np.append(colnames, "alpha")
-        colnames = np.insert(colnames, 0, "latitude")
-        df.columns = colnames
-        df.to_csv("windaltfitdata.csv")

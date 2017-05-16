@@ -59,11 +59,11 @@ def plot_objectivecomp(path=None):
     ax2.legend(["Objective: min($b$)", "Objective: min($S_{\mathrm{solar}}$)"],
                loc=2, fontsize=15)
     if path:
-        fig.savefig(path + "solarobjcomp.pdf", bbox_inches="tight")
-        fig2.savefig(path + "solarobjcomp2.pdf", bbox_inches="tight")
+        fig.savefig(path + "solarobjcomp.eps", bbox_inches="tight")
+        fig2.savefig(path + "solarobjcomp2.eps", bbox_inches="tight")
     else:
-        fig.savefig("solarobjcomp.pdf", bbox_inches="tight")
-        fig2.savefig("solarobjcomp2.pdf", bbox_inches="tight")
+        fig.savefig("solarobjcomp.eps", bbox_inches="tight")
+        fig2.savefig("solarobjcomp2.eps", bbox_inches="tight")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

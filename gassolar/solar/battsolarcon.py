@@ -9,9 +9,25 @@ from gpkit.tools.autosweep import autosweep_1d
 N = 100
 plt.rcParams.update({'font.size':15})
 
+def find_sols(bsts):
+    runagain = False
+    for s in bsts:
+        if s.splits is None:
+            continue
+        for sn in s.splits:
+            if sn in bsts:
+                continue
+            bsts.append(sn)
+            runagain = True
+    if runagain:
+        return find_sols(bsts)
+    else:
+        return bsts
+
 def plot_battsolarcon():
     fig, ax = plt.subplots()
-
+    time = 0
+    numsolves = 0
     etamax = []
     lines = []
     midx = []
@@ -29,7 +45,11 @@ def plot_battsolarcon():
             M.substitutions.update({"\\eta_Mission/Aircraft/SolarCells": 0.4})
             M.cost = M["h_{batt}"]
             sol = M.solve("mosek")
+            time += sol["soltime"]
+            numsolves += 1
             hmin = sol["cost"].magnitude + 1e-3
+            if hmin >= hmax:
+                break
             del M.substitutions["\\eta_Mission/Aircraft/SolarCells"]
             M.cost = M["\\eta_Mission/Aircraft/SolarCells"]
             xmin_ = np.linspace(hmin, hmax, 100)
@@ -38,6 +58,10 @@ def plot_battsolarcon():
             try:
                 bst = autosweep_1d(M, tol, M["h_{batt}"], [hmin, hmax],
                                    solver="mosek")
+                bsts = find_sols([bst])
+                sols = np.hstack([b.sols for b in bsts])
+                time += sum(np.unique([s["soltime"] for s in sols]))
+                numsolves += bst.nsols
                 if lat % 4 == 0:
                     l = ax.plot(xmin_, bst.sample_at(xmin_)["cost"], "k",
                                 label="%d$^{\\circ}$ Lat" % lat)
@@ -52,6 +76,7 @@ def plot_battsolarcon():
 
     # ax.fill_between(xmin_, bst.sample_at(xmin_)["cost"], max(etamax),
     #                 edgecolor="r", lw=2, hatch="/", facecolor="None", zorder=100)
+    print "%d solves in %.4f seconds" % (numsolves, time)
     labelLines(lines, align=False, xvals=midx, zorder=[10]*len(lines))
     # ax.text(425, 0.36, "Infeasible")
     ax.set_ylabel("Solar Cell Efficiency")

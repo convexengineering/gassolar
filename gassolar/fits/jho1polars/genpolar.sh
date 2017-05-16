@@ -2,7 +2,6 @@ AIRFOIL=$1
 POLARFILE=$1.ncrit09.Re$2k.pol
 
 if [ -f $POLARFILE ] ; then
-    echo "yes"
     rm $POLARFILE
 fi
 
@@ -14,7 +13,7 @@ pacc
 $POLARFILE
 
 iter 200
-cseq 0.2 1.2 .05
+cseq 0.2 1.3 .05
 
 quit
 EOF

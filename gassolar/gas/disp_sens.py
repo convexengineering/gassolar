@@ -3,29 +3,7 @@ import numpy as np
 import sys
 from gassolar.gas.gas import Mission
 from gassolar.environment.wind_speeds import get_windspeed
-from gassolar.solar.print_sens import plot_sens
-
-def sens_table(sols, varnames,
-               filename="../../gassolarpaper/gassens.generated.tex"):
-    with open(filename, "w") as f:
-        f.write("\\begin{longtable}{lccccccccccccc}\n")
-        f.write("\\caption{Gas Sensitivities}\\\\\n")
-        f.write("\\toprule\n")
-        f.write("\\toprule\n")
-        f.write("\\label{t:sens}\n")
-        f.write("Variable & 5 Day Endurance & 7 Day Endurance & 9 Day Endurance\\\\\n")
-        f.write("\\midrule\n")
-        for vname in varnames:
-            sens = []
-            for s in sols:
-                sen = s["sensitivities"]["constants"][vname]
-                if hasattr(sen, "__len__"):
-                    sen = s["sensitivities"]["constants"][max(sen)]
-                sens.append(sen)
-            vals = "$" + vname + "$ &" + " & ".join(["%.3g" % x for x in sens])
-            f.write(vals + "\\\\\n")
-        f.write("\\bottomrule\n")
-        f.write("\\end{longtable}")
+from gassolar.solar.print_sens import plot_sens, sens_table, sol_table
 
 if __name__ == "__main__":
     sols = []
@@ -45,11 +23,17 @@ if __name__ == "__main__":
 
     varnames = ["V_{wind}_Mission/Loiter/FlightSegment", "W_{pay}", "\\eta_{prop}", "BSFC_{min}", "t_Mission/Loiter", "N_{max}_Mission/AircraftLoading/WingLoading/ChordSparL"]
     latns = ["$V_{\\mathrm{wind}}$", "$W_{\\mathrm{pay}}$", "$\\eta_{\\mathrm{prop}}$", "$BSFC_{\\mathrm{min}}$", "$t_{\\mathrm{loiter}}$", "$N_{\\mathrm{max}}$"]
-    sens_table(sols, varnames, filename="sens.generated.tex")
-    fig, ax = plot_sens(M, sols[2], varnames, latns=latns)
+    fig, ax = plot_sens(M, sols[2], varnames)
+    
+    dvarns = ["MTOW", "b_Mission/Aircraft/Wing", "AR_Mission/Aircraft/Wing", "W_{fuel-tot}", "W_Mission/Aircraft/Wing", "W_Mission/Aircraft/Engine", "BSFC", "C_L", "C_D"]
+    dlatns = ["MTOW", "$b$", "$A$", "$W_{\\mathrm{fuel}}$", "$W_{\\mathrm{wing}}$", "$W_{\\mathrm{engine}}$", "BSFC", "$C_L$", "$C_D$"]
 
     if len(sys.argv) > 1:
         path = sys.argv[1]
+        sens_table(sols, [M], varnames, solar=False, filename=path.replace("figs/", "") + "gassens.generated.tex", latns=latns, title="Gas Powered Aircraft Sensitivities (90th Percentile Winds)", label="gassens")
+        sol_table(sols, [M]*3, dvarns, filename=path.replace("figs/", "") + "gvals.generated.tex", solar=False, latns=dlatns, title="Gas Powered Aircraft Design Variables", label="gvals")
         fig.savefig(path + "gassensbar.pdf", bbox_inches="tight")
     else:
+        sens_table(sols, [M], varnames, solar=False, filename="gassens.generated.tex", latns=latns, title="Gas Powered Aircraft Sensitivities (90th Percentile Winds)")
+        sol_table(sols, [M]*3, dvarns, filename="gvals.generated.tex", solar=False, latns=dlatns, title="Gas Powered Aircraft Design Variables", label="gvals")
         fig.savefig("gassensbar.pdf", bbox_inches="tight")

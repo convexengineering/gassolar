@@ -4,12 +4,14 @@ import sys
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import gpkitmodels.GP.aircraft.engine.gas_engine as Engine
 
 plt.rcParams.update({'font.size':15})
 WEIGHT = 10.0
 POWER = 10.0
 PATH = (os.path.abspath(__file__).replace(os.path.basename(__file__), "")
         + os.sep)
+GENERATE = False
 
 def plot_powerlaw(csv):
     df = pd.read_csv(csv)
@@ -19,9 +21,12 @@ def plot_powerlaw(csv):
     x = np.log(u)
     y = np.log(w)
 
-    cn, rm = fit(x, y, 1, "MA")
+    np.random.seed(0)
+    cn, err = fit(x, y, 1, "MA")
+    print "RMS error: %.4f" % err[0]
     weight = np.linspace(min(df["lbs"]), max(df["lbs"]), 100)
     yfit = cn.evaluate(np.log(weight/WEIGHT))
+    df = cn.get_dataframe(x)
 
     fig, ax = plt.subplots()
     ax.plot(u*WEIGHT, w*POWER, "o", mfc="None", mew=1.5)
@@ -30,11 +35,16 @@ def plot_powerlaw(csv):
     ax.set_ylabel("Maximum SL Shaft Power [hp]")
     ax.legend(["UND Engine Data", "Power Law Fit"], loc=2)
     ax.grid()
-    return fig, ax
+    return df, fig, ax
 
 if __name__ == "__main__":
     csvname = PATH + "powervsweight.csv"
-    fig, ax = plot_powerlaw(csvname)
+    df, fig, ax = plot_powerlaw(csvname)
+    if GENERATE:
+        path = os.path.dirname(Engine.__file__)
+        df.to_csv(path + os.sep + "power_lawfit.csv")
+    else:
+        df.to_csv("power_lawfit.csv")
     if len(sys.argv) > 1:
         path = sys.argv[1]
         fig.savefig(path + "powervsweightfit.pdf", bbox_inches="tight")

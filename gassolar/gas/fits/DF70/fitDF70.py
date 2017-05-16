@@ -6,11 +6,13 @@ from numpy import logspace, log, log10
 import matplotlib.pyplot as plt
 from gpfit.fit import fit
 from scipy import interpolate
+import gpkitmodels.GP.aircraft.engine.gas_engine as Engine
 plt.rcParams.update({'font.size':19})
 
 np.random.seed(0)
 PATH = (os.path.abspath(__file__).replace(os.path.basename(__file__), "")
         + os.sep)
+GENERATE = False
 
 def plot_BSFCtoPower(power_csv, bsfc_csv):
     # Fitting BSFC vs. Power
@@ -28,9 +30,10 @@ def plot_BSFCtoPower(power_csv, bsfc_csv):
     Type = 'SMA'
     K = 2
 
-    cstrt, rmserror = fit(x, y, K, Type)
-    print "RMS error = %.4f" % rmserror
+    cstrt, error = fit(x, y, K, Type)
+    print "RMS error = %.4f" % error[0]
     yfit = cstrt.evaluate(x)
+    dfc = cstrt.get_dataframe(x)
 
     fig, ax = plt.subplots()
     ax.plot(u*100, w*min(df["BSFC"]), "o", mfc="None", ms=7, mew=1.5)
@@ -41,7 +44,7 @@ def plot_BSFCtoPower(power_csv, bsfc_csv):
     ax.set_ylim([0, 1])
     ax.set_xlim([0, 100])
     ax.grid()
-    return fig, ax
+    return dfc, fig, ax
 
 def plot_BSFCtoRPM():
     # Fitting BSFC vs. RPM
@@ -115,7 +118,12 @@ def plot_lapse():
 if __name__ == "__main__":
     csvname = PATH + 'Dataset_Power_Kw.csv'
     csvname2 = PATH + 'Dataset_BSFC_kgKwh.csv'
-    fig, ax = plot_BSFCtoPower(csvname, csvname2)
+    df, fig, ax = plot_BSFCtoPower(csvname, csvname2)
+    if GENERATE:
+        path  = os.path.dirname(Engine.__file__)
+        df.to_csv(path + os.sep + "powerBSFCfit.csv")
+    else:
+        df.to_csv("powerBSFCfit.csv")
     if len(sys.argv) > 1:
         path = sys.argv[1]
         fig.savefig(path + "powertobsfcfit.pdf", bbox_inches="tight")

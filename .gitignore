@@ -83,15 +83,20 @@ test_reports_nounits/
 *.bbl
 *.blg
 *.glo
+*.nav
+*.snm
+*.toc
 
 # md files support files
 *.generated.tex
+*.generated.csv
 *.tex.md
 *.md.py
 
 # generated graphs
 *.pdf
 *.png
+*.eps
 
 # xfoil polars
 *.pol

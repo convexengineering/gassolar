@@ -15,11 +15,11 @@ from loiter import Loiter
 
 class Aircraft(Model):
     "the JHO vehicle"
-    def setup(self, Wfueltot, DF70=False):
+    def setup(self, Wfueltot):
 
         self.fuselage = Fuselage(Wfueltot)
         self.wing = Wing()
-        self.engine = Engine(DF70)
+        self.engine = Engine()
         self.empennage = Empennage()
 
         components = [self.fuselage, self.wing, self.engine, self.empennage]
@@ -29,9 +29,9 @@ class Aircraft(Model):
         Wpay = Variable("W_{pay}", 10, "lbf", "payload weight")
         Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight")
         Wwing = Variable("W_{wing}", "lbf", "wing weight for loading")
-        etaprop = Variable("\\eta_{prop}", 0.75, "-", "propulsive efficiency")
+        etaprop = Variable("\\eta_{prop}", 0.8, "-", "propulsive efficiency")
 
-        self.empennage.substitutions["V_h"] = 0.55
+        self.empennage.substitutions["V_h"] = 0.45
         self.empennage.substitutions["V_v"] = 0.04
         self.empennage.substitutions["m_h"] = 0.4
         constraints = [
@@ -148,20 +148,22 @@ class Climb(Model):
 
 class Mission(Model):
     "creates flight profile"
-    def setup(self, DF70=False):
+    def setup(self, latitude=38, percent=90):
 
         mtow = Variable("MTOW", "lbf", "max-take off weight")
         Wcent = Variable("W_{cent}", "lbf", "center aircraft weight")
         Wfueltot = Variable("W_{fuel-tot}", "lbf", "total aircraft fuel weight")
         LS = Variable("(W/S)", "lbf/ft**2", "wing loading")
 
-        JHO = Aircraft(Wfueltot, DF70)
+        JHO = Aircraft(Wfueltot)
 
-        climb1 = Climb(JHO, 10, altitude=np.linspace(0, 15000, 11)[1:])
-        cruise1 = Cruise(JHO, 1, R=200)
-        loiter1 = Loiter(JHO, 5)
-        cruise2 = Cruise(JHO, 1)
-        mission = [climb1, cruise1, loiter1, cruise2]
+        climb1 = Climb(JHO, 10, latitude=latitude, percent=percent,
+                       altitude=np.linspace(0, 15000, 11)[1:])
+        # cruise1 = Cruise(JHO, 1, R=200, latitude=latitude, percent=percent)
+        loiter1 = Loiter(JHO, 5, latitude=latitude, percent=percent)
+        # cruise2 = Cruise(JHO, 1, latitude=latitude, percent=percent)
+        # mission = [climb1, cruise1, loiter1, cruise2]
+        mission = [climb1, loiter1]
 
         loading = JHO.loading(Wcent, JHO["W_{wing}"], loiter1["V"][0], loiter1["C_L"][0])
 
@@ -169,7 +171,7 @@ class Mission(Model):
             mtow >= climb1["W_{start}"][0],
             Wfueltot >= sum(fs["W_{fuel-fs}"] for fs in mission),
             mission[-1]["W_{end}"][-1] >= JHO["W_{zfw}"],
-            Wcent >= Wfueltot + sum(summing_vars(JHO.smeared_loads, "W")),
+            Wcent >= Wfueltot + JHO["W_{pay}"] + JHO["W_{avn}"] + sum(summing_vars(JHO.smeared_loads, "W")),
             LS == mtow/JHO.wing["S"]
             ]
 
@@ -193,6 +195,6 @@ def test():
 
 if __name__ == "__main__":
     M = Mission()
-    M.cost = 1/M["t_Mission/Loiter"]
+    M.substitutions.update({"t_Mission/Loiter": 6})
+    M.cost = M["MTOW"]
     sol = M.solve("mosek")
-    print sol.table()
