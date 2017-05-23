@@ -107,16 +107,16 @@ def make_fits(day, latrange, month, gen=False, path=""):
                     try:
                         cns, err = fit(X, Y, K, ftype)
                         print "Lat %d; K = %d; ftype = %s; RMS = %.4f" % (
-                            l, K, ftype, err[0])
+                            l, K, ftype, err)
                     except ValueError:
                         print "Fit failed: Lat %d; K = %d; ftype = %s;" % (
                             l, K, ftype)
                         err = [0.9, 0.9]
-                    if err[0] < rms_best:
+                    if err < rms_best:
                         df = cns.get_dataframe(X)
                         if "0.0" in df.values or "inf" in df.values:
                             continue
-                        rms_best = err[0]
+                        rms_best = err
                         cn_best, df_best = cns, df
 
             if rms_best == 1:

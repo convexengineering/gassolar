@@ -1,0 +1,123 @@
+
+\chapter{Mission Requirements}
+
+A comparison of the gas and solar-electric powered aircraft is achieved by comparing their respective capabilities at satisfying a common set of requirements shown in Table~\ref{t:mreqs}.  These requirements can and will be changed in the results section to observe which architecture is best suited to meet various sets of requirements. A discussion of each requirement is included in this section.  
+
+\begin{longtable}{lccccccccccccc}
+\caption{Mission Requirements}\\
+\toprule
+\toprule
+\label{t:mreqs}
+Payload & 10 lbs\\
+Station Keeping & 90\% winds \\
+Endurance & $>6$ days\\
+Season & all seasons\\
+Altitude & $>$ 4,600 m\\
+Latitude & $\pm30^{\circ}$\\
+\bottomrule
+\end{longtable}
+
+\section{Station Keeping}
+
+To station keep an aircraft must fly at least as fast as the wind speed,
+
+\begin{equation}
+    \label{e:availreq}
+    V \geq V_{\text{wind}}.
+\end{equation}
+
+Distributions of wind speed data\cite{wind} indicate that it is impractical for long-endurance UAVs to station keep in 100 percentile wind speeds.  
+Therefore, the station keeping requirement is parameterized by a percentile wind speed, $p_{\text{wind}}$, above which the aircraft is allowed to drift off station. 
+The wind speed at a station is also a function of latitude, altitude, season or day of the year,
+
+\begin{equation}
+    \label{e:windspeed}
+    V_{\text{wind}} = f(\phi, h, \text{DOY}, p_{\text{wind}}).
+    \end{equation}
+
+Wind speed data was collected from the ERA Interim atmospheric datasets for the years 2005-2015.\cite{wind} 
+It is assumed that the wind speed distribution is independent of longitude. 
+
+To meet the season requirement, the solar-electric aircraft must be able to fly a full day/night cycle on the winter solstice.  
+If it can do so, it automatically exceeds the endurance requirement. 
+To achieve this design constraint the aircraft must be able to fly with limited solar energy, discussed in Section V.B, and with higher than average wind speeds as shown in Figure~\ref{f:windvsmonth}.  
+
+\begin{figure}[h!]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[+30$^{\circ}$ latitude \label{f:windvsmonthN30}]{\includegraphics[natwidth=560,natheight=420]{windvsmonthN30.pdf}}
+     \subfigure[-30$^{\circ}$ latitude \label{f:windvsmonthS30}]{\includegraphics[natwidth=560,natheight=420]{windvsmonthS30.pdf}}
+ \end{subfigmatrix}
+ \caption{Winds peak at the winter solstice in Northern and Southern Hemispheres.\cite{wind}}
+ \label{f:windvsmonth}
+\end{figure}
+
+For long-endurance gas powered aircraft, the endurance requirement is the amount of time the aircraft needs to remain in the air without refueling.  
+This is expected to be mostly independent of season, except insofar as the wind speeds depends on season. 
+
+Because wind speeds are greatest during the winter solstice for both the Northern and Southern Hemispheres, only wind speeds from December and June, respectively, will be used for the both the gas and solar-electric powered aircraft sizing and performance analysis. 
+
+\section{Altitude}
+
+One altitude requirement is a minimum height required to meet a certain coverage footprint,
+
+\begin{equation}
+ h \geq h_{\text{min}}.
+\end{equation}
+
+Long-endurance aircraft tend to fly at low speeds, which based on Figure~\ref{f:altvswindhmin} means there are two possible operating altitude regiems: at or around the minimum height requirement of 4,600 m, or at high altitudes between 16,700-20,000 m. 
+Gas powered aircraft generally fly in the lower altitude regime of 4,600 m because naturally aspirated engines lose power with increased altitude and are unable to reach altitudes higher than about 13,500 m.  
+Solar-electric powered aircraft, which do not have naturally aspirated engines, will fly around 18,000 m to avoid cloud coverage.
+
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth,natwidth=538,natheight=405]{altvswindhmin.pdf}
+    \caption{Aircraft must fly above $h_{\text{min}}$ to meet altitude requirement. Bands represent 80th, 90th and 95th percentiles.\cite{wind}}
+	\label{f:altvswindhmin}
+	\end{center}
+\end{figure}
+
+
+\section{Latitude}
+
+It is assumed that long-endurance aircraft will have a requirement to be capable of operating anywhere within a band of latitudes.  
+For example, an aircraft designed or optimized for the 35th latitude would be able to operate at any latitude between $\pm35$ degrees. 
+Latitude affects both the solar-electric and the gas powered aircraft because wind speed varies with latitude. 
+Figure~\ref{f:latvswind} shows how the wind speed varies with latitude in the Northern Hemisphere in December. 
+
+\begin{figure}[h!]
+	\begin{center}
+	\includegraphics[width=0.6\textwidth,natwidth=576,natheight=432]{latvswindN.pdf}
+    \caption{Wind speeds by latitude.  Bands represent 80th, 90th and 95th percentile winds.\cite{wind}}
+	\label{f:latvswind}
+	\end{center}
+\end{figure}
+
+Latitude additionally affects the solar-electric powered aircraft because at higher latitudes there is less daylight and therefore less solar energy during the winter months. This is further discussed in Section~\ref{sec:solarenergy}.
+
+\section{Percentile Wind Speed}
+
+For the purposes of this design study, a percentile wind speed corresponds to that percentile of wind speed data across all longitudes in December months spanning the years 2005-2015.  
+To understand what a given percentile wind speed implies operationally an autocorrelation analysis was done for multiple cites at varying latitudes at 60,000 during December. 
+Figures~\ref{f:bostonwinds} and~\ref{f:romewinds} show the autocorrelation analysis, or the similarity of the next data point to the previous data points, for wind speeds at 60,000 ft over Boston and Rome during December of 2015. 
+
+\begin{figure}[h!]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[Autocorrelation of Boston wind speeds\label{f:bostonwindatuo}]{\includegraphics[natwidth=560,natheight=420]{Boston_dec_2015auto.pdf}}
+     \subfigure[Boston wind speed data\label{f:bostonwind}]{\includegraphics[natwidth=560,natheight=420]{Boston_dec_2015.pdf}}
+ \end{subfigmatrix}
+ \caption{Wind speed analysis at 60,000 ft over Boston, Massachusetts during December, 2015.}
+ \label{f:bostonwinds}
+\end{figure}
+
+\begin{figure}[h!]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[Autocorrelation of Rome wind speeds\label{f:romewindatuo}]{\includegraphics[natwidth=560,natheight=420]{Rome_dec_2015auto.pdf}}
+     \subfigure[Rome wind speed data\label{f:romewind}]{\includegraphics[natwidth=560,natheight=420]{Rome_dec_2015.pdf}}
+ \end{subfigmatrix}
+ \caption{Wind speed analysis at 60,000 ft over Rome, Italy during December, 2015.}
+ \label{f:romewinds}
+\end{figure}
+
+This analysis shows high wind speeds can last for days at a time.  
+An aircraft designed for 90th percentile winds will likely be able to remain on station for 90\% of the time.  
+However, during times that wind speeds exceed the 90th percentile they could last for days at a time, possibly requiring the aircraft to drift off station, relocate or land. 

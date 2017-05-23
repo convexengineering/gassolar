@@ -1,0 +1,67 @@
+
+\chapter{Solar energy calculations} 
+
+The total available solar energy per day is an integral of the available solar power during the course of the day,
+
+    \begin{equation}
+        \label{e:solares}
+        (E/S)_{\text{sun}} = \int_{t_{\text{sun rise}}}^{t_{\text{sun set}}} (P/S)_{\text{sun}} dt.
+    \end{equation}
+    
+For simplicity, energy and power will refer to energy and power per unit area throughout the rest of this section (i.e. $(P/S) = P$). 
+The solar irradiated power $P_{\text{sun}}$, is a function of $\theta$, the angle between the normal to the flat surface, or aircraft wing, and the sun beam.\cite{solar}
+
+\begin{equation}
+    \label{e:solarp}
+    P_{\text{sun}} = P_0 \cos{\theta}
+\end{equation}
+
+The angle $\theta$, depends on the time of day $t$, latitude $\phi$, and declination angle $\Delta$,\cite{solar}
+
+    \begin{equation}
+        \label{e:solartheta}
+        \cos{\theta} = \sin{\Delta} \sin{\phi} + \cos{\Delta} \cos{\phi} \cos{2\pi t/24}.
+    \end{equation}
+
+ The declination angle $\Delta$, can be found using the relation\cite{solar} 
+
+    \begin{align}
+        \label{e:solardelta}
+        \Delta = &0.006918 - 0.399912 \cos{\beta} + 0.070257\sin{\beta} - 0.006758\cos{2\beta} + \nonumber \\
+        & 0.000907\sin{2\beta} - 0.002697\cos{3\beta} + 0.00148\sin{3\beta},
+    \end{align}
+
+    where $\beta = 2\pi (\text{DOY}-1)/365$.
+    The time of day $t_{\text{day}}$, and the time of night $t_{\text{night}}$, can be calculated using a derivation of Equation~\eqref{e:solartheta}, \cite{solar}
+
+    \begin{align}
+        \label{e:solartday}
+        \cos{(\pi t_{\text{sun rise}}/12)} &= -\tan{\Delta} \tan{\phi} \\
+        \label{e:solarsunrise}
+        t_{\text{sun rise}} &= -t_{\text{sun set}} \\
+        \label{e:solartday2}
+        t_{\text{day}} &= 2t_{\text{sun rise}} \\
+        \label{e:solartnight}
+        t_{\text{night}} &= 24 - t_{\text{day}}
+    \end{align}
+
+    where noon is $t=0$. Both $t_{\text{day}}$ and $t_{\text{night}}$ affect the battery size as defined in Equations~\eqref{e:solarreq} and~\eqref{e:solarbatt}. The solar power available assuming no inclination angle $P_0$, is found using the eccentricity of the earth's orbit, 
+
+    \begin{align}
+        \label{e:solarp0}
+        P_0 & = P_{\text{sun surface}} \frac{R_{\text{sun}}^2}{R_{\text{earth orbit}}^2}, \\
+        \label{e:solareo}
+        R_{\text{earth orbit}} & = r_0 \left[ 1 + 0.017 \sin{\left( 2\pi \frac{\text{DOY}-93}{365}\right)} \right],
+    \end{align}
+    
+    where 
+
+    \[ \begin{array}{lcl}
+        P_{\text{sun surface}} & : & \text{Power emitted at the sun's surface} \\
+        R_{\text{sun}} & : & \text{Radius of the sun} \\
+        R_{\text{earth orbit}} & : & \text{Distance from earth to sun} \\
+        r_0 & : & \text{Average distance from earth to sun} \\
+        0.017 & : & \text{Eccentricity of earth-sun orbit}.
+    \end{array} \]
+
+    Using a trapezoidal integration of Equation~\eqref{e:solares}, the total available solar energy per unit area can be obtained for a given latitude and day of the year. Because the equations in this appendix are not GP compatible, the total solar energy per unit area per day, the length of the day and the length of the night are calculated from the latitude and the day of the year prior to an optimization solve.

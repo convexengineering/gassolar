@@ -1,0 +1,14 @@
+\chapter{Discussion on the use of the \emph{JH01} airfoil} 
+
+The \emph{sd7032} airfoil was redesigned to prevent drag creep by weakening the pressure spike associated with premature separation at higher Reynolds numbers.  
+Figure~\ref{f:jhcps} shows the pressure distributions generated in XFOIL of the \emph{JH01} airfoil at $C_L=0.0$ and $C_L=1.35$ with $Re=\num{3d5}$.
+The redesigned airfoil was named \emph{JH01}. I would like to thank Mark Drela for the redesign.
+
+\begin{figure}[h!]
+ \begin{subfigmatrix}{2}% number of columns
+     \subfigure[$C_L=0.0$\label{f:cpmin}]{\includegraphics[width=0.45\textwidth,natwidth=792,natheight=612]{cpmin.eps}}
+     \subfigure[$C_L=1.35$\label{f:cpmax}]{\includegraphics[width=0.45\textwidth,natwidth=792,natheight=612]{cpmax.eps}}
+ \end{subfigmatrix}
+ \caption{Pressure coefficient plots at the minimum and maximum expected $C_L$ at Reynolds number $Re=\num{3d5}$.}
+ \label{f:jhcps}
+\end{figure}

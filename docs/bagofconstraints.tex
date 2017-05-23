@@ -4,7 +4,10 @@
 \usepackage{multirow}
 \usepackage{longtable,booktabs,tabularx}
 \usepackage[utf8]{inputenc}
-\def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
+\usepackage{color}
+\setbeamercolor{background canvas}{bg=black!100}
+\setbeamercolor{normal text}{fg=white}\usebeamercolor*{normal text}
+% \def\Put(#1,#2)#3{\leavevmode\makebox(0,0){\put(#1,#2){#3}}}
 \usepackage{tikz}
 \usetikzlibrary{arrows,shapes}
  \usepackage[sort, numbers]{natbib}
@@ -12,13 +15,14 @@
  \usepackage[framemethod=default]{mdframed}
 \newcommand{\tikzmark}[1]{\tikz[remember picture] \node[coordinate] (#1) {#1};}
 \setbeamertemplate{footline}
-{\begin{beamercolorbox}[sep=1ex]{author in head/foot}
-     \rlap{}\hfill\llap{\insertframenumber}%
-     \end{beamercolorbox}%
-     }
-   
+% {\begin{beamercolorbox}[sep=1ex]{author in head/foot}
+%      \rlap{}\hfill\llap{\insertframenumber}%
+%      \end{beamercolorbox}%
+%      }
  
 \begin{document}
+\pagecolor{black}
+\color{white}
 
 \begin{frame}
     \pause

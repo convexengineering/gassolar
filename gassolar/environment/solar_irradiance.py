@@ -64,7 +64,7 @@ def twi_fits(latitude, day, gen=False):
     x = np.log(P[1:-15])
     y = np.log(2*C[:-14])
     cn, err = fit(x, y, 1, "MA")
-    rm = err[0]
+    rm = err
     print "RMS error: %.4f" % rm
     dftw = cn.get_dataframe(x)
     if not gen:
@@ -86,7 +86,7 @@ def twi_fits(latitude, day, gen=False):
     x = np.log(P[1:-15])
     y = np.log(2*B[:-14])
     cn, err = fit(x, y, 1, "MA")
-    rm = err[0]
+    rm = err
     print "RMS error: %.4f" % rm
     dfday = cn.get_dataframe(x)
     if not gen:

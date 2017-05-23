@@ -1,7 +1,8 @@
 """Jungle Hawk Owl"""
 import numpy as np
 from gpkitmodels.GP.aircraft.engine.gas_engine import Engine
-from gpkitmodels.GP.aircraft.wing.wing import Wing
+from gpkitmodels.GP.aircraft.wing.wing import Wing as WingGP
+from gpkitmodels.SP.aircraft.wing.wing import Wing as WingSP
 from gpkitmodels.GP.aircraft.fuselage.elliptical_fuselage import Fuselage
 from gpkitmodels.GP.aircraft.tail.empennage import Empennage
 from gpkitmodels.GP.aircraft.tail.tail_boom import TailBoomState
@@ -15,10 +16,15 @@ from loiter import Loiter
 
 class Aircraft(Model):
     "the JHO vehicle"
-    def setup(self, Wfueltot):
+    def setup(self, Wfueltot, sp=False):
+
+        self.sp = sp
 
         self.fuselage = Fuselage(Wfueltot)
-        self.wing = Wing()
+        if sp:
+            self.wing = WingSP()
+        else:
+            self.wing = WingGP()
         self.engine = Engine()
         self.empennage = Empennage()
 
@@ -31,9 +37,13 @@ class Aircraft(Model):
         Wwing = Variable("W_{wing}", "lbf", "wing weight for loading")
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propulsive efficiency")
 
-        self.empennage.substitutions["V_h"] = 0.45
         self.empennage.substitutions["V_v"] = 0.04
-        self.empennage.substitutions["m_h"] = 0.4
+
+        if not sp:
+            self.empennage.substitutions["V_h"] = 0.45
+            self.empennage.substitutions["AR_h"] = 5.0
+            self.empennage.substitutions["m_h"] = 0.1
+
         constraints = [
             Wzfw >= sum(summing_vars(components, "W")) + Wpay + Wavn,
             Wwing >= sum(summing_vars([self.wing], "W")),
@@ -45,10 +55,6 @@ class Aircraft(Model):
                 self.empennage.verticaltail["S"]
                 * self.empennage.verticaltail["l_v"]/self.wing["S"]
                 / self.wing["b"]),
-            # self.wing["C_{L_{max}}"]/self.wing["m_w"] <= (
-            #     self.empennage.horizontaltail["C_{L_{max}}"]
-            #     / self.empennage.horizontaltail["m_h"])
-            self.empennage.horizontaltail["C_{L_{max}}"] == 1.5,
             self.wing["\\tau"]*self.wing["c_{root}"] >= self.empennage.tailboom["d_0"]
             ]
 
@@ -58,7 +64,10 @@ class Aircraft(Model):
         return AircraftPerf(self, state)
 
     def loading(self, Wcent, Wwing, V, CL):
-        return AircraftLoading(self, Wcent, Wwing, V, CL)
+        if self.sp:
+            return AircraftLoadingSP(self, Wcent, Wwing, V, CL)
+        else:
+            return AircraftLoading(self, Wcent, Wwing, V, CL)
 
 class AircraftLoading(Model):
     "aircraft loading model"
@@ -67,10 +76,19 @@ class AircraftLoading(Model):
         loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
         loading.append(aircraft.empennage.loading())
 
-        # tbstate = TailBoomState()
-        # loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
-        #                                    aircraft.empennage.tailboom,
-        #                                    aircraft.wing, tbstate))
+        return loading
+
+class AircraftLoadingSP(Model):
+    "aircraft loading model"
+    def setup(self, aircraft, Wcent, Wwing, V, CL):
+
+        loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
+        loading.append(aircraft.empennage.loading())
+
+        tbstate = TailBoomState()
+        loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
+                                           aircraft.empennage.tailboom,
+                                           aircraft.wing, tbstate))
 
         return loading
 
@@ -148,14 +166,14 @@ class Climb(Model):
 
 class Mission(Model):
     "creates flight profile"
-    def setup(self, latitude=38, percent=90):
+    def setup(self, latitude=38, percent=90, sp=False):
 
         mtow = Variable("MTOW", "lbf", "max-take off weight")
         Wcent = Variable("W_{cent}", "lbf", "center aircraft weight")
         Wfueltot = Variable("W_{fuel-tot}", "lbf", "total aircraft fuel weight")
         LS = Variable("(W/S)", "lbf/ft**2", "wing loading")
 
-        JHO = Aircraft(Wfueltot)
+        JHO = Aircraft(Wfueltot, sp=sp)
 
         climb1 = Climb(JHO, 10, latitude=latitude, percent=percent,
                        altitude=np.linspace(0, 15000, 11)[1:])
@@ -190,7 +208,9 @@ class Mission(Model):
 
 def test():
     M = Mission()
-    M.cost = 1/M["t_Mission/Loiter"]
+    M.substitutions.update({"t_Mission/Loiter": 6})
+    M.cost = M["MTOW"]
+    sol = M.solve("mosek")
     M.solve()
 
 if __name__ == "__main__":

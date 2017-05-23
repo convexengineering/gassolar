@@ -31,7 +31,7 @@ def plot_BSFCtoPower(power_csv, bsfc_csv):
     K = 2
 
     cstrt, error = fit(x, y, K, Type)
-    print "RMS error = %.4f" % error[0]
+    print "RMS error = %.4f" % error
     yfit = cstrt.evaluate(x)
     dfc = cstrt.get_dataframe(x)
 

@@ -23,7 +23,7 @@ def plot_powerlaw(csv):
 
     np.random.seed(0)
     cn, err = fit(x, y, 1, "MA")
-    print "RMS error: %.4f" % err[0]
+    print "RMS error: %.4f" % err
     weight = np.linspace(min(df["lbs"]), max(df["lbs"]), 100)
     yfit = cn.evaluate(np.log(weight/WEIGHT))
     df = cn.get_dataframe(x)

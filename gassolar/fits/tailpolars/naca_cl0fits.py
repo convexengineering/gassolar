@@ -101,7 +101,7 @@ if __name__ == "__main__":
     X, Y = fit_setup(NACA, Re) # call fit(X, Y, 4, "SMA") to get fit
     np.random.seed(0)
     cn, err = fit(X, Y, 5, "MA")
-    print "RMS error: %.5f    Max Err: %.5f" % (err[0], err[1])
+    print "RMS error: %.5f" % err
     df = cn.get_dataframe(X)
     if GENERATE:
         path = os.path.dirname(TailAero.__file__)

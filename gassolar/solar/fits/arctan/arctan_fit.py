@@ -15,7 +15,7 @@ def arctanfit():
     y = np.log(w)
 
     cn, err = fit(x, y, 1, "MA")
-    rm = err[0]
+    rm = err
     print "RMS error: %.4f" % rm
 
     yfit = cn.evaluate(x)

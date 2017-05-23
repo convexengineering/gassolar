@@ -1,0 +1,22 @@
+
+\chapter{Convex fitted functions} 
+
+Some constraints in this optimization study are convex equations that approximate data or other functions.  
+These equations include wind speed vs air density, airfoil drag polar, tail drag polar, BSFC to throttle mapping, and arctan equations.  
+Each of these equations was generated using the fitting techniques described by Hoburg et. al.\cite{fitting} 
+All fitted equations are either \emph{max-affine} or \emph{softmax-affine} functions,
+
+\begin{align}
+    f_{\text{MA}} (\bm{x}) &= \max\limits_{k=1 \dots K} [b_k + \bm{x}_K^T\bm{x}] \\
+    f_{\text{SMA}} (\bm{x}) &= \frac{1}{\alpha} \log{\sum_{k=1}^K \exp{(\alpha(b_k + \bm{a}_k^T \bm{x}))}}.
+\end{align}
+
+The log-space RMS error, 
+
+\begin{equation}
+\text{RMS error} \equiv \sqrt{\frac{1}{m} \sum_{i=1}^m (f(\bm{x}_i) - y_i)^2},
+\end{equation}
+
+ is given throughout the paper for each equation, where $m$ is the number of data points. 
+
+Bounds are imposed inside the optimization to ensure that the optimizer does not find a solution that exceeds the range over which the data was fitted.  In the case of the wing and tail drag polar fitted equations, a post-solve process runs XFOIL and verifies that the optimized drag for a given lift coefficient and Reynolds number is within 5\% of the XFOIL computed drag.

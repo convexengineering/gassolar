@@ -48,7 +48,7 @@ def plot_contours(path=None):
                 sol = M.solve("mosek")
                 stime += sol["soltime"]
                 numsolves += 1
-                del M.substitutions["\\eta_Mission, Aircraft, SolarCells"]
+                del M.substitutions["\\eta_Mission/Aircraft/SolarCells"]
                 if sol("h_{batt}").magnitude < hmin:
                     M.substitutions.update({"h_{batt}": hmin})
                     M.cost = M["\\eta_Mission/Aircraft/SolarCells"]

@@ -9,9 +9,9 @@ export PIP=`which pip`
 # make sure pip is up to date
 python $PIP install --upgrade pip
 
-# export PATH=$PATH:/Users/jenkins/mosek/8/tools/platform/osx64x86/bin
-# export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/jenkins/mosek/8/tools/platform/osx64x86/bin
-# python /Users/jenkins/mosek/8/tools/platform/osx64x86/python/2/setup.py install
+export PATH=$PATH:/Users/jenkins/mosek/8/tools/platform/osx64x86/bin
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/Users/jenkins/mosek/8/tools/platform/osx64x86/bin
+python /Users/jenkins/mosek/8/tools/platform/osx64x86/python/2/setup.py install
 
 #Install packages needed for testing
 python $PIP install --upgrade xmlrunner

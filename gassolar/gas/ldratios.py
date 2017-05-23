@@ -25,7 +25,7 @@ def ld_plot(model, num):
         else:
             model.substitutions.update({vk: wind})
     model.substitutions.update({"MTOW": 200})
-    model.substitutions.update({"N_{max}_Mission, AircraftLoading, WingLoading, GustL":  0.1})
+    model.substitutions.update({"N_{max}_Mission/AircraftLoading/WingLoading/GustL":  0.1})
     sol = model.solve("mosek")
     re = sol("Re_Mission/Loiter/FlightSegment/AircraftPerf/WingAero")[-1]
 
