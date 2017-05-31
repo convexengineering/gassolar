@@ -63,14 +63,14 @@ def twi_fits(latitude, day, gen=False):
 
     x = np.log(P[1:-15])
     y = np.log(2*C[:-14])
-    cn, err = fit(x, y, 1, "MA")
+    cntw, err = fit(x, y, 1, "MA")
     rm = err
     print "RMS error: %.4f" % rm
-    dftw = cn.get_dataframe(x)
+    fdtw = cntw.get_fitdata()
     if not gen:
         fig1, ax1 = plt.subplots()
         fig2, ax2 = plt.subplots()
-        yfit = cn.evaluate(x)
+        yfit = cntw.evaluate(x)
         ax1.plot(P[1:-15], 2*C[:-14], "o", c="g", markerfacecolor="none",
                  mew=1.5)
         ax1.plot(P[1:-15], np.exp(yfit), c="g",
@@ -80,17 +80,15 @@ def twi_fits(latitude, day, gen=False):
         ax1.set_ylabel("Twilight Energy $(E/S)_{\mathrm{twilight}}}$ " +
                        "[Whr/m$^2$]", fontsize=19)
         ax1.grid()
-        params.append(cn[0].right.c)
-        params.append(cn[0].right.exp[list(cn[0].varkeys["u_fit_(0,)"])[0]])
 
     x = np.log(P[1:-15])
     y = np.log(2*B[:-14])
-    cn, err = fit(x, y, 1, "MA")
+    cnday, err = fit(x, y, 1, "MA")
     rm = err
     print "RMS error: %.4f" % rm
-    dfday = cn.get_dataframe(x)
+    fdday = cnday.get_fitdata()
     if not gen:
-        yfit = cn.evaluate(x)
+        yfit = cnday.evaluate(x)
         ax2.plot(P[1:-15], 2*B[:-14], "o", c="g", markerfacecolor="none",
                  mew=1.5)
         ax2.plot(P[1:-15], np.exp(yfit), c="g",
@@ -102,7 +100,7 @@ def twi_fits(latitude, day, gen=False):
                        fontsize=19)
         fig1.savefig(path + "Cenergy.pdf")
         fig2.savefig(path + "Benergy.pdf")
-    return dftw, dfday
+    return fdtw, fdday
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

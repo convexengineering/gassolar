@@ -107,12 +107,12 @@ if __name__ == "__main__":
     np.random.seed(0)
     cn, err = fit(X, Y, 4, "SMA")
     print "RMS error: %.5f" % err
-    df = cn.get_dataframe(X)
+    df = cn.get_dataframe()
     if GENERATE:
         path = os.path.dirname(inspect.getfile(Wing))
-        df.to_csv(path + os.sep + "jho_fitdata.csv")
+        df.to_csv(path + os.sep + "jho_fitdata.csv", index=False)
     else:
-        df.to_csv("jho_fitdata.csv")
+        df.to_csv("jho_fitdata.csv", index=False)
 
     # replot = np.array([150, 200, 300, 350, 400])
     replot = np.array([300, 350, 400, 450, 500])

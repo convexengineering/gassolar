@@ -15,6 +15,7 @@ from gpkitmodels.GP.aircraft.tail.tail_boom import TailBoomState
 from gpkitmodels.SP.aircraft.tail.tail_boom_flex import TailBoomFlexibility
 from gpkitmodels.tools.summing_constraintset import summing_vars
 from gpkitmodels.tools.fit_constraintset import FitCS
+from gpfit.fit_constraintset import FitCS as FCS
 
 basepath = os.path.abspath(__file__).replace(os.path.basename(__file__), "")
 path = basepath.replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
@@ -106,7 +107,6 @@ class AircraftLoading(Model):
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
         loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
-        loading.append(aircraft.empennage.loading())
 
         return loading
 
@@ -115,7 +115,6 @@ class AircraftLoadingSP(Model):
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
         loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
-        loading.append(aircraft.empennage.loading())
 
         tbstate = TailBoomState()
         loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
@@ -225,11 +224,8 @@ class FlightState(Model):
 
         df = pd.read_csv(path + "windfits" + month +
                          "/windaltfit_lat%d.csv" % latitude)
-        # df = DF[DF["latitude"] == latitude]
-        # dft = DFt[DFt["latitude"] == latitude]
-        # dfd = DFd[DFd["latitude"] == latitude]
-        with StdoutCaptured(None):
-            dft, dfd = twi_fits(latitude, day, gen=True)
+        # with StdoutCaptured(None):
+        dft, dfd = twi_fits(latitude, day, gen=True)
         esirr, td, tn, _ = get_Eirr(latitude, day)
 
         Vwind = Variable("V_{wind}", "m/s", "wind velocity")
@@ -258,8 +254,8 @@ class FlightState(Model):
         constraints = [
             V/mfac >= Vwind,
             FitCS(df, Vwind/Vwindref, [rho/rhoref, pct]),
-            FitCS(dfd, ESday/ESvar, [PSmin/PSvar]),
-            FitCS(dft, ESc/ESvar, [PSmin/PSvar]),
+            FCS(dfd, ESday/ESvar, [PSmin/PSvar]),
+            FCS(dft, ESc/ESvar, [PSmin/PSvar]),
             ]
 
         return constraints
