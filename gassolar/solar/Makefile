@@ -5,4 +5,5 @@ all:
 	ipython solarlat.py ../../docs/figs/
 	ipython windstruct.py ../../docs/figs/
 	ipython battsolarcon.py ../../docs/figs/
+	ipython season.py ../../docs/figs/
 

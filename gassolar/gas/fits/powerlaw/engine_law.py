@@ -11,7 +11,7 @@ WEIGHT = 10.0
 POWER = 10.0
 PATH = (os.path.abspath(__file__).replace(os.path.basename(__file__), "")
         + os.sep)
-GENERATE = False
+GENERATE = True
 
 def plot_powerlaw(csv):
     df = pd.read_csv(csv)
@@ -26,7 +26,7 @@ def plot_powerlaw(csv):
     print "RMS error: %.4f" % err
     weight = np.linspace(min(df["lbs"]), max(df["lbs"]), 100)
     yfit = cn.evaluate(np.log(weight/WEIGHT))
-    df = cn.get_dataframe(x)
+    df = cn.get_dataframe()
 
     fig, ax = plt.subplots()
     ax.plot(u*WEIGHT, w*POWER, "o", mfc="None", mew=1.5)
@@ -42,9 +42,9 @@ if __name__ == "__main__":
     df, fig, ax = plot_powerlaw(csvname)
     if GENERATE:
         path = os.path.dirname(Engine.__file__)
-        df.to_csv(path + os.sep + "power_lawfit.csv")
+        df.to_csv(path + os.sep + "power_lawfit.csv", index=False)
     else:
-        df.to_csv("power_lawfit.csv")
+        df.to_csv("power_lawfit.csv", index=False)
     if len(sys.argv) > 1:
         path = sys.argv[1]
         fig.savefig(path + "powervsweightfit.pdf", bbox_inches="tight")

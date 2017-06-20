@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 plt.rcParams.update({'font.size':15})
-GENERATE = False
+GENERATE = True
 
 def arctanfit():
     u = np.linspace(1e-15, 0.7, 100)
@@ -19,7 +19,7 @@ def arctanfit():
     print "RMS error: %.4f" % rm
 
     yfit = cn.evaluate(x)
-    df = cn.get_dataframe(x)
+    df = cn.get_dataframe()
     fig, ax = plt.subplots()
     ax.plot(u, w, lw=2)
     ax.plot(u, np.exp(yfit), "--", lw=2)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     df, fig, ax = arctanfit()
     if GENERATE:
         path = os.path.dirname(GustL.__file__)
-        df.to_csv(path + os.sep + "arctan_fit.csv")
+        df.to_csv(path + os.sep + "arctan_fit.csv", index=False)
     else:
         df.to_csv("arctan_fit.csv")
     if len(sys.argv) > 1:

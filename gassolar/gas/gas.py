@@ -74,7 +74,6 @@ class AircraftLoading(Model):
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
         loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
-        loading.append(aircraft.empennage.loading())
 
         return loading
 
@@ -83,7 +82,6 @@ class AircraftLoadingSP(Model):
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
         loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
-        loading.append(aircraft.empennage.loading())
 
         tbstate = TailBoomState()
         loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,

@@ -1,11 +1,12 @@
 " Simple Solar-Electric Powered Aircraft Model "
 #pylint: disable=attribute-defined-outside-init, invalid-name, unused-variable
-#pylint: disable=too-many-locals
+#pylint: disable=too-many-locals, redefined-variable-type
+#pylint: disable=too-many-instance-attributes
 import os
-import sys
 import pandas as pd
 import numpy as np
 from gassolar.environment.solar_irradiance import get_Eirr, twi_fits
+from gassolar.environment.wind_speeds import get_month
 from gpkit import Model, Variable
 from gpkit.tests.helpers import StdoutCaptured
 from gpkitmodels.GP.aircraft.wing.wing import Wing as WingGP
@@ -14,7 +15,7 @@ from gpkitmodels.GP.aircraft.tail.empennage import Empennage
 from gpkitmodels.GP.aircraft.tail.tail_boom import TailBoomState
 from gpkitmodels.SP.aircraft.tail.tail_boom_flex import TailBoomFlexibility
 from gpkitmodels.tools.summing_constraintset import summing_vars
-from gpkitmodels.tools.fit_constraintset import FitCS
+from gpfit.fit_constraintset import FitCS as FCS
 
 basepath = os.path.abspath(__file__).replace(os.path.basename(__file__), "")
 path = basepath.replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
@@ -38,8 +39,15 @@ class Aircraft(Model):
 
         self.components = [self.solarcells, self.wing, self.battery,
                            self.empennage, self.motor]
+        loading = []
+        if sp:
+            tbstate = TailBoomState()
+            loading = TailBoomFlexibility(self.empennage.horizontaltail,
+                                          self.empennage.tailboom,
+                                          self.wing, tbstate)
 
-        Wpay = Variable("W_{pay}", 10, "lbf", "payload weight")
+        Wpay = Variable("W_{pay}", 0, "lbf", "payload weight")
+        Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Wcent = Variable("W_{cent}", "lbf", "center weight")
@@ -52,11 +60,11 @@ class Aircraft(Model):
             self.empennage.substitutions["m_h"] = 0.1
 
         constraints = [
-            Wtotal >= (Wpay + sum(summing_vars(self.components, "W"))),
+            Wtotal >= (Wpay + Wavn + sum(summing_vars(self.components, "W"))),
             Wwing >= (sum(summing_vars([self.wing, self.battery,
                                         self.solarcells], "W"))),
-            Wcent >= Wpay + sum(summing_vars([self.empennage, self.motor],
-                                             "W")),
+            Wcent >= Wpay + Wavn + sum(
+                summing_vars([self.empennage, self.motor], "W")),
             self.solarcells["S"] <= self.wing["S"],
             self.wing["c_{MAC}"]**2*0.5*self.wing["\\tau"]*self.wing["b"] >= (
                 self.battery["\\mathcal{V}"]),
@@ -72,18 +80,11 @@ class Aircraft(Model):
                 self.wing["\\tau"]*self.wing["c_{root}"])
             ]
 
-        return constraints, self.components
+        return constraints, self.components, loading
 
     def flight_model(self, state):
         " what happens during flight "
         return AircraftPerf(self, state)
-
-    def loading(self, Wcent, Wwing, V, CL):
-        " loading for all components "
-        if self.sp:
-            return AircraftLoadingSP(self, Wcent, Wwing, V, CL)
-        else:
-            return AircraftLoading(self, Wcent, Wwing, V, CL)
 
 class Motor(Model):
     "the thing that provides power"
@@ -100,29 +101,6 @@ class Motor(Model):
                        W >= m*g]
 
         return constraints
-
-class AircraftLoading(Model):
-    "aircraft loading cases"
-    def setup(self, aircraft, Wcent, Wwing, V, CL):
-
-        loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
-        loading.append(aircraft.empennage.loading())
-
-        return loading
-
-class AircraftLoadingSP(Model):
-    "aircraft loading cases"
-    def setup(self, aircraft, Wcent, Wwing, V, CL):
-
-        loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
-        loading.append(aircraft.empennage.loading())
-
-        tbstate = TailBoomState()
-        loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
-                                           aircraft.empennage.tailboom,
-                                           aircraft.wing, tbstate))
-
-        return loading
 
 class Battery(Model):
     "battery model"
@@ -181,8 +159,9 @@ class AircraftPerf(Model):
         CD = Variable("C_D", "-", "aircraft drag coefficient")
         cda = Variable("CDA", "-", "non-wing drag coefficient")
         Pshaft = Variable("P_{shaft}", "hp", "shaft power")
-        Pacc = Variable("P_{acc}", 0.0, "W", "Accessory power draw")
+        Pavn = Variable("P_{avn}", 0.0, "W", "Accessory power draw")
         Poper = Variable("P_{oper}", "W", "operating power")
+        mfac = Variable("m_{fac}", 1.2, "-", "drag margin factor")
 
         dvars = []
         for dc, dm in zip(areadragcomps, areadragmodel):
@@ -200,11 +179,11 @@ class AircraftPerf(Model):
                 Poper*state["t_{night}"]
                 + state["(E/S)_C"]*static.solarcells["\\eta"]
                 * static.solarcells["S"]),
-            Poper >= Pacc + Pshaft/static.motor["\\eta"],
+            Poper >= Pavn + Pshaft/static.motor["\\eta"],
             Poper == (state["(P/S)_{min}"]*static.solarcells["S"]
                       * static.solarcells["\\eta"]),
             cda >= sum(dvars),
-            CD >= cda + self.wing["C_d"],
+            CD/mfac >= cda + self.wing["C_d"],
             Poper <= static.motor["P_{max}"]
             ]
 
@@ -221,16 +200,15 @@ class FlightState(Model):
     percent: percentile wind speeds [%]
     day: day of the year [Jan 1st = 1]
     """
-    def setup(self, latitude=45, day=355, month="dec"):
+    def setup(self, latitude=45, day=355):
 
+        month = get_month(day)
         df = pd.read_csv(path + "windfits" + month +
-                         "/windaltfit_lat%d.csv" % latitude)
-        # df = DF[DF["latitude"] == latitude]
-        # dft = DFt[DFt["latitude"] == latitude]
-        # dfd = DFd[DFd["latitude"] == latitude]
+                         "/windaltfit_lat%d.csv" % latitude).to_dict(
+                             orient="records")[0]
         with StdoutCaptured(None):
             dft, dfd = twi_fits(latitude, day, gen=True)
-        esirr, td, tn, _ = get_Eirr(latitude, day)
+        esirr, _, tn, _ = get_Eirr(latitude, day)
 
         Vwind = Variable("V_{wind}", "m/s", "wind velocity")
         V = Variable("V", "m/s", "true airspeed")
@@ -246,7 +224,6 @@ class FlightState(Model):
                        "energy for batteries during sunrise/set")
         ESvar = Variable("(E/S)_{ref}", 1, "W*hr/m^2", "energy units variable")
         PSvar = Variable("(P/S)_{ref}", 1, "W/m^2", "power units variable")
-        tday = Variable("t_{day}", td, "hr", "Daylight span")
         tnight = Variable("t_{night}", tn, "hr", "night duration")
         pct = Variable("p_{wind}", 0.9, "-", "percentile wind speeds")
         Vwindref = Variable("V_{wind-ref}", 100.0, "m/s",
@@ -257,9 +234,9 @@ class FlightState(Model):
 
         constraints = [
             V/mfac >= Vwind,
-            FitCS(df, Vwind/Vwindref, [rho/rhoref, pct]),
-            FitCS(dfd, ESday/ESvar, [PSmin/PSvar]),
-            FitCS(dft, ESc/ESvar, [PSmin/PSvar]),
+            FCS(df, Vwind/Vwindref, [rho/rhoref, pct]),
+            FCS(dfd, ESday/ESvar, [PSmin/PSvar]),
+            FCS(dft, ESc/ESvar, [PSmin/PSvar]),
             ]
 
         return constraints
@@ -276,24 +253,37 @@ def altitude(density):
 
 class FlightSegment(Model):
     "flight segment"
-    def setup(self, aircraft, etap=0.8, latitude=35, day=355, month="dec"):
+    def setup(self, aircraft, latitude=35, day=355):
+
+        self.latitude = latitude
+        self.day = day
 
         self.aircraft = aircraft
-        self.fs = FlightState(latitude=latitude, day=day, month=month)
+        self.fs = FlightState(latitude=latitude, day=day)
         self.aircraftPerf = self.aircraft.flight_model(self.fs)
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
-                                     self.aircraftPerf, etap)
+                                     self.aircraftPerf)
 
-        self.submodels = [self.fs, self.aircraftPerf, self.slf]
+        self.loading = self.aircraft.wing.loading(
+            self.aircraft["W_{cent}"], self.aircraft["W_{wing}"],
+            self.aircraftPerf["V"], self.aircraftPerf["C_L"])
+
+        for vk in self.loading.varkeys["N_{max}"]:
+            if "ChordSparL" in vk.descr["models"]:
+                self.loading.substitutions.update({vk: 5})
+            if "GustL" in vk.descr["models"]:
+                self.loading.substitutions.update({vk: 2})
+
+        self.submodels = [self.fs, self.aircraftPerf, self.slf, self.loading]
 
         return self.submodels
 
 class SteadyLevelFlight(Model):
     "steady level flight model"
-    def setup(self, state, aircraft, perf, etap):
+    def setup(self, state, aircraft, perf):
 
         T = Variable("T", "N", "thrust")
-        etaprop = Variable("\\eta_{prop}", etap, "-", "propeller efficiency")
+        etaprop = Variable("\\eta_{prop}", 0.8, "-", "propeller efficiency")
 
         constraints = [
             aircraft["W_{total}"] <= (
@@ -307,52 +297,69 @@ class SteadyLevelFlight(Model):
 
 class Flight(Model):
     "define mission for aircraft"
-    def setup(self, aircraft, latitude, day, month):
+    def setup(self, aircraft, latitude, day):
 
-        flight = FlightSegment(aircraft, latitude=latitude, day=day,
-                               month=month)
-        loading = aircraft.loading(aircraft["W_{cent}"], aircraft["W_{wing}"],
-                                   flight["V"], flight["C_L"])
-        for vk in loading.varkeys["N_{max}"]:
-            if "ChordSparL" in vk.descr["models"]:
-                loading.substitutions.update({vk: 5})
-            if "GustL" in vk.descr["models"]:
-                loading.substitutions.update({vk: 2})
 
-        return flight, loading
-
+        self.flight = FlightSegment(aircraft, latitude=latitude, day=day)
+        return self.flight
 
 class Mission(Model):
     "define mission for aircraft"
-    def setup(self, latitude=35, day=355, month="dec", sp=False):
-
-        mos = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
-               "oct", "nov", "dec"]
+    def setup(self, latitude=35, day=355, sp=False):
 
         self.solar = Aircraft(sp=sp)
-        mission = []
-        if day == 355:
-            for l in range(20, latitude+1, 1):
-                mission.append(Flight(self.solar, l, day, month))
+        lats = range(1, latitude+1, 1)
+        self.mission = []
+        if day == 355 or day == 172:
+            for l in lats:
+                self.mission.append(FlightSegment(self.solar, l, day))
         else:
-            for l in range(20, latitude+1, 1):
-                mission.append(Flight(self.solar, l, day, month))
-                mission.append(Flight(self.solar, l, day,
-                                      mos[-mos.index(month)-2]))
+            assert day < 172
+            for l in lats:
+                self.mission.append(FlightSegment(self.solar, l, day))
+                self.mission.append(FlightSegment(self.solar, l,
+                                                  355 - 10 - day))
 
-        return self.solar, mission
+        return self.solar, self.mission
+
+    def process_result(self, result):
+        super(Mission, self).process_result(result)
+        result["latitude"] = []
+        result["day"] = []
+        sens = result["sensitivities"]["constants"]
+        for f in self.mission:
+            const = False
+            for sub in f.substitutions:
+                if sub in self.solar.varkeys:
+                    continue
+                if any(s > 1e-5 for s in np.hstack([abs(sens[sub])])):
+                    const = True
+                    break
+            if const:
+                print "%d is a constraining latitude" % f.latitude
+                result["latitude"].append(f.latitude)
+                result["day"].append(f.day)
+                continue
+            for vk in f.varkeys:
+                if vk in self.solar.varkeys:
+                    continue
+                del result["variables"][vk]
+                if vk in result["freevariables"]:
+                    del result["freevariables"][vk]
+                else:
+                    del result["constants"][vk]
+                    del result["sensitivities"]["constants"][vk]
 
 def test():
     " test model for continuous integration "
-    m = Mission(latitude=25)
+    m = Mission(latitude=20)
     m.cost = m["W_{total}"]
     m.solve()
+    m = Mission(latitude=20, sp=True)
+    m.cost = m["W_{total}"]
+    m.localsolve()
 
 if __name__ == "__main__":
-    M = Mission(latitude=25)
+    M = Mission(latitude=20)
     M.cost = M["W_{total}"]
     sol = M.solve("mosek")
-    mn = [max(M[sv].descr["modelnums"]) for sv in sol("(E/S)_{irr}") if
-          abs(sol["sensitivities"]["constants"][sv]) > 0.01][0]
-    # sol = M.localsolve("mosek")
-    H = altitude(np.hstack([sol(sv).magnitude for sv in sol("\\rho")]))

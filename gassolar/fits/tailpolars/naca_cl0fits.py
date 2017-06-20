@@ -8,7 +8,7 @@ from gpfit.fit import fit
 import os
 plt.rcParams.update({'font.size':15})
 
-GENERATE = False
+GENERATE = True
 REFAC = 1e6
 NACAFAC = 100.0
 
@@ -102,12 +102,12 @@ if __name__ == "__main__":
     np.random.seed(0)
     cn, err = fit(X, Y, 5, "MA")
     print "RMS error: %.5f" % err
-    df = cn.get_dataframe(X)
+    df = cn.get_dataframe()
     if GENERATE:
         path = os.path.dirname(TailAero.__file__)
-        df.to_csv(path + os.sep + "tail_dragfit.csv")
+        df.to_csv(path + os.sep + "tail_dragfit.csv", index=False)
     else:
-        df.to_csv("tail_dragfit.csv")
+        df.to_csv("tail_dragfit.csv", index=False)
 
     F, A = plot_fits(NACA, cn, X, Y)
     if len(sys.argv) > 1:

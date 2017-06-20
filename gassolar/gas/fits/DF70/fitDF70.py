@@ -12,7 +12,7 @@ plt.rcParams.update({'font.size':19})
 np.random.seed(0)
 PATH = (os.path.abspath(__file__).replace(os.path.basename(__file__), "")
         + os.sep)
-GENERATE = False
+GENERATE = True
 
 def plot_BSFCtoPower(power_csv, bsfc_csv):
     # Fitting BSFC vs. Power
@@ -33,7 +33,7 @@ def plot_BSFCtoPower(power_csv, bsfc_csv):
     cstrt, error = fit(x, y, K, Type)
     print "RMS error = %.4f" % error
     yfit = cstrt.evaluate(x)
-    dfc = cstrt.get_dataframe(x)
+    dfc = cstrt.get_dataframe()
 
     fig, ax = plt.subplots()
     ax.plot(u*100, w*min(df["BSFC"]), "o", mfc="None", ms=7, mew=1.5)
@@ -121,9 +121,9 @@ if __name__ == "__main__":
     df, fig, ax = plot_BSFCtoPower(csvname, csvname2)
     if GENERATE:
         path  = os.path.dirname(Engine.__file__)
-        df.to_csv(path + os.sep + "powerBSFCfit.csv")
+        df.to_csv(path + os.sep + "powerBSFCfit.csv", index=False)
     else:
-        df.to_csv("powerBSFCfit.csv")
+        df.to_csv("powerBSFCfit.csv", index=False)
     if len(sys.argv) > 1:
         path = sys.argv[1]
         fig.savefig(path + "powertobsfcfit.pdf", bbox_inches="tight")

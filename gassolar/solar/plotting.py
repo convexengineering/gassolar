@@ -2,35 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gpfit.softmax_affine import softmax_affine
 from gpfit.max_affine import max_affine
+from gassolar.environment.wind_speeds import get_windspeed
 import os
 import pandas as pd
+from scipy import interpolate
 
 path = os.path.abspath(__file__).replace(os.path.basename(__file__), "").replace(os.sep+"solar"+os.sep, os.sep+"environment"+os.sep)
 DF = pd.read_csv(path + "windaltfitdata.csv")
 
-def windalt_plot(latitude, sol1=None, sol2=None):
+def windalt_plot(latitude, sol1=None, sol2=None, p=0.90):
     plt.rcParams.update({'font.size':15})
     alt = np.linspace(40000, 80000, 20)
-    den = density(alt)
-    x = np.log([np.hstack([den]*6),
-                np.hstack([[p/100.0]*len(den)
-                           for p in range(75, 100, 5) + [99]])]).T
-
-    # df = DF[DF["latitude"] == latitude]
-    df = pd.read_csv(path + "windfitsdec/windaltfit_lat%d.csv" % latitude)
-    ftype = df["ftype"].iloc[0]
-    K = df["K"].iloc[0]
-    if ftype == "SMA":
-        params = np.append(np.hstack([[
-            np.log((df["c%d" % i]**(1/df["a1"])).iloc[0]),
-            (df["e%d1" % i]/df["a1"]).iloc[0],
-            (df["e%d2" % i]/df["a1"]).iloc[0]] for i in range(1, K)]),
-                           1/df["a1"].iloc[0])
-
-        vwind = (np.exp(softmax_affine(x, params)[0])*100).reshape(6, 20)[3]
     fig, ax = plt.subplots()
-    l = ax.plot(alt/1000.0, vwind*1.95384, linewidth=2)
     if sol1:
+        p = sol1("p_{wind}").items()[0][1]
         if sol2:
             sols = [sol1, sol2]
         else:
@@ -39,6 +24,11 @@ def windalt_plot(latitude, sol1=None, sol2=None):
             altsol = altitude(min([sol(sv).magnitude for sv in sol("\\rho")]))
             vsol = max([sol(sv).to("knots").magnitude for sv in sol("V")])
             ax.plot(altsol/1000, vsol, "o", markersize=10, mfc="c")
+
+    y = get_windspeed(latitude, np.round(p*100), alt, 355)
+    f = interpolate.interp1d(alt, y, "cubic")
+    vwind = f(alt)
+    l = ax.plot(alt/1000.0, vwind*1.95384, linewidth=2)
     ax.set_xlabel("Altitude [kft]")
     ax.set_ylabel("90th Percentile Wind Speed [knots]")
     ax.grid()
@@ -53,16 +43,6 @@ def altitude(density):
     p = density*R*T11
     h = (11000 - R*T11/g*np.log(p/p11))/0.3048
     return h
-
-def density(altitude):
-    g = 9.80665 # m/s^2
-    R = 287.04 # m^2/K/s^2
-    T11 = 216.65 # K
-    p11 = 22532 # Pa
-    p = 22632*np.exp(-g/R/T11*(altitude*0.3048-11000))
-    den = p/R/T11
-    return den
-
 
 from math import atan2,degrees
 import numpy as np

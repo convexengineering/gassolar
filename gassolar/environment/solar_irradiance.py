@@ -66,7 +66,7 @@ def twi_fits(latitude, day, gen=False):
     cn, err = fit(x, y, 1, "MA")
     rm = err
     print "RMS error: %.4f" % rm
-    dftw = cn.get_dataframe(x)
+    dftw = cn.get_fitdata()
     if not gen:
         fig1, ax1 = plt.subplots()
         fig2, ax2 = plt.subplots()
@@ -88,7 +88,7 @@ def twi_fits(latitude, day, gen=False):
     cn, err = fit(x, y, 1, "MA")
     rm = err
     print "RMS error: %.4f" % rm
-    dfday = cn.get_dataframe(x)
+    dfday = cn.get_fitdata()
     if not gen:
         yfit = cn.evaluate(x)
         ax2.plot(P[1:-15], 2*B[:-14], "o", c="g", markerfacecolor="none",

@@ -10,6 +10,27 @@ plt.rcParams.update({'font.size':15})
 #         + "windspeeds" + os.sep)
 PATH = os.path.abspath(__file__).replace(os.path.basename(__file__), "")
 
+def get_month(doy):
+    """
+    Find which month given a day of the year
+    INPUTS:
+        doy:            day of the year
+                            int
+    OUTPUTS:
+        month:          month of corresponding day
+                            string
+    """
+
+    mos = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
+           "oct", "nov", "dec"]
+    dayinmo = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    moday = [sum(dayinmo[:di+1]) for di in range(len(dayinmo))]
+    for di, mo in enumerate(moday):
+        if mo > doy:
+            month = mos[di]
+            break
+    return month
+
 def get_windspeed(latitude, perc, altitude, day, NS="NS", path=PATH):
     """
     Method to return windspeeds for different latitudes
@@ -28,14 +49,7 @@ def get_windspeed(latitude, perc, altitude, day, NS="NS", path=PATH):
     """
     path = path + "winds%s" % NS + os.sep
 
-    mos = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep",
-           "oct", "nov", "dec"]
-    dayinmo = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
-    moday = [sum(dayinmo[:i+1]) for i in range(len(dayinmo))]
-    for i, mo in enumerate(moday):
-        if mo > day:
-            month = mos[i]
-            break
+    month = get_month(day)
     path += month + os.sep
 
     # pressure ranges for which there is data
