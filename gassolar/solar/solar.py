@@ -330,6 +330,8 @@ class Mission(Model):
         for f in self.mission:
             const = False
             for sub in f.substitutions:
+                if sub not in f.varkeys:
+                    continue
                 if sub in self.solar.varkeys:
                     continue
                 if any(s > 1e-5 for s in np.hstack([abs(sens[sub])])):
