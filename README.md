@@ -1,7 +1,7 @@
 # gas_solar_trade
 Trade off analysis between solar and gas powered long endurance aircraft. [Related paper (preprint)](http://hoburg.mit.edu/publications/gassolar.pdf)
 
-[![Build Status](https://acdl.mit.edu/csi/buildStatus/icon?job=gpkit_ResearchModel_gas_solar_trade_Push)](https://acdl.mit.edu/csi/job/gpkit_ResearchModel_gas_solar_trade_Push)
+[![Build Status](https://acdl.mit.edu/csi/job/gpkit_ResearchModel_gassolar_Push/badge/icon)](https://acdl.mit.edu/csi/job/gpkit_ResearchModel_gassolar_Push/)
 
 Geometric programming is used to evaulating the trade space and quantitatively weigh the trade offs between various archictures and configurations for long endurance aircraft.  Models include the effect of solar irradiance, wind speeds, engine performance, structural component sizing, and aerodynamic effects. 
 
