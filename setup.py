@@ -45,7 +45,7 @@ setup(
     install_requires=["numpy", "scipy", "pint"],
     version="0.0.0.0",
     packages=["gassolar", "gassolar.gas", "gassolar.environment", "gassolar.solar"],
-    package_data={},
+    package_data={"gassolar.environment": ["windfits*/*.csv"]},
     license=LICENSE,
     long_description=LONG_DESCRIPTION,
 )
