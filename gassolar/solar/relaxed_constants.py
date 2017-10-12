@@ -9,7 +9,8 @@ and postcondition an SP to ensure all relax values are 1
 
 def relaxed_constants(model, include_only=None, exclude=None):
     """
-    Method to precondition an SP so it solves with a relaxed constants algorithim
+    Method to precondition an SP so it solves with a relaxed constants
+        algorithim
 
     ARGUMENTS
     ---------
