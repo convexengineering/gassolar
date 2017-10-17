@@ -41,19 +41,19 @@ class Aircraft(Model):
 
         if not sp:
             self.empennage.substitutions["V_h"] = 0.45
-            self.empennage.substitutions["AR_h"] = 5.0
+            self.empennage.htail.planform.substitutions["AR"] = 5.0
             self.empennage.substitutions["m_h"] = 0.1
 
         constraints = [
             Wzfw >= sum(summing_vars(components, "W")) + Wpay + Wavn,
             Wwing >= sum(summing_vars([self.wing], "W")),
-            self.empennage.horizontaltail["V_h"] <= (
-                self.empennage.horizontaltail["S"]
-                * self.empennage.horizontaltail["l_h"]/self.wing["S"]**2
+            self.empennage.htail["V_h"] <= (
+                self.empennage.htail["S"]
+                * self.empennage.htail["l_h"]/self.wing["S"]**2
                 * self.wing["b"]),
-            self.empennage.verticaltail["V_v"] <= (
-                self.empennage.verticaltail["S"]
-                * self.empennage.verticaltail["l_v"]/self.wing["S"]
+            self.empennage.vtail["V_v"] <= (
+                self.empennage.vtail["S"]
+                * self.empennage.vtail["l_v"]/self.wing["S"]
                 / self.wing["b"]),
             self.wing["\\tau"]*self.wing["c_{root}"] >= self.empennage.tailboom["d_0"]
             ]
@@ -73,7 +73,7 @@ class AircraftLoading(Model):
     "aircraft loading model"
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
-        loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
+        loading = [aircraft.wing.loading(aircraft.wing, Wcent, Wwing, V, CL)]
 
         return loading
 
@@ -81,10 +81,10 @@ class AircraftLoadingSP(Model):
     "aircraft loading model"
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
-        loading = [aircraft.wing.loading(Wcent, Wwing, V, CL)]
+        loading = [aircraft.wing.loading(aircraft.wing, Wcent, Wwing, V, CL)]
 
         tbstate = TailBoomState()
-        loading.append(TailBoomFlexibility(aircraft.empennage.horizontaltail,
+        loading.append(TailBoomFlexibility(aircraft.empennage.htail,
                                            aircraft.empennage.tailboom,
                                            aircraft.wing, tbstate))
 
@@ -94,18 +94,20 @@ class AircraftPerf(Model):
     "performance model for aircraft"
     def setup(self, static, state):
 
-        self.wing = static.wing.flight_model(state)
+        self.wing = static.wing.flight_model(static.wing, state)
         self.fuselage = static.fuselage.flight_model(state)
         self.engine = static.engine.flight_model(state)
-        self.htail = static.empennage.horizontaltail.flight_model(state)
-        self.vtail = static.empennage.verticaltail.flight_model(state)
+        self.htail = static.empennage.htail.flight_model(static.empennage.htail,
+                                                         state)
+        self.vtail = static.empennage.vtail.flight_model(static.empennage.vtail,
+                                                         state)
         self.tailboom = static.empennage.tailboom.flight_model(state)
 
         self.dynamicmodels = [self.wing, self.fuselage, self.engine,
                               self.htail, self.vtail, self.tailboom]
         areadragmodel = [self.fuselage, self.htail, self.vtail, self.tailboom]
-        areadragcomps = [static.fuselage, static.empennage.horizontaltail,
-                         static.empennage.verticaltail,
+        areadragcomps = [static.fuselage, static.empennage.htail,
+                         static.empennage.vtail,
                          static.empennage.tailboom]
 
         Wend = Variable("W_{end}", "lbf", "vector-end weight")

@@ -86,6 +86,9 @@ def plot_battsolarcon():
     ax.grid()
     return fig, ax
 
+def test():
+    _, _ = plot_battsolarcon()
+
 if __name__ == "__main__":
     fig, ax = plot_battsolarcon()
     if len(sys.argv) > 1:
