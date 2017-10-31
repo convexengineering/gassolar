@@ -20,7 +20,7 @@ class Aircraft(Model):
 
         self.sp = sp
 
-        self.fuselage = Fuselage(Wfueltot)
+        self.fuselage = Fuselage()
         if sp:
             self.wing = WingSP()
         else:

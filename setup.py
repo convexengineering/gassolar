@@ -42,10 +42,10 @@ setup(
     author="MIT Department of Aeronautics and Astronautics",
     author_email="gpkit@mit.edu",
     url="https://www.github.com/hoburg/gpkit-models",
-    install_requires=["numpy", "scipy", "pint"],
+    install_requires=["numpy", "scipy", "gpkit", "pandas", "gpfit"],
     version="0.0.0.0",
     packages=["gassolar", "gassolar.gas", "gassolar.environment", "gassolar.solar"],
-    package_data={"gassolar.environment": ["windfits*/*.csv"]},
+    package_data={"gassolar.environment": ["winds*/*/*.csv", "windfits*/*.csv"]},
     license=LICENSE,
     long_description=LONG_DESCRIPTION,
 )
