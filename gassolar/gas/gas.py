@@ -16,7 +16,7 @@ from loiter import Loiter
 
 class Aircraft(Model):
     "the JHO vehicle"
-    def setup(self, Wfueltot, sp=False):
+    def setup(self, sp=False):
 
         self.sp = sp
 
@@ -173,7 +173,7 @@ class Mission(Model):
         Wfueltot = Variable("W_{fuel-tot}", "lbf", "total aircraft fuel weight")
         LS = Variable("(W/S)", "lbf/ft**2", "wing loading")
 
-        JHO = Aircraft(Wfueltot, sp=sp)
+        JHO = Aircraft(sp=sp)
 
         climb1 = Climb(JHO, 10, latitude=latitude, percent=percent,
                        altitude=np.linspace(0, 15000, 11)[1:])
@@ -190,7 +190,8 @@ class Mission(Model):
             Wfueltot >= sum(fs["W_{fuel-fs}"] for fs in mission),
             mission[-1]["W_{end}"][-1] >= JHO["W_{zfw}"],
             Wcent >= Wfueltot + JHO["W_{pay}"] + JHO["W_{avn}"] + sum(summing_vars(JHO.smeared_loads, "W")),
-            LS == mtow/JHO.wing["S"]
+            LS == mtow/JHO.wing["S"],
+            JHO.fuselage["\\mathcal{V}"] >= Wfueltot/JHO.fuselage["\\rho_{fuel}"]
             ]
 
         for i, fs in enumerate(mission[1:]):
