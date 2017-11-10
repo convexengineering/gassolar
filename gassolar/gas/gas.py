@@ -39,10 +39,16 @@ class Aircraft(Model):
 
         self.empennage.substitutions["V_v"] = 0.04
 
+        loading = []
         if not sp:
             self.empennage.substitutions["V_h"] = 0.45
             self.empennage.htail.planform.substitutions["AR"] = 5.0
             self.empennage.substitutions["m_h"] = 0.1
+        else:
+            tbstate = TailBoomState()
+            loading.append(TailBoomFlexibility(self.empennage.htail,
+                                               self.empennage.tailboom,
+                                               self.wing, tbstate))
 
         constraints = [
             Wzfw >= sum(summing_vars(components, "W")) + Wpay + Wavn,
@@ -58,35 +64,18 @@ class Aircraft(Model):
             self.wing["\\tau"]*self.wing["c_{root}"] >= self.empennage.tailboom["d_0"]
             ]
 
-        return components, constraints
+        return components, constraints, loading
 
     def flight_model(self, state):
         return AircraftPerf(self, state)
-
-    def loading(self, Wcent, Wwing, V, CL):
-        if self.sp:
-            return AircraftLoadingSP(self, Wcent, Wwing, V, CL)
-        else:
-            return AircraftLoading(self, Wcent, Wwing, V, CL)
-
-class AircraftLoading(Model):
-    "aircraft loading model"
-    def setup(self, aircraft, Wcent, Wwing, V, CL):
-
-        loading = [aircraft.wing.loading(aircraft.wing, Wcent, Wwing, V, CL)]
-
-        return loading
 
 class AircraftLoadingSP(Model):
     "aircraft loading model"
     def setup(self, aircraft, Wcent, Wwing, V, CL):
 
-        loading = [aircraft.wing.loading(aircraft.wing, Wcent, Wwing, V, CL)]
+        # loading = [aircraft.wing.loading(aircraft.wing, Wcent, Wwing, V, CL)]
+        loading = []
 
-        tbstate = TailBoomState()
-        loading.append(TailBoomFlexibility(aircraft.empennage.htail,
-                                           aircraft.empennage.tailboom,
-                                           aircraft.wing, tbstate))
 
         return loading
 
@@ -183,7 +172,8 @@ class Mission(Model):
         # mission = [climb1, cruise1, loiter1, cruise2]
         mission = [climb1, loiter1]
 
-        loading = JHO.loading(Wcent, JHO["W_{wing}"], loiter1["V"][0], loiter1["C_L"][0])
+        loading = [JHO.wing.spar.loading(JHO.wing),
+                   JHO.wing.spar.gustloading(JHO.wing)]
 
         constraints = [
             mtow >= climb1["W_{start}"][0],
@@ -191,7 +181,12 @@ class Mission(Model):
             mission[-1]["W_{end}"][-1] >= JHO["W_{zfw}"],
             Wcent >= Wfueltot + JHO["W_{pay}"] + JHO["W_{avn}"] + sum(summing_vars(JHO.smeared_loads, "W")),
             LS == mtow/JHO.wing["S"],
-            JHO.fuselage["\\mathcal{V}"] >= Wfueltot/JHO.fuselage["\\rho_{fuel}"]
+            JHO.fuselage["\\mathcal{V}"] >= Wfueltot/JHO.fuselage["\\rho_{fuel}"],
+            Wcent == loading[0]["W"],
+            Wcent == loading[1]["W"],
+            loiter1["V"][0] == loading[1]["V"],
+            JHO["W_{wing}"] == loading[1]["W_w"],
+            loiter1["C_L"][0] == loading[1]["c_l"]
             ]
 
         for i, fs in enumerate(mission[1:]):
@@ -199,20 +194,21 @@ class Mission(Model):
                 mission[i]["W_{end}"][-1] == fs["W_{start}"][0]
                 ])
 
-        for vk in loading.varkeys["N_{max}"]:
-            if "ChordSparL" in vk.descr["models"]:
-                loading.substitutions.update({vk: 5})
-            if "GustL" in vk.descr["models"]:
-                loading.substitutions.update({vk: 2})
+        loading[0].substitutions["N_{max}"] = 5
+        loading[1].substitutions["N_{max}"] = 2
 
         return JHO, mission, loading, constraints
 
 def test():
-    M = Mission()
-    M.substitutions.update({"t_Mission/Loiter": 6})
-    M.cost = M["MTOW"]
-    sol = M.solve("mosek")
-    M.solve()
+    " test for integrated testing "
+    model = Mission()
+    model.substitutions.update({"t_Mission/Loiter": 6})
+    model.cost = model["MTOW"]
+    model.solve("mosek")
+    model = Mission(sp=True)
+    model.substitutions.update({"t_Mission/Loiter": 6})
+    model.cost = model["MTOW"]
+    model.localsolve("mosek")
 
 if __name__ == "__main__":
     M = Mission()

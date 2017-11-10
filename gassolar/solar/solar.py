@@ -268,19 +268,23 @@ class FlightSegment(Model):
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                      self.aircraftPerf)
 
-        self.loading = self.aircraft.wing.loading(self.aircraft.wing,
-            self.aircraft["W_{cent}"], self.aircraft["W_{wing}"],
-            self.aircraftPerf["V"], self.aircraftPerf["C_L"])
+        self.loading = [
+            self.aircraft.wing.spar.loading(self.aircraft.wing),
+            self.aircraft.wing.spar.gustloading(self.aircraft.wing)]
 
-        for vk in self.loading.varkeys["N_{max}"]:
-            if "ChordSparL" in vk.descr["models"]:
-                self.loading.substitutions.update({vk: 5})
-            if "GustL" in vk.descr["models"]:
-                self.loading.substitutions.update({vk: 2})
+        self.loading[0].substitutions["N_{max}"] = 5
+        self.loading[1].substitutions["N_{max}"] = 2
+
+        constraints = [self.loading[0]["W"] == self.aircraft["W_{cent}"],
+                       self.loading[1]["W"] == self.aircraft["W_{cent}"],
+                       self.loading[1]["W_w"] == self.aircraft["W_{wing}"],
+                       self.loading[1]["V"] == self.fs["V"],
+                       self.loading[1]["c_l"] == self.aircraftPerf["C_L"],
+                      ]
 
         self.submodels = [self.fs, self.aircraftPerf, self.slf, self.loading]
 
-        return self.submodels
+        return constraints, self.submodels
 
 class SteadyLevelFlight(Model):
     "steady level flight model"
@@ -298,14 +302,6 @@ class SteadyLevelFlight(Model):
             perf["P_{shaft}"] >= T*state["V"]/etaprop]
 
         return constraints
-
-class Flight(Model):
-    "define mission for aircraft"
-    def setup(self, aircraft, latitude, day):
-
-
-        self.flight = FlightSegment(aircraft, latitude=latitude, day=day)
-        return self.flight
 
 class Mission(Model):
     "define mission for aircraft"
