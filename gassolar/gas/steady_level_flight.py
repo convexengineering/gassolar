@@ -9,7 +9,7 @@ class SteadyLevelFlight(Model):
 
         constraints = [
             (perf["W_{end}"]*perf["W_{start}"])**0.5 <= (
-                0.5*state["\\rho"]*state["V"]**2*perf["C_L"]
+                0.5*state["\\rho"]*state["V"]**2*perf.wing.CL
                 * aircraft.wing["S"]),
             T >= (0.5*state["\\rho"]*state["V"]**2*perf["C_D"]
                   *aircraft.wing["S"]),
