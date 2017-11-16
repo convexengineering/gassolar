@@ -32,7 +32,7 @@ class Wing(Model):
         S = Variable("S", "ft**2", "planform area")
         b = Variable("b", "ft", "wing span")
         cmac = Variable("c_{MAC}", "ft", "mean aerodynamic chord")
-        AR = Variable("AR", 27, "-", "aspect ratio")
+        AR = self.AR = Variable("AR", 27, "-", "aspect ratio")
 
         constraints = [b**2 == S*AR,
                        cmac == S/b]
