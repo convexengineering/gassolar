@@ -214,9 +214,9 @@ class FlightState(Model):
         esirr, _, tn, _ = get_Eirr(latitude, day)
 
         Vwind = Variable("V_{wind}", "m/s", "wind velocity")
-        V = Variable("V", "m/s", "true airspeed")
-        rho = Variable("\\rho", "kg/m**3", "air density")
-        mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity")
+        V = self.V = Variable("V", "m/s", "true airspeed")
+        rho = self.rho = Variable("\\rho", "kg/m**3", "air density")
+        mu = self.mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity")
         ESirr = Variable("(E/S)_{irr}", esirr, "W*hr/m^2",
                          "solar energy")
         PSmin = Variable("(P/S)_{min}", "W/m^2",
