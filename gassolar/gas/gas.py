@@ -45,10 +45,9 @@ class Aircraft(Model):
             self.emp.substitutions[self.emp.htail.planform.AR] = 5.0
             self.emp.substitutions[self.emp.htail.mh] = 0.1
         else:
-            tbstate = TailBoomState()
             loading.append(TailBoomFlexibility(self.emp.htail,
-                                               self.emp.tailboom,
-                                               self.wing, tbstate))
+                                               self.emp.hbend,
+                                               self.wing))
 
         constraints = [
             Wzfw >= sum(summing_vars(components, "W")) + Wpay + Wavn,

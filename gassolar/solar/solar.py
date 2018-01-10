@@ -43,10 +43,9 @@ class Aircraft(Model):
                            self.emp, self.motor]
         loading = []
         if sp:
-            tbstate = TailBoomState()
             loading = TailBoomFlexibility(self.emp.htail,
-                                          self.emp.tailboom,
-                                          self.wing, tbstate)
+                                          self.emp.hbend,
+                                          self.wing)
 
         Wpay = Variable("W_{pay}", 0, "lbf", "payload weight")
         Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight")
