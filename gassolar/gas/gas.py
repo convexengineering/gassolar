@@ -38,16 +38,14 @@ class Aircraft(Model):
         etaprop = Variable("\\eta_{prop}", 0.8, "-", "propulsive efficiency")
 
         self.emp.substitutions[self.emp.vtail.Vv] = 0.04
+        self.emp.substitutions[self.emp.vtail.planform.tau] = 0.08
+        self.emp.substitutions[self.emp.htail.planform.tau] = 0.08
+        self.wing.substitutions[self.wing.planform.tau] = 0.115
 
-        loading = []
         if not sp:
             self.emp.substitutions[self.emp.htail.Vh] = 0.45
             self.emp.substitutions[self.emp.htail.planform.AR] = 5.0
             self.emp.substitutions[self.emp.htail.mh] = 0.1
-        else:
-            loading.append(TailBoomFlexibility(self.emp.htail,
-                                               self.emp.hbend,
-                                               self.wing))
 
         constraints = [
             Wzfw >= sum(summing_vars(components, "W")) + Wpay + Wavn,
@@ -63,27 +61,17 @@ class Aircraft(Model):
             self.wing.planform.tau*self.wing.planform.croot >= self.emp.tailboom.d0
             ]
 
-        return components, constraints, loading
+        return components, constraints
 
     def flight_model(self, state):
         return AircraftPerf(self, state)
-
-class AircraftLoadingSP(Model):
-    "aircraft loading model"
-    def setup(self, aircraft, Wcent, Wwing, V, CL):
-
-        # loading = [aircraft.wing.loading(aircraft.wing, Wcent, Wwing, V, CL)]
-        loading = []
-
-
-        return loading
 
 class AircraftPerf(Model):
     "performance model for aircraft"
     def setup(self, static, state):
 
         self.wing = static.wing.flight_model(static.wing, state)
-        self.fuselage = static.fuselage.flight_model(state)
+        self.fuselage = static.fuselage.flight_model(static.fuselage, state)
         self.engine = static.engine.flight_model(state)
         self.htail = static.emp.htail.flight_model(static.emp.htail, state)
         self.vtail = static.emp.vtail.flight_model(static.emp.vtail, state)
@@ -172,8 +160,17 @@ class Mission(Model):
         # mission = [climb1, cruise1, loiter1, cruise2]
         mission = [climb1, loiter1]
 
-        loading = [JHO.wing.spar.loading(JHO.wing),
-                   JHO.wing.spar.gustloading(JHO.wing)]
+        hbend = JHO.emp.tailboom.tailLoad(JHO.emp.tailboom, JHO.emp.htail,
+                                          loiter1.fs.fs)
+        vbend = JHO.emp.tailboom.tailLoad(JHO.emp.tailboom, JHO.emp.vtail,
+                                          loiter1.fs.fs)
+        loading = [JHO.wing.spar.loading(JHO.wing, loiter1.fs.fs),
+                   JHO.wing.spar.gustloading(JHO.wing, loiter1.fs.fs),
+                   hbend, vbend]
+
+        if sp:
+            loading.append(TailBoomFlexibility(JHO.emp.htail,
+                                               hbend, JHO.wing))
 
         constraints = [
             mtow >= climb1["W_{start}"][0],
@@ -181,7 +178,7 @@ class Mission(Model):
             mission[-1]["W_{end}"][-1] >= JHO["W_{zfw}"],
             Wcent >= Wfueltot + JHO["W_{pay}"] + JHO["W_{avn}"] + sum(summing_vars(JHO.smeared_loads, "W")),
             LS == mtow/JHO.wing["S"],
-            JHO.fuselage["\\mathcal{V}"] >= Wfueltot/JHO.fuselage["\\rho_{fuel}"],
+            JHO.fuselage.Vol >= Wfueltot/JHO.fuselage.rhofuel,
             Wcent == loading[0]["W"],
             Wcent == loading[1]["W"],
             loiter1["V"][0] == loading[1].v,

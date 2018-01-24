@@ -41,12 +41,6 @@ class Aircraft(Model):
 
         self.components = [self.solarcells, self.wing, self.battery,
                            self.emp, self.motor]
-        loading = []
-        if sp:
-            loading = TailBoomFlexibility(self.emp.htail,
-                                          self.emp.hbend,
-                                          self.wing)
-
         Wpay = Variable("W_{pay}", 0, "lbf", "payload weight")
         Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight")
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
@@ -54,6 +48,9 @@ class Aircraft(Model):
         Wcent = Variable("W_{cent}", "lbf", "center weight")
 
         self.emp.substitutions[self.emp.vtail.Vv] = 0.04
+        self.emp.substitutions[self.emp.vtail.planform.tau] = 0.08
+        self.emp.substitutions[self.emp.htail.planform.tau] = 0.08
+        self.wing.substitutions[self.wing.planform.tau] = 0.115
 
         if not sp:
             self.emp.substitutions[self.emp.htail.Vh] = 0.45
@@ -81,7 +78,7 @@ class Aircraft(Model):
                 self.wing.planform.tau*self.wing.planform.croot)
             ]
 
-        return constraints, self.components, loading
+        return constraints, self.components
 
     def flight_model(self, state):
         " what happens during flight "
@@ -233,12 +230,17 @@ class FlightState(Model):
         rhoref = Variable("\\rho_{ref}", 1.0, "kg/m**3",
                           "reference air density")
         mfac = Variable("m_{fac}", 1.0, "-", "wind speed margin factor")
+        qne = self.qne = Variable("qne", "kg/s^2/m",
+                                  "never exceed dynamic pressure")
+        Vne = Variable("Vne", 40, "m/s", "never exceed velocity")
+        rhosl = Variable("rhosl", 1.225, "kg/m^3", "air density at sea level")
 
         constraints = [
             V/mfac >= Vwind,
             FCS(df, Vwind/Vwindref, [rho/rhoref, pct]),
             FCS(dfd, ESday/ESvar, [PSmin/PSvar]),
             FCS(dft, ESc/ESvar, [PSmin/PSvar]),
+            qne == 0.5*Vne**2*rhosl
             ]
 
         return constraints
@@ -266,9 +268,18 @@ class FlightSegment(Model):
         self.slf = SteadyLevelFlight(self.fs, self.aircraft,
                                      self.aircraftPerf)
 
+        hbend = self.aircraft.emp.tailboom.tailLoad(
+            self.aircraft.emp.tailboom, self.aircraft.emp.htail, self.fs)
+        vbend = self.aircraft.emp.tailboom.tailLoad(
+            self.aircraft.emp.tailboom, self.aircraft.emp.vtail, self.fs)
         self.loading = [
-            self.aircraft.wing.spar.loading(self.aircraft.wing),
-            self.aircraft.wing.spar.gustloading(self.aircraft.wing)]
+            self.aircraft.wing.spar.loading(self.aircraft.wing, self.fs),
+            self.aircraft.wing.spar.gustloading(self.aircraft.wing, self.fs),
+            hbend, vbend]
+
+        if self.aircraft.sp:
+            self.loading.append(TailBoomFlexibility(
+                self.aircraft.emp.htail, hbend, self.aircraft.wing))
 
         self.loading[0].substitutions[self.loading[0].Nmax] = 5
         self.loading[1].substitutions[self.loading[1].Nmax] = 2
@@ -320,35 +331,35 @@ class Mission(Model):
 
         return self.solar, self.mission
 
-    def process_result(self, result):
-        super(Mission, self).process_result(result)
-        result["latitude"] = []
-        result["day"] = []
-        sens = result["sensitivities"]["constants"]
-        for f in self.mission:
-            const = False
-            for sub in f.substitutions:
-                if sub not in f.varkeys:
-                    continue
-                if sub in self.solar.varkeys:
-                    continue
-                if any(s > 1e-5 for s in np.hstack([abs(sens[sub])])):
-                    const = True
-                    break
-            if const:
-                print "%d is a constraining latitude" % f.latitude
-                result["latitude"].append(f.latitude)
-                result["day"].append(f.day)
-                continue
-            for vk in f.varkeys:
-                if vk in self.solar.varkeys:
-                    continue
-                del result["variables"][vk]
-                if vk in result["freevariables"]:
-                    del result["freevariables"][vk]
-                else:
-                    del result["constants"][vk]
-                    del result["sensitivities"]["constants"][vk]
+    # def process_result(self, result):
+    #     super(Mission, self).process_result(result)
+    #     result["latitude"] = []
+    #     result["day"] = []
+    #     sens = result["sensitivities"]["constants"]
+    #     for f in self.mission:
+    #         const = False
+    #         for sub in f.substitutions:
+    #             if sub not in f.varkeys:
+    #                 continue
+    #             if sub in self.solar.varkeys:
+    #                 continue
+    #             if any(s > 1e-5 for s in np.hstack([abs(sens[sub])])):
+    #                 const = True
+    #                 break
+    #         if const:
+    #             print "%d is a constraining latitude" % f.latitude
+    #             result["latitude"].append(f.latitude)
+    #             result["day"].append(f.day)
+    #             continue
+    #         for vk in f.varkeys:
+    #             if vk in self.solar.varkeys:
+    #                 continue
+    #             del result["variables"][vk]
+    #             if vk in result["freevariables"]:
+    #                 del result["freevariables"][vk]
+    #             else:
+    #                 del result["constants"][vk]
+    #                 del result["sensitivities"]["constants"][vk]
 
 def test():
     " test model for continuous integration "
