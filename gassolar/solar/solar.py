@@ -42,7 +42,7 @@ class Aircraft(Model):
         self.components = [self.solarcells, self.wing, self.battery,
                            self.emp, self.motor]
         Wpay = Variable("W_{pay}", 0, "lbf", "payload weight")
-        Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight")
+        Wavn = Variable("W_{avn}", 8, "lbf", "avionics weight", pr=3)
         Wtotal = Variable("W_{total}", "lbf", "aircraft weight")
         Wwing = Variable("W_{wing}", "lbf", "wing weight")
         Wcent = Variable("W_{cent}", "lbf", "center weight")
@@ -90,10 +90,10 @@ class Motor(Model):
 
         W = Variable("W", "lbf", "motor weight")
         Pmax = Variable("P_{max}", "W", "max power")
-        Bpm = Variable("B_{PM}", 4140.8, "W/kg", "power mass ratio")
-        m = Variable("m", "kg", "motor mass")
+        Bpm = Variable("B_{PM}", 4140.8, "W/kg", "power mass ratio", pr=4)
+        m = Variable("m", "kg", "motor mass", fix=True)
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        eta = Variable("\\eta", 0.95, "-", "motor efficiency")
+        eta = Variable("\\eta", 0.95, "-", "motor efficiency", pr=4)
 
         constraints = [Pmax == Bpm*m,
                        W >= m*g]
@@ -106,14 +106,14 @@ class Battery(Model):
 
         W = Variable("W", "lbf", "battery weight")
         eta_charge = Variable("\\eta_{charge}", 0.98, "-",
-                              "charging efficiency")
+                              "charging efficiency", pr=1)
         eta_discharge = Variable("\\eta_{discharge}", 0.98, "-",
-                                 "discharging efficiency")
-        E = Variable("E", "J", "total battery energy")
+                                 "discharging efficiency", pr=1)
+        E = Variable("E", "J", "total battery energy", fix=True)
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery specific energy")
+        hbatt = Variable("h_{batt}", 350, "W*hr/kg", "battery specific energy", pr=6)
         vbatt = Variable("(E/\\mathcal{V})", 800, "W*hr/l",
-                         "volume battery energy density")
+                         "volume battery energy density", pr=4)
         Volbatt = Variable("\\mathcal{V}", "m**3", "battery volume")
 
         constraints = [W >= E/hbatt*g,
@@ -128,11 +128,11 @@ class SolarCells(Model):
     def setup(self):
 
         rhosolar = Variable("\\rho_{solar}", 0.27, "kg/m^2",
-                            "solar cell area density")
+                            "solar cell area density", pr=5)
         g = Variable("g", 9.81, "m/s**2", "gravitational constant")
-        S = Variable("S", "ft**2", "solar cell area")
+        S = Variable("S", "ft**2", "solar cell area", fix=True)
         W = Variable("W", "lbf", "solar cell weight")
-        etasolar = Variable("\\eta", 0.22, "-", "solar cell efficiency")
+        etasolar = Variable("\\eta", 0.22, "-", "solar cell efficiency", pr=5)
 
         constraints = [W >= rhosolar*S*g]
 
@@ -182,7 +182,7 @@ class AircraftPerf(Model):
             Poper == (state["(P/S)_{min}"]*static.solarcells["S"]
                       * static.solarcells["\\eta"]),
             cda >= sum(dvars),
-            CD/mfac >= cda + self.wing["Cd"],
+            CD >= cda + self.wing["Cd"],
             Poper <= static.motor["P_{max}"]
             ]
 
@@ -212,9 +212,9 @@ class FlightState(Model):
         Vwind = Variable("V_{wind}", "m/s", "wind velocity")
         V = self.V = Variable("V", "m/s", "true airspeed")
         rho = self.rho = Variable("\\rho", "kg/m**3", "air density")
-        mu = self.mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity")
+        mu = self.mu = Variable("\\mu", 1.42e-5, "N*s/m**2", "viscosity", pr=1)
         ESirr = Variable("(E/S)_{irr}", esirr, "W*hr/m^2",
-                         "solar energy")
+                         "solar energy", pr=2)
         PSmin = Variable("(P/S)_{min}", "W/m^2",
                          "minimum necessary solar power")
         ESday = Variable("(E/S)_{day}", "W*hr/m^2",
@@ -224,11 +224,11 @@ class FlightState(Model):
         ESvar = Variable("(E/S)_{ref}", 1, "W*hr/m^2", "energy units variable")
         PSvar = Variable("(P/S)_{ref}", 1, "W/m^2", "power units variable")
         tnight = Variable("t_{night}", tn, "hr", "night duration")
-        pct = Variable("p_{wind}", 0.9, "-", "percentile wind speeds")
+        pct = Variable("p_{wind}", 0.9, "-", "percentile wind speeds", pr=1)
         Vwindref = Variable("V_{wind-ref}", 100.0, "m/s",
-                            "reference wind speed")
+                            "reference wind speed", pr=1)
         rhoref = Variable("\\rho_{ref}", 1.0, "kg/m**3",
-                          "reference air density")
+                          "reference air density", pr=1)
         mfac = Variable("m_{fac}", 1.0, "-", "wind speed margin factor")
         qne = self.qne = Variable("qne", "kg/s^2/m",
                                   "never exceed dynamic pressure")
@@ -236,7 +236,7 @@ class FlightState(Model):
         rhosl = Variable("rhosl", 1.225, "kg/m^3", "air density at sea level")
 
         constraints = [
-            V/mfac >= Vwind,
+            V >= Vwind,
             FCS(df, Vwind/Vwindref, [rho/rhoref, pct]),
             FCS(dfd, ESday/ESvar, [PSmin/PSvar]),
             FCS(dft, ESc/ESvar, [PSmin/PSvar]),
@@ -300,7 +300,7 @@ class SteadyLevelFlight(Model):
     def setup(self, state, aircraft, perf):
 
         T = Variable("T", "N", "thrust")
-        etaprop = Variable("\\eta_{prop}", 0.8, "-", "propeller efficiency")
+        etaprop = Variable("\\eta_{prop}", 0.8, "-", "propeller efficiency", pr=2)
 
         constraints = [
             aircraft["W_{total}"] <= (
