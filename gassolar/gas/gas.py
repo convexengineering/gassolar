@@ -199,16 +199,16 @@ class Mission(Model):
 def test():
     " test for integrated testing "
     model = Mission()
-    model.substitutions.update({"t_Mission/Loiter": 6})
+    model.substitutions.update({"Mission.Loiter.t": 6})
     model.cost = model["MTOW"]
     model.solve("mosek")
     model = Mission(sp=True)
-    model.substitutions.update({"t_Mission/Loiter": 6})
+    model.substitutions.update({"Mission.Loiter.t": 6})
     model.cost = model["MTOW"]
     model.localsolve("mosek")
 
 if __name__ == "__main__":
     M = Mission()
-    M.substitutions.update({"t_Mission/Loiter": 6})
+    M.substitutions.update({"Mission.Loiter.t": 6})
     M.cost = M["MTOW"]
     sol = M.solve("mosek")
