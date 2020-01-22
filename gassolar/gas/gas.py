@@ -201,11 +201,11 @@ def test():
     model = Mission()
     model.substitutions.update({"Mission.Loiter.t": 6})
     model.cost = model["MTOW"]
-    model.solve("mosek")
+    model.solve()
     model = Mission(sp=True)
     model.substitutions.update({"Mission.Loiter.t": 6})
     model.cost = model["MTOW"]
-    model.localsolve("mosek")
+    model.localsolve()
 
 if __name__ == "__main__":
     M = Mission()
