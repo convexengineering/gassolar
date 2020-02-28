@@ -53,7 +53,7 @@ def get_windspeed(latitude, perc, altitude, day, NS="NS", path=PATH):
     path += month + os.sep
 
     # pressure ranges for which there is data
-    pressures = [5, 10, 30] + range(50, 1050, 50)
+    pressures = [5, 10, 30] + list(range(50, 1050, 50))
     pressures = np.array(pressures)
     filename = None
 

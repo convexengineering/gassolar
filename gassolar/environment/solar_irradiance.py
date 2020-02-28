@@ -29,7 +29,7 @@ def get_Eirr(latitude, day, N=50.0):
              0.002697*cos(3*beta) + 0.00148*sin(3*beta))
     tstart = 12/np.pi*arccos(-tan(delta)*tan(lat))
     tend = -tstart
-    t = np.linspace(tstart, tend, N)
+    t = np.linspace(tstart, tend, int(N))
     costhsun = sin(delta)*sin(lat) + cos(delta)*cos(lat)*cos(2*np.pi*t/24)
 
     r0 = 149.597e6 # avg distance from earth to sun km
@@ -65,7 +65,7 @@ def twi_fits(latitude, day, gen=False):
     y = np.log(2*C[:-14])
     cn, err = fit(x, y, 1, "MA")
     rm = err
-    print "RMS error: %.4f" % rm
+    print("RMS error: %.4f" % rm)
     dftw = cn.get_fitdata()
     if not gen:
         fig1, ax1 = plt.subplots()
@@ -87,7 +87,7 @@ def twi_fits(latitude, day, gen=False):
     y = np.log(2*B[:-14])
     cn, err = fit(x, y, 1, "MA")
     rm = err
-    print "RMS error: %.4f" % rm
+    print("RMS error: %.4f" % rm)
     dfday = cn.get_fitdata()
     if not gen:
         yfit = cn.evaluate(x)
@@ -188,4 +188,3 @@ if __name__ == "__main__":
         df.to_csv("solar_dayfit.csv")
     else:
         _, _ = twi_fits([30], 355, gen=True)
-
